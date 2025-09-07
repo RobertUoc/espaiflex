@@ -1,0 +1,12 @@
+<app-menu
+    (selectedOption)="recibirFormulari($event)"
+></app-menu>
+<hr>
+<div class="container mt-3">
+    @if(selectedOption == 'complements') { <app-complements></app-complements> }
+    @if(selectedOption == 'edificis') { <app-edificis></app-edificis> }
+    @if(selectedOption == 'sales') { <app-sales></app-sales> }
+</div>
+
+
+  

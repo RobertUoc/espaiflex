@@ -1,0 +1,110 @@
+<h1>Complements</h1>
+
+<div class="container mt-4">  
+
+  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalNuevoEdificio" (click)="obrirModal('0')">
+    Crear nou complement
+  </button>
+
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>        
+        <th>Nom</th>
+        <th>Preu</th>
+        <th>Actiu</th>
+        <th>Accions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(complement of complements | paginate: { itemsPerPage: 5, currentPage: paginaActual };  track complement.id; let id_complement = $index) {
+      <tr>        
+        <td class="w-50">{{ complement.descripcio }}</td>
+        <td class="w-10 text-end">{{ complement.preu | PipePreu }} €</td>
+        <td class="w-10 text-center">
+          <span [class.text-success]="complement.actiu == 'SI'" [class.text-danger]="complement.actiu != 'NO'">
+            {{ complement.actiu }}
+          </span>
+        </td>
+        <td class="w-10 text-center">
+          <button class="btn btn-primary btn-sm" (click)="obrirModal(complement.id)">
+            <i class="bi bi-pencil-square"></i> Modificar
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  <pagination-controls 
+    (pageChange)="paginaActual = $event"
+    previousLabel="Anterior"
+    nextLabel="Seguent"
+    screenReaderPageLabel="Pàgina"
+    screenReaderCurrentLabel="Pàgina Actual"
+  ></pagination-controls>
+</div>
+
+    <!-- Modal -->
+    <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
+      <div class="modal-dialog">
+        <div class="modal-content bg-warning">
+          <form (ngSubmit)="saveComplement()" #form="ngForm">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{ complementSeleccionado.id == '0' ? 'Crear Complement' : 'Modificar Complement' }}
+             </h5>
+              <button type="button" class="btn-close" (click)="tancarModal()"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label>Nom</label>
+                <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.descripcio" 
+                       required minlength="3" maxlength="50"
+                       #descripcioField="ngModel"
+                       name="descripcio" id="descripcio">
+
+                @if(descripcioField.invalid && descripcioField.touched) {      
+                   @if(descripcioField.errors?.['required']) {
+                      <div class="invalido">Ompli la descripció del complement.</div>
+                   }
+                   @if(descripcioField.errors?.['minlength']) {
+                      <div class="invalido">Míim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                   }
+                   @if(descripcioField.errors?.['maxlength']) {
+                    <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
+                   }                 
+                }
+
+              </div>
+              <div class="mb-3">
+                <label>Preu</label>
+                <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.preu" 
+                    pattern="^\d+(\.\d{1,2})?$" 
+                    #preuField="ngModel"
+                    name="preu" id="preu">
+
+                    @if(preuField.invalid && preuField.touched) {      
+                      @if(preuField.errors?.['pattern']) {
+                         <div class="invalido">Només està permes números i el punt decimal.</div>
+                      }
+                   }                       
+                    
+              </div>
+              <div class="col-xl-2">
+                <label>Actiu</label>
+                <select class="form-select" [(ngModel)]="complementSeleccionado.actiu" name="actiu" id="actiu">
+                      <option value="SI">SI</option>
+                      <option value="NO">NO</option>
+                </select>
+              </div>
+              
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Guardar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  

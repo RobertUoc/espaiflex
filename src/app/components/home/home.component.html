@@ -1,0 +1,41 @@
+<div class="bg-image">
+  <app-login class="position-absolute top-0 end-0 m-3"></app-login>
+
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center bg-white p-4 rounded shadow">
+      <input [(ngModel)]="poblacion" class="form-control mb-3" placeholder="Introdueix la població">
+      <button class="btn btn-primary" (click)="buscar()">Buscar edificiss</button>
+    </div>
+  </div>
+
+  <!-- Modal Bootstrap -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Espais en {{ poblacion }}</h5>
+          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+        </div>
+        <div class="modal-body">
+
+          <div class="container">
+            <div class="row">
+              @if(edificios.length > 0) {              
+                <div class="col-md-3" *ngFor="let edificio of edificios">
+                  <button class="btn btn-outline-primary w-100 p-0" (click)="irAlCalendario(edificio.id)">
+                    <img [src]="edificio.imatge" [alt]="edificio.nom" class="img-fluid rounded" />
+                  </button>
+                  <p class="text-center mt-2">{{ edificio.nom }}</p>
+                </div>
+              }
+            </div>
+          </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

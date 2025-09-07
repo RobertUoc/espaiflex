@@ -1,0 +1,164 @@
+<h1>Sales</h1>
+
+<div class="container mt-4">  
+
+  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalNuevoEdificio" (click)="obrirModal('0')">
+    Crear nova sala
+  </button>
+
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>        
+        <th>Nom</th>
+        <th>Edifici</th>
+        <th>Color</th>
+        <th>Preu</th>
+        <th>Actiu</th>
+        <th>Accions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(sala of sales | paginate: { itemsPerPage: 5, currentPage: paginaActual };  track sala.id; let id_sala = $index) {
+      <tr>        
+        <td class="w-40">{{ sala.descripcio }}</td>
+        <td class="w-40">{{ sala.nom_edifici }}</td>
+        <td class="w-10" [ngStyle]="{'background-color': sala.color}">&nbsp;</td>
+        <td class="w-10 text-end">{{ sala.preu | PipePreu }} €</td>
+        <td class="w-10 text-center">
+          <span [class.text-success]="sala.actiu == 'SI'" [class.text-danger]="sala.actiu != 'NO'">
+            {{ sala.actiu }}
+          </span>
+        </td>
+        <td class="w-10 text-center">
+          <button class="btn btn-primary btn-sm" (click)="obrirModal(sala.id)">
+            <i class="bi bi-pencil-square"></i> Modificar
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  <pagination-controls 
+    (pageChange)="paginaActual = $event"
+    previousLabel="Anterior"
+    nextLabel="Seguent"
+    screenReaderPageLabel="Pàgina"
+    screenReaderCurrentLabel="Pàgina Actual"
+  ></pagination-controls>
+</div>
+
+    <!-- Modal -->
+    <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-warning">
+          <form (ngSubmit)="saveComplement()" #form="ngForm">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{ salaSeleccionado.id == '0' ? 'Crear Sala' : 'Modificar Sala' }}
+             </h5>
+              <button type="button" class="btn-close" (click)="tancarModal()"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label>Nom</label>
+                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" 
+                       required minlength="3" maxlength="50"
+                       #descripcioField="ngModel"
+                       name="descripcio" id="descripcio">
+
+                @if(descripcioField.invalid && descripcioField.touched) {      
+                   @if(descripcioField.errors?.['required']) {
+                      <div class="invalido">Ompli la descripció de la sala.</div>
+                   }
+                   @if(descripcioField.errors?.['minlength']) {
+                      <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                   }
+                   @if(descripcioField.errors?.['maxlength']) {
+                    <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
+                   }                 
+                }
+              </div>
+
+              <div class="mb-3">
+                <label>Edificis</label>
+                <select class="form-select" [(ngModel)]="salaSeleccionado.id_edifici" 
+                        name="id_edifici" id="id_edifici" 
+                        required
+                        #edificiField="ngModel">
+                    @for(edi of edificis; track edi.id ) {
+                      <option [value]="edi.id">{{ edi.nom }}</option>
+                    }
+                    @if(edificiField.invalid && edificiField.touched) {      
+                        @if(edificiField.errors?.['required']) {
+                           <div class="invalido">Trii un edifici.</div>
+                        }
+                    }    
+                </select>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-2">
+                  <label>Color</label>
+                  <input type="color" class="form-control h-75" [(ngModel)]="salaSeleccionado.color" name="color" id="color">
+                </div>
+                <div class="col-xl-2">
+                  <label>Preu</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" 
+                      pattern="^\d+(\.\d{1,2})?$" 
+                      #preuField="ngModel"
+                      name="preu" id="preu">
+  
+                      @if(preuField.invalid && preuField.touched) {      
+                        @if(preuField.errors?.['pattern']) {
+                           <div class="invalido">Només està permes números i el punt decimal.</div>
+                        }
+                      }                                           
+                </div>                  
+              </div>
+
+              <div class="mb-3 mt-3">
+                <label>Missatge</label>
+                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" name="missatge" id="missatge">
+              </div>
+
+              <div class="col-xl-1">
+                <label>Actiu</label>
+                <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
+                      <option value="SI">SI</option>
+                      <option value="NO">NO</option>
+                </select>
+              </div>      
+                            
+              <div class="row mt-2">
+                <div class="col-xl-6">
+                  <label for="disponibles">Complements disponibles</label>
+                  <select multiple class="form-select" id="disponibles" [(ngModel)]="selectedDisponibleId" name="disponibles">
+                    <option *ngFor="let item of disponibles" [ngValue]="item.id">{{ item.descripcio }}</option>                                                            
+                  </select>
+                </div>
+          
+                <div class="col-xl-1 d-flex flex-column justify-content-center align-items-center">
+                  <button type="button" class="btn btn-primary mb-2" (click)="moverADerecha()"><i class="bi bi-arrow-right-circle"></i></button>
+                  <button type="button" class="btn btn-secondary" (click)="moverAIzquierda()"><i class="bi bi-arrow-left-circle"></i></button>
+                </div>
+          
+                <div class="col-xl-5">
+                  <label for="seleccionadas">Complements seleccionadas</label>
+                  <select multiple class="form-select" id="seleccionados" [(ngModel)]="selectedSeleccionadoId" name="seleccionados">
+                    <option *ngFor="let item of seleccionados" [ngValue]="item.id">{{ item.descripcio }}</option>
+                  </select>
+                </div>          
+              </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Guardar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+

@@ -1,0 +1,5 @@
+<form class="d-flex gap-2" (ngSubmit)="onSubmit()" #form="ngForm">
+  <input type="text" class="form-control" placeholder="Usuari"  [(ngModel)]="user" id="user" name="user">
+  <input type="password" class="form-control" placeholder="Contrasenya"  [(ngModel)]="password"  id="password" name="password">
+  <button class="btn btn-success" [disabled]="!form.valid">Login</button>
+</form>

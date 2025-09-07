@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+.bg-image {
+    background-image: url('assets/portada.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    position: relative;
+  }
+  
+.invalido {
+    font-weight: bold;
+    color: red;
+}

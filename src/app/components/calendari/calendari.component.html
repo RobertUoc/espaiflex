@@ -230,7 +230,6 @@
 
 <!-- Reserva modal -->
 <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block':  modalVisible[90] }">
-
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -289,3 +288,50 @@
     </div>
   </div>
 </div>    
+
+<!-- Mostrar dia -->
+<div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block':  modalVisible[80] }">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Dia {{ dia | PipeFecha }}</h5>
+        <button type="button" class="btn-close" (click)="tancarModal()"></button>
+      </div>
+
+      <div class="modal-body container-fluid">     
+        
+        <table>                                              
+            
+              <tr *ngFor="let mira of mira_dia">
+                <td>{{mira.id}}</td>
+                <td>
+                  <table>
+
+                 <td *ngFor="let col of mira.items">
+                    <div style="width: 50%; height: 60px;"
+                    class="p-2 rounded text-white"
+                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
+                    >
+                      {{col.hora_inici}}
+                    </div>
+                </td>
+
+
+                  </table>
+
+                </td>
+
+
+
+
+
+
+
+              </tr>                 
+      
+        </table>
+
+      </div>
+
+    </div>
+</div>

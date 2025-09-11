@@ -20,6 +20,9 @@ import { UsersService } from '../../service/users.service';
 import { SalesService } from '../../service/sales.service';
 import { ComplementsService } from '../../service/complements.service';
 import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
+import { PipeFechaPipe } from '../../pipe/pipeFecha.pipe';
+import { CalendariService } from '../../service/calendari.service';
+import { Horas } from '../../models/horas.model'
 
 @Component({
   selector: 'app-calendari',
@@ -30,6 +33,7 @@ import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
     NgClass,
     CommonModule,
     PipePreuPipe,
+    PipeFechaPipe
   ],
   templateUrl: './calendari.component.html',
   styleUrls: ['./calendari.component.css'],
@@ -49,6 +53,9 @@ export class CalendariComponent implements OnInit {
   public sales = [new Sales()];
   public salaSeleccionado = new Sales();
   public complements = [new Complements()];
+  public dia:string = '';
+  public mira_dia: any[] = [];  
+  public horas: string[] = [];
 
   id_edifici: string = '';
   calendarVisible = signal(true);
@@ -78,7 +85,8 @@ export class CalendariComponent implements OnInit {
     private changeDetector: ChangeDetectorRef,
     private userService: UsersService,
     private salesService: SalesService,
-    private complementService: ComplementsService
+    private complementService: ComplementsService,
+    private calendariService: CalendariService
   ) {}
 
   ngOnInit() {
@@ -223,11 +231,57 @@ export class CalendariComponent implements OnInit {
   }
 
   handleDateSelect(selectInfo: DateSelectArg) {
-    const title = prompt('Please enter a new title for your event');
-    const calendarApi = selectInfo.view.calendar;
+    this.dia = selectInfo.startStr;    
+    let horaStr = [];
+    let horaInicio = 0;
+    let horaFin = 0;
+    let horaFinal = '';
+    let horaSet = [];
+   
 
+    this.calendariService.getMira(this.dia,this.id_edifici).subscribe({
+      next: (data) => {                       
+            const agrupado: { [key: string]: { hora_inici: string; estado: string }[] } = {};
+            
+            data.forEach(item => {
+                if (!agrupado[item.descripcio]) agrupado[item.descripcio] = [];
+
+                // Crear Capcelera
+                horaStr = item.hora_inici.split(':');                
+                horaInicio = Number(horaStr[0]);
+                horaFin = horaInicio + 1;
+                horaFinal = horaInicio.toString().padStart(2, '0') + ' a ' + horaFin.toString().padStart(2, '0');
+                if (!this.horas.includes(horaFinal)) { this.horas.push(horaFinal); }
+
+                agrupado[item.descripcio].push({hora_inici: horaFinal, estado: item.estado});           
+                                                            
+                
+            });
+            this.horas = this.horas.sort();                               
+            this.mira_dia = Object.entries(agrupado).map(([id, items]) => ({
+              id,
+              items
+            }));
+
+            console.log(this.mira_dia);
+
+      },
+      error: (error) => {
+        console.log(error);
+      },
+      complete: () => {       
+        console.log('Ok');
+      },
+    });   
+  
+    const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
 
+   
+    this.finestra = 80;
+    this.modalVisible[this.finestra] = true;
+
+    /**
     if (title) {
       calendarApi.addEvent({
         id: this.createEventId(),
@@ -237,9 +291,9 @@ export class CalendariComponent implements OnInit {
         allDay: selectInfo.allDay,
       });
     }
-  }
+  */
 
-  handleEventClick(clickInfo: EventClickArg) {
+  }  handleEventClick(clickInfo: EventClickArg) {
     if (
       confirm(
         `Are you sure you want to delete the event '${clickInfo.event.title}'`

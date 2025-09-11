@@ -32,40 +32,50 @@
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
             <div class="modal-body">
-              <div class="mb-3">
-                <label>Nom</label>
-                <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" name="nom" id="nom">
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Nom</label>
+                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" name="nom" id="nom">
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Provincia</label>
-                <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia" id="id_provincia">
-                    @for(pro of provincies; track pro.id ) {
-                      <option [value]="pro.id">{{ pro.nom }}</option>
-                    }
-                </select>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Provincia</label>
+                  <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia" id="id_provincia">
+                      @for(pro of provincies; track pro.id ) {
+                        <option [value]="pro.id">{{ pro.nom }}</option>
+                      }
+                  </select>
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Foto URL</label>
-                <input type="file" (change)="onFileSeleccionada($event)" class="form-control mb-2">
-                <div *ngIf="previewUrl" class="mb-3">                    
-                    <img [src]="previewUrl" class="img-thumbnail" width="200">
-                </div>                                                                              
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Fotografia URL</label>
+                  <input type="file" (change)="onFileSeleccionada($event)" class="form-control mb-2">
+                  <div *ngIf="previewUrl" class="mb-3">                    
+                      <img [src]="previewUrl" class="img-thumbnail" width="200">
+                  </div>                                                                              
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Descripció</label>
-                <textarea class="form-control" [(ngModel)]="edificioSeleccionado.descripcio" name="descripcio" id="descripcio"></textarea>
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Descripció</label>
+                  <textarea class="form-control" [(ngModel)]="edificioSeleccionado.descripcio" name="descripcio" id="descripcio"></textarea>
+                </div>
               </div>
-              <div class="col-xl-2">
-                <label>Actiu</label>
-                <select class="form-select" [(ngModel)]="edificioSeleccionado.actiu" name="actiu" id="actiu">
-                      <option value="SI">SI</option>
-                      <option value="NO">NO</option>
-                </select>
+              <div class="row">
+                <div class="col-md-3">
+                  <label>Actiu</label>
+                  <select class="form-select" [(ngModel)]="edificioSeleccionado.actiu" name="actiu" id="actiu">
+                        <option value="SI">SI</option>
+                        <option value="NO">NO</option>
+                  </select>
+                </div>
               </div>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success">Guardar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
+              <button type="submit" class="btn btn-success">Desar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>
         </div>

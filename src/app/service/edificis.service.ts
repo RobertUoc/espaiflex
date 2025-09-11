@@ -22,11 +22,12 @@ export class EdificisService {
     }
 
     getEdifici(id:string): Observable<Edificis> {
+      console.log(this.apiUrl + 'edificis.php?id=' + id);
       return this.http.get<Edificis>( this.apiUrl + 'edificis.php?id=' + id);      
     }
 
-    getProvincies(id:string): Observable<[]> {
-      return this.http.get<[]>( this.apiUrl + 'edificis.php?provincia=' + id);      
+    getProvincies(id:string): Observable<[]> {      
+      return this.http.get<[]>( this.apiUrl + 'edificis.php?provincia=' + id);            
     }
 
     putEdifici(_id:string,_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string) {      

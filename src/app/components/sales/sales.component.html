@@ -59,43 +59,50 @@
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
             <div class="modal-body">
-              <div class="mb-3">
-                <label>Nom</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" 
-                       required minlength="3" maxlength="50"
-                       #descripcioField="ngModel"
-                       name="descripcio" id="descripcio">
-
-                @if(descripcioField.invalid && descripcioField.touched) {      
-                   @if(descripcioField.errors?.['required']) {
-                      <div class="invalido">Ompli la descripció de la sala.</div>
-                   }
-                   @if(descripcioField.errors?.['minlength']) {
-                      <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
-                   }
-                   @if(descripcioField.errors?.['maxlength']) {
-                    <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
-                   }                 
-                }
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Nom</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" 
+                         required minlength="3" maxlength="50"
+                         #descripcioField="ngModel"
+                         name="descripcio" id="descripcio">
+                         @if(descripcioField.invalid && descripcioField.touched) {      
+                           @if(descripcioField.errors?.['required']) {
+                             <div class="invalido">Ompli la descripció de la sala.</div>
+                           }
+                           @if(descripcioField.errors?.['minlength']) {
+                             <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                           }
+                           @if(descripcioField.errors?.['maxlength']) {
+                             <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
+                           }                 
+                         }
+                </div>
               </div>
-
-              <div class="mb-3">
-                <label>Edificis</label>
-                <select class="form-select" [(ngModel)]="salaSeleccionado.id_edifici" 
-                        name="id_edifici" id="id_edifici" 
-                        required
-                        #edificiField="ngModel">
-                    @for(edi of edificis; track edi.id ) {
-                      <option [value]="edi.id">{{ edi.nom }}</option>
-                    }
-                    @if(edificiField.invalid && edificiField.touched) {      
-                        @if(edificiField.errors?.['required']) {
-                           <div class="invalido">Trii un edifici.</div>
-                        }
-                    }    
-                </select>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Edificis</label>
+                  <select class="form-select" [(ngModel)]="salaSeleccionado.id_edifici" 
+                          name="id_edifici" id="id_edifici" 
+                          required
+                          #edificiField="ngModel">
+                          @for(edi of edificis; track edi.id ) {
+                            <option [value]="edi.id">{{ edi.nom }}</option>
+                          }
+                          @if(edificiField.invalid && edificiField.touched) {      
+                            @if(edificiField.errors?.['required']) {
+                               <div class="invalido">Trii un edifici.</div>
+                            }
+                          }    
+                  </select>
+                </div>
               </div>
-
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Missatge</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" name="missatge" id="missatge">
+                </div>
+              </div>
               <div class="row">
                 <div class="col-xl-2">
                   <label>Color</label>
@@ -113,22 +120,17 @@
                            <div class="invalido">Només està permes números i el punt decimal.</div>
                         }
                       }                                           
-                </div>                  
+                </div>     
+                <div class="col-xl-2">
+                  <label>Actiu</label>
+                  <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
+                        <option value="SI">SI</option>
+                        <option value="NO">NO</option>
+                  </select>
+                </div>                                   
               </div>
-
-              <div class="mb-3 mt-3">
-                <label>Missatge</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" name="missatge" id="missatge">
-              </div>
-
-              <div class="col-xl-1">
-                <label>Actiu</label>
-                <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
-                      <option value="SI">SI</option>
-                      <option value="NO">NO</option>
-                </select>
-              </div>      
-                            
+              <hr>
+                         
               <div class="row mt-2">
                 <div class="col-xl-6">
                   <label for="disponibles">Complements disponibles</label>
@@ -154,8 +156,8 @@
 
 
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Guardar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>
         </div>

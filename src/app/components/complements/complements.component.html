@@ -37,7 +37,7 @@
   <pagination-controls 
     (pageChange)="paginaActual = $event"
     previousLabel="Anterior"
-    nextLabel="Seguent"
+    nextLabel="Següent"
     screenReaderPageLabel="Pàgina"
     screenReaderCurrentLabel="Pàgina Actual"
   ></pagination-controls>
@@ -55,52 +55,54 @@
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
             <div class="modal-body">
-              <div class="mb-3">
-                <label>Nom</label>
-                <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.descripcio" 
-                       required minlength="3" maxlength="50"
-                       #descripcioField="ngModel"
-                       name="descripcio" id="descripcio">
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Nom</label>
+                  <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.descripcio" 
+                         required minlength="3" maxlength="50"
+                         #descripcioField="ngModel"
+                         name="descripcio" id="descripcio">
 
-                @if(descripcioField.invalid && descripcioField.touched) {      
-                   @if(descripcioField.errors?.['required']) {
-                      <div class="invalido">Ompli la descripció del complement.</div>
-                   }
-                   @if(descripcioField.errors?.['minlength']) {
-                      <div class="invalido">Míim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
-                   }
-                   @if(descripcioField.errors?.['maxlength']) {
-                    <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
-                   }                 
-                }
-
+                  @if(descripcioField.invalid && descripcioField.touched) {      
+                     @if(descripcioField.errors?.['required']) {
+                        <div class="invalido">Ompli la descripció del complement.</div>
+                    }
+                    @if(descripcioField.errors?.['minlength']) {
+                        <div class="invalido">Míim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                    }
+                    @if(descripcioField.errors?.['maxlength']) {
+                      <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
+                    }                 
+                  }
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Preu</label>
-                <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.preu" 
-                    pattern="^\d+(\.\d{1,2})?$" 
-                    #preuField="ngModel"
-                    name="preu" id="preu">
-
-                    @if(preuField.invalid && preuField.touched) {      
-                      @if(preuField.errors?.['pattern']) {
-                         <div class="invalido">Només està permes números i el punt decimal.</div>
-                      }
-                   }                       
-                    
-              </div>
-              <div class="col-xl-2">
-                <label>Actiu</label>
-                <select class="form-select" [(ngModel)]="complementSeleccionado.actiu" name="actiu" id="actiu">
-                      <option value="SI">SI</option>
-                      <option value="NO">NO</option>
-                </select>
+              <div class="row">
+                <div class="col-md-3">
+                  <label>Preu</label>
+                  <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.preu"                     
+                      pattern="^\d+(\.\d{1,2})?$" 
+                      #preuField="ngModel"
+                      name="preu" id="preu">
+                
+                      @if(preuField.invalid && preuField.touched) {      
+                        @if(preuField.errors?.['pattern']) {
+                           <div class="invalido">Només està permes números i el punt decimal.</div>
+                        }
+                     }                                           
+                </div>
+                <div class="col-md-3">
+                  <label>Actiu</label>
+                  <select class="form-select" [(ngModel)]="complementSeleccionado.actiu" name="actiu" id="actiu">
+                        <option value="SI">SI</option>
+                        <option value="NO">NO</option>
+                  </select>
+                </div>
               </div>
               
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Guardar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>
         </div>

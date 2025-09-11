@@ -20,7 +20,7 @@
 
 <div class="d-flex justify-content-center">
     @for (sala of sales; track sala.id; let id_sala = $index) {
-      <button class="col-xl-1 border border-secondary rounded ms-2 p-2 text-center" [ngStyle]="{ 'background-color': sala.color }" (click)="getSala( sala.id )">{{sala.descripcio}}</button>
+      <button class="col-md-1 border border-secondary rounded ms-2 p-2 text-center" [ngStyle]="{ 'background-color': sala.color }" (click)="getSala( sala.id )">{{sala.descripcio}}</button>
     }
 </div>
 
@@ -36,24 +36,30 @@
     </full-calendar>
   </div>
 
+
   <!-- Modal Login -->
   <div class="modal fade" id="loginModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[2] }">
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
         <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Iniciar Sesió</h5>
+          <h5 class="modal-title" id="loginModalLabel">Iniciar Sessió</h5>
           <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
         </div>
         <div class="modal-body">
           <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm">
-            <div class="mb-3">
-              <label class="form-label">Correo electrònic</label>
-              <input type="email" class="form-control" name="loginData.email" id="loginData.email" [(ngModel)]="loginData.email">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="form-label">Correu electrònic</label>
+                <input type="email" class="form-control" name="loginData.email" id="loginData.email" [(ngModel)]="loginData.email">
+              </div>              
+            </div>  
+            <div class="row">
+              <div class="col-md-6">                                  
+                <label class="form-label">Contrasenya</label>
+                <input type="password" class="form-control" name="loginData.password" id="loginData.password" [(ngModel)]="loginData.password">
+              </div>         
             </div>
-            <div class="mb-3">
-              <label class="form-label">Contrasenya</label>
-              <input type="password" class="form-control" name="loginData.password" id="loginData.password" [(ngModel)]="loginData.password">
-            </div>         
+            <hr>
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">Entrar</button>
                 <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>            
@@ -74,69 +80,78 @@
         </div>
         <div class="modal-body">
           <form (ngSubmit)="onRegisterSubmit()"  #Registreform="ngForm">
-            <div class="mb-3">
-              <label class="form-label">Nom</label>
-              <input type="email" class="form-control" [(ngModel)]="registerData.nom"                
-                     required minlength="3" maxlength="50" 
-                     #nomField="ngModel"
-                     name="nom" id="nom">
-                @if(nomField.invalid && nomField.touched) {      
-                    @if(nomField.errors?.['required']) {
-                        <div class="invalido">Ompli el nom.</div>
-                    }
-                    @if(nomField.errors?.['minlength']) {
-                       <div class="invalido">Mínim obligat. {{ nomField.errors?.['minlength'].requiredLength }}</div>
-                    }
-                    @if(nomField.errors?.['maxlength']) {
-                        <div class="invalido">Màxim obligat. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
-                    }    
-                }            
+            <div class="row">
+              <div class="col-md-12">
+                <label class="form-label">Nom</label>
+                <input type="email" class="form-control" [(ngModel)]="registerData.nom"                
+                       required minlength="3" maxlength="50" 
+                       #nomField="ngModel"
+                       name="nom" id="nom">
+                       @if(nomField.invalid && nomField.touched) {      
+                         @if(nomField.errors?.['required']) {
+                           <div class="invalido">Ompli el nom.</div>
+                         }
+                         @if(nomField.errors?.['minlength']) {
+                           <div class="invalido">Mínim obligat. {{ nomField.errors?.['minlength'].requiredLength }}</div>
+                         }
+                         @if(nomField.errors?.['maxlength']) {
+                           <div class="invalido">Màxim obligat. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
+                         }    
+                       }            
+              </div>
             </div>
-            <div class="mb-3">
-               <label class="form-label">Correo electrònic</label>
-               <input type="email" class="form-control" [(ngModel)]="registerData.email"
+            <div class="row">
+              <div class="col-md-12">                        
+                <label class="form-label">Correu electrònic</label>
+                <input type="email" class="form-control" [(ngModel)]="registerData.email"
                        required minlength="3" maxlength="50" 
                        #emailField="ngModel"
                        name="email" id="email">
-                @if(emailField.invalid && emailField.touched) {      
-                    @if(emailField.errors?.['required']) {
-                       <div class="invalido">Ompli el correu electrònic.</div>
-                    }
-                    @if(emailField.errors?.['minlength']) {
-                        <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
-                    }
-                    @if(emailField.errors?.['maxlength']) {
-                        <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
-                    }    
-                }            
+                       @if(emailField.invalid && emailField.touched) {      
+                          @if(emailField.errors?.['required']) {
+                            <div class="invalido">Ompli el correu electrònic.</div>
+                          }
+                          @if(emailField.errors?.['minlength']) {
+                            <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
+                          }
+                          @if(emailField.errors?.['maxlength']) {
+                            <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
+                          }    
+                       }            
+              </div>
             </div>
-            <div class="mb-3">
-               <label class="form-label">Contrasenya</label>
-               <input type="password" class="form-control" [(ngModel)]="registerData.password"
-                    required minlength="3" maxlength="8" 
-                    #passwordField="ngModel"
-                    name="password" id="password">
-                @if(emailField.invalid && emailField.touched) {      
-                    @if(emailField.errors?.['required']) {
-                        <div class="invalido">Ompli la contrasenya.</div>
-                    }
-                    @if(emailField.errors?.['minlength']) {
-                        <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
-                    }
-                    @if(emailField.errors?.['maxlength']) {
-                        <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
-                    }    
-                }            
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Confirmar contrasenya</label>
-              <input type="password" class="form-control" [(ngModel)]="registerData.confirm"
-                    #confirmField="ngModel"
-                    name="confirm" id="confirm">              
+            <div class="row">
+              <div class="col-md-6">                                                
+                <label class="form-label">Contrasenya</label>
+                <input type="password" class="form-control" [(ngModel)]="registerData.password"
+                       required minlength="3" maxlength="8" 
+                       #passwordField="ngModel"
+                       name="password" id="password">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirmar contrasenya</label>
+                <input type="password" class="form-control" [(ngModel)]="registerData.confirm"
+                      #confirmField="ngModel"
+                      name="confirm" id="confirm">              
+              </div>     
+              
+              @if(passwordField.invalid && passwordField.touched) {      
+                @if(passwordField.errors?.['required']) {
+                  <div class="invalido">Ompli la contrasenya.</div>
+                }
+                @if(passwordField.errors?.['minlength']) {
+                  <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
+                }
+                @if(passwordField.errors?.['maxlength']) {
+                  <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
+                }    
+              }            
+
               <div *ngIf="confirmField.touched && !passwordsMatch()" class="text-danger mt-1">
-                   Las contrasenyes no coincideixen.
-               </div>
+                   <div class="invalido">Las contrasenyes no coincideixen.</div>
+              </div>
             </div>
+            <hr> 
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrar-se' : 'Actulitzar-se' }}</button>
                 <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>
@@ -159,25 +174,32 @@
         <div class="modal-body">
           <form>            
             <div class="modal-body">
-              <div class="mb-3">
-                <label>Nom</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" disabled name="descripcio" id="descripcio">
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Nom</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" disabled name="descripcio" id="descripcio">
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Edifici</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.nom_edifici" disabled name="nom_edifici" id="nom_edifici">
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Edifici</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.nom_edifici" disabled name="nom_edifici" id="nom_edifici">
+                </div>
+                <div class="col-md-3">
+                  <label>Preu</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
+                </div>
               </div>
-              <div class="mb-3">
-                <label>Preu</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
-              </div>
-              <div class="mb-3">
-                <label>Missatge</label>
-                <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" disabled name="missatge" id="missatge">
-              </div>
+              @if(salaSeleccionado.missatge) {
+                <div class="row border rounded mt-4 bg-danger p-2">
+                  <div class="col-md-12">                    
+                    <h5>{{ salaSeleccionado.missatge }}</h5>
+                  </div>
+                </div>
+              }  
             </div>
             <hr>
-            <div class="mb-3">                                              
+            <div class="col-md-12">                                              
                   <table class="table table-striped table-bordered">
                       <thead class="table-dark">
                         <tr>        
@@ -209,7 +231,7 @@
 <!-- Reserva modal -->
 <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block':  modalVisible[90] }">
 
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="loginModalLabel">Sala</h5>
@@ -218,13 +240,13 @@
 
       <div class="modal-body container-fluid">                
               <div class="row">
-                <div class="col-xs-5 mr-2"> 
+                <div class="col-md-3 mr-2"> 
                   <div class="form-group">
                     <label for="fecha">Data:</label>
                     <input type="date" class="form-control" id="fecha" name="fecha" size=10 required>
                   </div>
                 </div>
-                <div class="col-xs-5 mr-2"> 
+                <div class="col-md-4 mr-2"> 
                   <div class="form-group">
                      <label for="sala">Sala:</label>
                      <select class="form-control" id="sala" name="sala" required>
@@ -234,11 +256,11 @@
                      </select>
                    </div>
                 </div>                
-                <div class="col-xs-10 mr-2"> 
+                <div class="col-md-3 mr-2"> 
                   <label>&nbsp;</label>
-                  <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Buscar Hores"/>			     		                         
+                  <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores"/>			     		                         
                 </div>
-                <div class="col-xs-10 mr-2"> 
+                <div class="col-md-2 mr-2"> 
                   <label>&nbsp;</label>                  
                   <button type="button" class="form-control btn btn-danger" (click)="tancarModal()">Sortir</button>
                 </div>

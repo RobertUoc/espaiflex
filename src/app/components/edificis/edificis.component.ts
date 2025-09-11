@@ -65,7 +65,7 @@ export class EdificisComponent implements OnInit {
   }
 
   obrirModal( id_edifici: string) {    
-    this.modalVisible = true;
+    this.modalVisible = true;    
     if (id_edifici == '0') {      
       this.edificioSeleccionado = new Edificis();
     }
@@ -75,12 +75,13 @@ export class EdificisComponent implements OnInit {
             this.edificioSeleccionado = new Edificis(data.id,data.nom,data.id_provincia,data.imatge,data.descripcio,data.actiu);    
             this.previewUrl = data.imatge;
             this.imagenBase64 = 'data:image/jpeg;base64,' + data.imatge;
+            console.log(this.edificioSeleccionado);
         },
         error: error => {
           console.log(error);
         },
         complete: () => {        
-          console.log('Ok');
+          console.log('Lectura Ok');
         }
       });  
     }

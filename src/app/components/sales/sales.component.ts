@@ -148,9 +148,12 @@ selectedSeleccionadoId: string | null = null;
         this.salaSeleccionado.actiu,
         complement
       ).subscribe(response => {        
-        this.tancarModal();
-        this.getSales();
+//        this.tancarModal();
+//        this.getSales();
       });      
+      this.tancarModal();
+      this.getSales();
+      
     }
     else {
       // Update

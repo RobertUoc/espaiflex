@@ -241,14 +241,14 @@
               <div class="row">
                 <div class="col-md-3 mr-2"> 
                   <div class="form-group">
-                    <label for="fecha">Data:</label>
-                    <input type="date" class="form-control" id="fecha" name="fecha" size=10 required>
+                    <label for="fecha">Data:</label>                    
+                    <input type="date" class="form-control" id="data_reserva" name="data_reserva" [(ngModel)]="data_reserva" size=10 required>
                   </div>
                 </div>
                 <div class="col-md-4 mr-2"> 
                   <div class="form-group">
                      <label for="sala">Sala:</label>
-                     <select class="form-control" id="sala" name="sala" required>
+                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva">
                         @for (sala of sales; track sala.id; let id_sala = $index) {
                           <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
                         }
@@ -257,7 +257,7 @@
                 </div>                
                 <div class="col-md-3 mr-2"> 
                   <label>&nbsp;</label>
-                  <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores"/>			     		                         
+                  <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores" (click)="generate()"/>			     		                         
                 </div>
                 <div class="col-md-2 mr-2"> 
                   <label>&nbsp;</label>                  
@@ -265,23 +265,32 @@
                 </div>
               </div>
               <div class="mt-3 container">
-                     <div class="row" id="hourGrid">
-
+                     <div *ngIf="mostrarHourGrid">
+                        @for(mira of mira_dia;track mira.id) {                         
+                          <div class="row text-center">
+                              @for(col of mira.items;track $index) {
+                                <button class="col-md-2 d-flex p-2 rounded text-white m-1"
+                                    #horesSelected
+                                    name="horesSelected"
+                                    [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
+                                    [disabled]="col.estado != 'No informado'" 
+                                    (click)="triaHora($event)">                                
+                                {{col.hora_inici}}
+                                </button>
+                              }                        
+                          </div>
+                        }                     
                      </div>
                      <hr>
-                     <div class="row mb-2" id="extrasGrid">
-
-                     </div>
-                     <div class="row mb-2" id="informaticaGrid">
-
-                     </div>
-                     <div class="row mb-2" id="gabinetGrid">
+                     <div class="row mb-2" id="extras">
 
                      </div>
               </div>
               <div class="modal-footer">
-                  <div class="text-center" id="peu">
-
+                  <div *ngIf="mostrarPeu">      
+                        <h1>Preu {{ this.preu_sala_total | PipePreu }}</h1>                  
+                        <button type="button" class="btn btn-primary m-2">Desar</button>
+                        <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
                   </div>
               </div>          
       </div>
@@ -297,41 +306,27 @@
         <h5 class="modal-title" id="loginModalLabel">Dia {{ dia | PipeFecha }}</h5>
         <button type="button" class="btn-close" (click)="tancarModal()"></button>
       </div>
-
-      <div class="modal-body container-fluid">     
-        
-        <table>                                              
-            
-              <tr *ngFor="let mira of mira_dia">
-                <td>{{mira.id}}</td>
-                <td>
-                  <table>
-
-                 <td *ngFor="let col of mira.items">
-                    <div style="width: 50%; height: 60px;"
-                    class="p-2 rounded text-white"
-                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
-                    >
-                      {{col.hora_inici}}
-                    </div>
-                </td>
-
-
-                  </table>
-
-                </td>
-
-
-
-
-
-
-
-              </tr>                 
-      
-        </table>
-
-      </div>
-
+      <div class="modal-body container-fluid text-center">     
+        <div class="row">
+          @for(mira of mira_dia;track mira.id) {
+            <div class="col-md-6">
+               <strong>{{mira.id}}</strong>
+                <div class="row">
+                 @for(col of mira.items;track $index) {
+                      <div class="col-md-3 d-flex p-2 rounded text-white m-1"
+                         [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
+                      >
+                        {{col.hora_inici}}
+                      </div>
+                  }
+                </div>
+           </div>                      
+          }
+        </div>   
+        <hr>
+        <div class="d-flex justify-content-between">               
+             <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>            
+        </div>
+      </div>    
     </div>
 </div>

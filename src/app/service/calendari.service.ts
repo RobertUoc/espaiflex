@@ -23,4 +23,10 @@ export class CalendariService {
       this.apiUrl + 'calendari.php?dia=' + dia + '&edifici=' + edifici
     );
   }
+
+    getMiraDia(dia: string, sala: string): Observable<Horas[]> {    
+    return this.http.get<Horas[]>(
+      this.apiUrl + 'calendari.php?dia=' + dia + '&sala=' + sala
+    );
+  }
 }

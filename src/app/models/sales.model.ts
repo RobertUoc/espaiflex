@@ -7,8 +7,9 @@ export class Sales {
        public nom_edifici:string = '',
        public preu:number = 0,
        public actiu:string = 'SI',
-       public color:string = '',
-       public missatge:string = ''
+       public color:string = '',       
+       public missatge:string = '',
+       public max_ocupacio = '1',
     ) { }
     
 }

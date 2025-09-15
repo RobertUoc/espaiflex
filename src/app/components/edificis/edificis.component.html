@@ -1,7 +1,7 @@
 <h1>Edificis</h1>
 <div class="container mt-4">
   
-  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalNuevoEdificio" (click)="obrirModal('0')">
+  <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
     Crear nou edifici
   </button>
 
@@ -24,7 +24,7 @@
     <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
       <div class="modal-dialog">
         <div class="modal-content bg-warning">
-          <form (ngSubmit)="saveEdifici()" enctype="multipart/form-data">
+          <form (ngSubmit)="saveEdifici()" enctype="multipart/form-data" #form="ngForm">
             <div class="modal-header">
               <h5 class="modal-title">
                 {{ edificioSeleccionado.id == '0' ? 'Crear Edifici' : 'Modificar Edifici' }}
@@ -35,7 +35,23 @@
               <div class="row">
                 <div class="col-md-12">
                   <label>Nom</label>
-                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" name="nom" id="nom">
+                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" 
+                      required minlength="3" maxlength="50"
+                      #nomField="ngModel"                  
+                      name="nom" id="nom">
+
+                      @if(nomField.invalid && nomField.touched) {      
+                         @if(nomField.errors?.['required']) {
+                            <div class="invalido">Ompli el nom de l'edifici.</div>
+                        }
+                        @if(nomField.errors?.['minlength']) {
+                            <div class="invalido">Mínim obligat. {{ nomField.errors?.['minlength'].requiredLength }}</div>
+                        }
+                        @if(nomField.errors?.['maxlength']) {
+                          <div class="invalido">Màxim obligat. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
+                        }                 
+                      }
+
                 </div>
               </div>
               <div class="row">
@@ -74,7 +90,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success">Desar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
               <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>

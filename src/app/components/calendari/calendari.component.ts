@@ -58,11 +58,12 @@ export class CalendariComponent implements OnInit {
   public horas: string[] = [];
   public data_reserva: string = '';
   public sala_reserva: string = '';
+  public max_sala: string = '1';
   public mostrarHourGrid: boolean = false;
   public mostrarPeu: boolean = false;
   public agrupado: { [key: string]: { hora_inici: string; estado: string }[]; } = {};
   public preu_sala : number = 0;
-  public preu_sala_total: number = 0;
+  public preu_sala_total: number = 0;  
 
   id_edifici: string = '';
   calendarVisible = signal(true);
@@ -98,9 +99,14 @@ export class CalendariComponent implements OnInit {
     private calendariService: CalendariService
   ) {}
 
+
   ngOnInit() {
     this.id_edifici = this.route.snapshot.paramMap.get('id') || '';
     this.getSales(this.id_edifici);
+  }
+
+  actualizarMaximo() {    
+    this.max_sala = this.sales[parseInt(this.sala_reserva)].max_ocupacio;
   }
 
   getSales(id_edifici: string) {
@@ -128,7 +134,9 @@ export class CalendariComponent implements OnInit {
           data.preu,
           data.actiu,
           data.color,
-          data.missatge
+          data.missatge,
+          data.max_ocupacio
+          
         );
       },
       error: (error) => {

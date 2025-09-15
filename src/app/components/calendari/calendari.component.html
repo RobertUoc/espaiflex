@@ -185,10 +185,16 @@
                   <label>Edifici</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.nom_edifici" disabled name="nom_edifici" id="nom_edifici">
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-md-3">
                   <label>Preu</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
                 </div>
+                <div class="col-md-3">
+                  <label>Aforament</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" disabled name="max" id="max">
+                </div>                
               </div>
               @if(salaSeleccionado.missatge) {
                 <div class="row border rounded mt-4 bg-danger p-2">
@@ -233,7 +239,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Sala</h5>
+        <h5 class="modal-title" id="loginModalLabel">Reserva Sala</h5>
         <button type="button" class="btn-close" (click)="tancarModal()"></button>
       </div>
 
@@ -248,7 +254,7 @@
                 <div class="col-md-4 mr-2"> 
                   <div class="form-group">
                      <label for="sala">Sala:</label>
-                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva">
+                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva" (change)="actualizarMaximo()">
                         @for (sala of sales; track sala.id; let id_sala = $index) {
                           <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
                         }
@@ -262,6 +268,12 @@
                 <div class="col-md-2 mr-2"> 
                   <label>&nbsp;</label>                  
                   <button type="button" class="form-control btn btn-danger" (click)="tancarModal()">Sortir</button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-2 mr-2"> 
+                    <label for="fecha">Aforament:</label>                    
+                    <input type="input" class="form-control" id="max_sala" name="max_sala" [(ngModel)]="max_sala" size=5 disabled>
                 </div>
               </div>
               <div class="mt-3 container">

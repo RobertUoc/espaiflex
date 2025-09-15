@@ -2,7 +2,7 @@
 
 <div class="container mt-4">  
 
-  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalNuevoEdificio" (click)="obrirModal('0')">
+  <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
     Crear nova sala
   </button>
 
@@ -13,6 +13,7 @@
         <th>Edifici</th>
         <th>Color</th>
         <th>Preu</th>
+        <th>Ocupació</th>
         <th>Actiu</th>
         <th>Accions</th>
       </tr>
@@ -24,6 +25,7 @@
         <td class="w-40">{{ sala.nom_edifici }}</td>
         <td class="w-10" [ngStyle]="{'background-color': sala.color}">&nbsp;</td>
         <td class="w-10 text-end">{{ sala.preu | PipePreu }} €</td>
+        <td class="w-10 text-end">{{ sala.max_ocupacio }}</td>
         <td class="w-10 text-center">
           <span [class.text-success]="sala.actiu == 'SI'" [class.text-danger]="sala.actiu != 'NO'">
             {{ sala.actiu }}
@@ -48,7 +50,7 @@
 </div>
 
     <!-- Modal -->
-    <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
+    <div class="modal" tabindex="-1" id="modalNuevoEdificio" [ngClass]="{ 'show d-block': modalVisible }">
       <div class="modal-dialog modal-lg">
         <div class="modal-content bg-warning">
           <form (ngSubmit)="saveComplement()" #form="ngForm">
@@ -114,20 +116,52 @@
                       pattern="^\d+(\.\d{1,2})?$" 
                       #preuField="ngModel"
                       name="preu" id="preu">
-  
-                      @if(preuField.invalid && preuField.touched) {      
-                        @if(preuField.errors?.['pattern']) {
-                           <div class="invalido">Només està permes números i el punt decimal.</div>
-                        }
-                      }                                           
                 </div>     
+                <div class="col-xl-2">
+                  <label>Ocupació</label>
+                  <input type="input" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" 
+                        minlength="1" maxlength="3" required
+                        pattern="[0-9]*$"
+                        #max_ocupacioField="ngModel"
+                        name="max_ocupacio" id="max_ocupacio"
+                        >
+                </div>                                
                 <div class="col-xl-2">
                   <label>Actiu</label>
                   <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
                   </select>
-                </div>                                   
+                </div>    
+                
+                
+                      @if(preuField.invalid && preuField.touched) {      
+                        @if(preuField.errors?.['pattern']) {
+                           <div class="invalido mt-2">Només està permes números i el punt decimal.</div>
+                        }
+                      }                                           
+
+                      @if(max_ocupacioField.invalid && max_ocupacioField.touched) {      
+                        @if(max_ocupacioField.errors?.['pattern']) {
+                           <div class="invalido mt-2">Només està permes números.</div>
+                        }        
+                        @if(max_ocupacioField.errors?.['required']) {
+                           <div class="invalido mt-2">Ompli l'ocupació de la sala.</div>
+                        }                                        
+                        @if(max_ocupacioField.errors?.['minlength']) {
+                           <div class="invalido mt-2">Mínim obligat. {{ max_ocupacioField.errors?.['minlength'].requiredLength }}</div>
+                        }
+                        @if(max_ocupacioField.errors?.['maxlength']) {
+                           <div class="invalido mt-2">Màxim obligat. {{ max_ocupacioField.errors?.['maxlength'].requiredLength }}</div>
+                        }        
+                        @if(max_ocupacioField.errors?.['max']) {
+                           <div class="invalido mt-2">Número Màxim superat. {{ max_ocupacioField.errors?.['max'].requiredLength }}</div>
+                        }  
+                        @if(max_ocupacioField.errors?.['min']) {
+                           <div class="invalido mt-2">Número Mínim superat. {{ max_ocupacioField.errors?.['min'].requiredLength }}</div>
+                        }                                                                                                                                                     
+                      }   
+
               </div>
               <hr>
                          

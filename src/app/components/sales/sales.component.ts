@@ -3,13 +3,10 @@ import { Sales } from '../../models/sales.model';
 import { SalesService } from '../../service/sales.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgClass, NgIf } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { config } from '../../models/config';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Edificis } from '../../models/edificis.model';
 import { EdificisService } from '../../service/edificis.service';
 import { Complements } from '../../models/complements.model';
-import { ComplementsService } from '../../service/complements.service';
 import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
 
 @Component({
@@ -46,8 +43,7 @@ selectedSeleccionadoId: string | null = null;
   };
 
 
-  constructor(private salesService : SalesService, private EdficisServies: EdificisService, private ComplementsServies: ComplementsService, 
-    private http: HttpClient) { }
+  constructor(private salesService : SalesService, private EdficisServies: EdificisService) { }
 
   ngOnInit() {
     this.getSales();
@@ -86,23 +82,24 @@ selectedSeleccionadoId: string | null = null;
 
   obrirModal(id_sala: string) {  
     this.modalVisible = true;
-    if (id_sala == '0') {      
-      this.salaSeleccionado = new Sales();
-
+    if (id_sala == '0') {            
       this.salesService.getDisponibles(id_sala).subscribe({
           next: data => {                 
             this.disponibles = data;              
           },
           error: error => {
               console.log(error);
-          },      
-      });      
-      this.seleccionados = [new Complements()];
+          },   
+          complete: () => {
+              this.seleccionados = [];     
+              this.salaSeleccionado = new Sales();         
+          }   
+      });            
     }
     else {
       this.salesService.getSala(id_sala).subscribe({
         next: data => {                 
-            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge);               
+            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge, data.max_ocupacio);               
         },
         error: error => {
           console.log(error);
@@ -125,8 +122,7 @@ selectedSeleccionadoId: string | null = null;
             error: error => {
               console.log(error);
             },
-          });
-          console.log('Ok');
+          });          
         }
       });  
     }
@@ -134,36 +130,33 @@ selectedSeleccionadoId: string | null = null;
 
   tancarModal() {
     this.modalVisible = false;
+    console.log('tancar');
   }  
 
   saveComplement() {    
+    let complement = this.seleccionados.map(item => item.id).join('#');
     if (this.salaSeleccionado.id == '0') {
       // Insert
-      console.log('ALTA');            
-      let complement  = this.seleccionados.map(item => item.id).join('#');
+      console.log('ALTA');                  
       this.salesService.insertSala(this.salaSeleccionado.descripcio, this.salaSeleccionado.id_edifici,
         this.salaSeleccionado.preu,                  
         this.salaSeleccionado.color,
         this.salaSeleccionado.missatge,
         this.salaSeleccionado.actiu,
+        this.salaSeleccionado.max_ocupacio,
         complement
       ).subscribe(response => {        
-//        this.tancarModal();
-//        this.getSales();
-      });      
-      this.tancarModal();
-      this.getSales();
-      
+        this.tancarModal();
+        this.getSales();
+      });            
     }
     else {
       // Update
-      let complement = this.seleccionados.map(item => item.id).join('#');
       console.log('UPDATE');            
       this.salesService.putSala(this.salaSeleccionado.id,
         this.salaSeleccionado.descripcio,  this.salaSeleccionado.id_edifici ,this.salaSeleccionado.preu,
-        this.salaSeleccionado.color, this.salaSeleccionado.missatge,
-        this.salaSeleccionado.actiu,
-        complement
+        this.salaSeleccionado.color, this.salaSeleccionado.missatge, this.salaSeleccionado.actiu,
+        this.salaSeleccionado.max_ocupacio, complement
       ).subscribe(response => {        
         this.tancarModal();
         this.getSales();

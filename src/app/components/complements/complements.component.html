@@ -2,7 +2,7 @@
 
 <div class="container mt-4">  
 
-  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalNuevoEdificio" (click)="obrirModal('0')">
+  <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
     Crear nou complement
   </button>
 
@@ -44,7 +44,7 @@
 </div>
 
     <!-- Modal -->
-    <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
+    <div class="modal" tabindex="-1" id="modalNuevoComplemento" [ngClass]="{ 'show d-block': modalVisible }">
       <div class="modal-dialog">
         <div class="modal-content bg-warning">
           <form (ngSubmit)="saveComplement()" #form="ngForm">
@@ -60,7 +60,7 @@
                   <label>Nom</label>
                   <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.descripcio" 
                          required minlength="3" maxlength="50"
-                         #descripcioField="ngModel"
+                         #descripcioField="ngModel"                         
                          name="descripcio" id="descripcio">
 
                   @if(descripcioField.invalid && descripcioField.touched) {      
@@ -68,7 +68,7 @@
                         <div class="invalido">Ompli la descripció del complement.</div>
                     }
                     @if(descripcioField.errors?.['minlength']) {
-                        <div class="invalido">Míim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                        <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
                     }
                     @if(descripcioField.errors?.['maxlength']) {
                       <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>

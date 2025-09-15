@@ -52,17 +52,19 @@ export class SalesService {
     _color: string,
     _missatge: string,
     _actiu: string,
-    _complement: string
-  ) {
-    return this.http.put(this.apiUrl + 'sales.php', {
-      id: _id,
+    _max_ocupacio: string,
+    _complement: string,    
+  ) {    
+    return this.http.put(this.apiUrl + 'sales.php', {      
       descripcio: _descripcio,
       idedifici: _idedifici,
       preu: _preu,
       color: _color,
-      missatge: _missatge,
+      missatge: _missatge,      
+      max_ocupacio: _max_ocupacio,
       actiu: _actiu,
-      complement: _complement
+      complement: _complement,  
+      id: _id,    
     });
   }
 
@@ -73,7 +75,8 @@ export class SalesService {
     _color: string,
     _missatge: string,
     _actiu: string,
-    _complement: string
+    _max_ocupacio: string,
+    _complement: string,    
   ) {
     return this.http.post(this.apiUrl + 'sales.php', {
       descripcio: _descripcio,
@@ -82,7 +85,8 @@ export class SalesService {
       color: _color,
       missatge: _missatge,
       actiu: _actiu,
-      complement: _complement
+      max_ocupacio: _max_ocupacio,
+      complement: _complement,      
     });
   }
 }

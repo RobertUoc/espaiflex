@@ -53,6 +53,7 @@ export class SalesService {
     _missatge: string,
     _actiu: string,
     _max_ocupacio: string,
+    _horari: string,
     _complement: string,    
   ) {    
     return this.http.put(this.apiUrl + 'sales.php', {      
@@ -63,6 +64,7 @@ export class SalesService {
       missatge: _missatge,      
       max_ocupacio: _max_ocupacio,
       actiu: _actiu,
+      horari: _horari,
       complement: _complement,  
       id: _id,    
     });
@@ -76,6 +78,7 @@ export class SalesService {
     _missatge: string,
     _actiu: string,
     _max_ocupacio: string,
+    _horari: string,
     _complement: string,    
   ) {
     return this.http.post(this.apiUrl + 'sales.php', {
@@ -86,6 +89,7 @@ export class SalesService {
       missatge: _missatge,
       actiu: _actiu,
       max_ocupacio: _max_ocupacio,
+      horari : _horari,
       complement: _complement,      
     });
   }

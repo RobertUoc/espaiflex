@@ -11,9 +11,10 @@
       <tr>        
         <th>Nom</th>
         <th>Edifici</th>
-        <th>Color</th>
-        <th>Preu</th>
+        <th>Color</th>        
         <th>Ocupació</th>
+        <th>Horari</th>        
+        <th>Preu</th>
         <th>Actiu</th>
         <th>Accions</th>
       </tr>
@@ -23,9 +24,10 @@
       <tr>        
         <td class="w-40">{{ sala.descripcio }}</td>
         <td class="w-40">{{ sala.nom_edifici }}</td>
-        <td class="w-10" [ngStyle]="{'background-color': sala.color}">&nbsp;</td>
-        <td class="w-10 text-end">{{ sala.preu | PipePreu }} €</td>
+        <td class="w-10" [ngStyle]="{'background-color': sala.color}">&nbsp;</td>        
         <td class="w-10 text-end">{{ sala.max_ocupacio }}</td>
+        <td>{{ sala.horari == '1' ? '1 hora' : '½ hora' }} </td>
+        <td class="w-10 text-end">{{ sala.preu | PipePreu }} €</td>
         <td class="w-10 text-center">
           <span [class.text-success]="sala.actiu == 'SI'" [class.text-danger]="sala.actiu != 'NO'">
             {{ sala.actiu }}
@@ -111,13 +113,6 @@
                   <input type="color" class="form-control h-75" [(ngModel)]="salaSeleccionado.color" name="color" id="color">
                 </div>
                 <div class="col-xl-2">
-                  <label>Preu</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" 
-                      pattern="^\d+(\.\d{1,2})?$" 
-                      #preuField="ngModel"
-                      name="preu" id="preu">
-                </div>     
-                <div class="col-xl-2">
                   <label>Ocupació</label>
                   <input type="input" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" 
                         minlength="1" maxlength="3" required
@@ -132,7 +127,21 @@
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
                   </select>
-                </div>    
+                </div>   
+                <div class="col-xl-2">
+                  <label>Horari</label>
+                  <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari">
+                          <option value="1">1 hora</option>
+                          <option value="2">½ hora</option>
+                  </select>
+                </div>              
+                <div class="col-xl-2">
+                  <label>{{ salaSeleccionado.horari == '2' ? 'Preu ½ hora' : 'Preu hora' }}</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" 
+                      pattern="^\d+(\.\d{1,2})?$" 
+                      #preuField="ngModel"
+                      name="preu" id="preu">
+                </div>                            
                 
                 
                       @if(preuField.invalid && preuField.touched) {      

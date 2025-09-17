@@ -23,7 +23,6 @@ export class SalesComponent implements OnInit {
   public edificis = [new Edificis()];
   public complements = [new Complements()];
 
-
   
 disponibles = [new Complements()];
 seleccionados = [new Complements()];
@@ -99,7 +98,7 @@ selectedSeleccionadoId: string | null = null;
     else {
       this.salesService.getSala(id_sala).subscribe({
         next: data => {                 
-            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge, data.max_ocupacio);               
+            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge, data.max_ocupacio, data.horari);               
         },
         error: error => {
           console.log(error);
@@ -142,8 +141,9 @@ selectedSeleccionadoId: string | null = null;
         this.salaSeleccionado.preu,                  
         this.salaSeleccionado.color,
         this.salaSeleccionado.missatge,
-        this.salaSeleccionado.actiu,
+        this.salaSeleccionado.actiu,        
         this.salaSeleccionado.max_ocupacio,
+        this.salaSeleccionado.horari,
         complement
       ).subscribe(response => {        
         this.tancarModal();
@@ -156,7 +156,7 @@ selectedSeleccionadoId: string | null = null;
       this.salesService.putSala(this.salaSeleccionado.id,
         this.salaSeleccionado.descripcio,  this.salaSeleccionado.id_edifici ,this.salaSeleccionado.preu,
         this.salaSeleccionado.color, this.salaSeleccionado.missatge, this.salaSeleccionado.actiu,
-        this.salaSeleccionado.max_ocupacio, complement
+        this.salaSeleccionado.max_ocupacio, this.salaSeleccionado.horari, complement
       ).subscribe(response => {        
         this.tancarModal();
         this.getSales();

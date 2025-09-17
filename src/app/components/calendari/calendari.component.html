@@ -188,13 +188,20 @@
               </div>
               <div class="row">
                 <div class="col-md-3">
-                  <label>Preu</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
-                </div>
-                <div class="col-md-3">
                   <label>Aforament</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" disabled name="max" id="max">
-                </div>                
+                </div>       
+                <div class="col-md-4">
+                  <label>Horari</label>
+                  <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari" disabled>
+                        <option value="1">1 hora</option>
+                        <option value="2">½ hora</option>
+                  </select>
+                </div>         
+                <div class="col-md-3">
+                  <label>{{ salaSeleccionado.horari == '2' ? 'Preu ½ hora' : 'Preu hora' }}</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
+                </div>                                                
               </div>
               @if(salaSeleccionado.missatge) {
                 <div class="row border rounded mt-4 bg-danger p-2">
@@ -275,6 +282,13 @@
                     <label for="fecha">Aforament:</label>                    
                     <input type="input" class="form-control" id="max_sala" name="max_sala" [(ngModel)]="max_sala" size=5 disabled>
                 </div>
+                <div class="col-md-2 mr-2"> 
+                    <label for="fecha">Horari:</label>        
+                    <select class="form-select" [(ngModel)]="horari" name="horari" id="horari" disabled>
+                          <option value="1">1 hora</option>
+                          <option value="2">½ hora</option>
+                    </select>                                                    
+                </div>                
               </div>
               <div class="mt-3 container">
                      <div *ngIf="mostrarHourGrid">

@@ -64,6 +64,7 @@ export class CalendariComponent implements OnInit {
   public agrupado: { [key: string]: { hora_inici: string; estado: string }[]; } = {};
   public preu_sala : number = 0;
   public preu_sala_total: number = 0;  
+  public horari: string = '1';
 
   id_edifici: string = '';
   calendarVisible = signal(true);
@@ -135,8 +136,8 @@ export class CalendariComponent implements OnInit {
           data.actiu,
           data.color,
           data.missatge,
-          data.max_ocupacio
-          
+          data.max_ocupacio,
+          data.horari    
         );
       },
       error: (error) => {
@@ -273,13 +274,15 @@ export class CalendariComponent implements OnInit {
     this.calendariService.getMiraDia(fecha, uri_sala).subscribe({
       next: (data) => {
         this.agrupado = {};
-        let compara = '0';        
+        let compara = '0';  
+        // this.horari            
         data.forEach((item) => {
           if (!this.agrupado[item.descripcio]) {
             this.agrupado[item.descripcio] = [];
             compara = '0';
           }
           // Crear Capcelera
+          this.horari = item.tipus;
           compara = this.CrearBotons(item,compara);
         });
         this.horas = this.horas.sort();
@@ -336,11 +339,26 @@ export class CalendariComponent implements OnInit {
 
           horaStr = item.hora_inici.split(':');
           horaInicio = Number(horaStr[0]);
-          horaFin = horaInicio + 1;
-          horaFinal =
-            horaInicio.toString().padStart(2, '0') +
-            ' a ' +
-            horaFin.toString().padStart(2, '0');
+          if (this.horari == '1') {
+            horaFin = horaInicio + 1;
+            horaFinal =
+              horaInicio.toString().padStart(2, '0') +
+              ' a ' +
+              horaFin.toString().padStart(2, '0');
+          }
+          if (this.horari == '2') {        
+            if (horaStr[2] == '00') {
+              horaFinal = horaStr[0] + ':' + horaStr[1];
+                ' a '  +
+                horaStr[1] + ':30';
+            }
+            else {
+              horaFinal = horaStr[0] + ':' + horaStr[1];
+                ' a '  +
+                (horaInicio +1).toString().padStart(2,'0') + ':30';
+            }
+          }
+          
           if (!this.horas.includes(horaFinal)) {
             this.horas.push(horaFinal);
           }

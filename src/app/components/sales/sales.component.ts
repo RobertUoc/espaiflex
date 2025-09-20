@@ -128,8 +128,7 @@ selectedSeleccionadoId: string | null = null;
   }
 
   tancarModal() {
-    this.modalVisible = false;
-    console.log('tancar');
+    this.modalVisible = false;    
   }  
 
   saveComplement() {    

@@ -1,33 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 import { Complements } from '../../models/complements.model';
 import { ComplementsService } from '../../service/complements.service';
-import { FormsModule } from '@angular/forms';
-import { CommonModule, NgClass, NgIf } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { config } from '../../models/config';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
   selector: 'app-complements',
-  imports: [ FormsModule, NgClass, CommonModule, NgxPaginationModule, PipePreuPipe ],  
+  imports: [ NgClass, CommonModule, NgxPaginationModule, PipePreuPipe, ReactiveFormsModule ],  
   templateUrl: './complements.component.html',
   styleUrls: ['./complements.component.css']
 })
 export class ComplementsComponent implements OnInit {
   public complements = [new Complements()];
   public modalVisible = false;
-  public complementSeleccionado = new Complements();  
   public paginaActual: number = 1;
+  public complement!: FormGroup;
 
-
-  constructor(private complementsService : ComplementsService, private http: HttpClient) { }
-
-  ngOnInit() {
-    this.getComplements();
+  constructor(private fb: FormBuilder, private complementsService : ComplementsService, private http: HttpClient) { 
+    this.createForm();
   }
 
+  ngOnInit() {
+    this.getComplements();    
+  }
+
+  createForm() {
+    this.complement = this.fb.group({
+      id: ['0'],
+      descripcio: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      preu: ['0', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      actiu: ['SI']
+    });    
+  }
   getComplements() {
     // Complements
     this.complementsService.getComplements().subscribe({
@@ -44,19 +53,27 @@ export class ComplementsComponent implements OnInit {
   }
 
   obrirModal(id_complement: string) {  
-    this.modalVisible = true;
-    if (id_complement == '0') {      
-      this.complementSeleccionado = new Complements();
-    }
-    else {
+    this.modalVisible = true;       
+    this.complement.patchValue({
+      id:'0',
+      descripcio:'',
+      preu:'0',
+      actiu:'SI'
+    })    
+    if (id_complement != '0') {      
       this.complementsService.getComplement(id_complement).subscribe({
-        next: data => {                 
-            this.complementSeleccionado = new Complements(data.id,data.descripcio,data.preu,data.actiu);    
+        next: data => {                             
+            this.complement.patchValue({
+              id:data.id,
+              descripcio:data.descripcio,
+              preu:data.preu,
+              actiu:data.actiu
+            })
         },
         error: error => {
           console.log(error);
         },
-        complete: () => {        
+        complete: () => {                  
           console.log('Ok');
         }
       });  
@@ -68,21 +85,17 @@ export class ComplementsComponent implements OnInit {
   }  
 
   saveComplement() {    
-    if (this.complementSeleccionado.id == '0') {
-      // Insert
-      console.log('ALTA');            
-      this.complementsService.insertComplement(this.complementSeleccionado.descripcio,  this.complementSeleccionado.preu,                  
-        this.complementSeleccionado.actiu
+    if (this.complement.value.id == '0') {
+      // Insert                
+      this.complementsService.insertComplement(this.complement.value.descripcio, this.complement.value.preu, this.complement.value.actiu
       ).subscribe(response => {        
         this.tancarModal();
         this.getComplements();
       });
     }
     else {
-      // Update
-      this.complementsService.putComplement(this.complementSeleccionado.id,
-        this.complementSeleccionado.descripcio,  this.complementSeleccionado.preu,
-        this.complementSeleccionado.actiu
+      // Update      
+      this.complementsService.putComplement(this.complement.value.id, this.complement.value.descripcio, this.complement.value.preu, this.complement.value.actiu
       ).subscribe(response => {        
         this.tancarModal();
         this.getComplements();

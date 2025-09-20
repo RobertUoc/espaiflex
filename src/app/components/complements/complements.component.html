@@ -47,10 +47,11 @@
     <div class="modal" tabindex="-1" id="modalNuevoComplemento" [ngClass]="{ 'show d-block': modalVisible }">
       <div class="modal-dialog">
         <div class="modal-content bg-warning">
-          <form (ngSubmit)="saveComplement()" #form="ngForm">
+
+          <form  [formGroup]="complement" (ngSubmit)="saveComplement()">
             <div class="modal-header">
               <h5 class="modal-title">
-                {{ complementSeleccionado.id == '0' ? 'Crear Complement' : 'Modificar Complement' }}
+                {{ complement.get('id')?.value == '0' ? 'Crear Complement' : 'Modificar Complement' }}
              </h5>
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
@@ -58,50 +59,45 @@
               <div class="row">
                 <div class="col-md-12">
                   <label>Nom</label>
-                  <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.descripcio" 
-                         required minlength="3" maxlength="50"
-                         #descripcioField="ngModel"                         
-                         name="descripcio" id="descripcio">
-
-                  @if(descripcioField.invalid && descripcioField.touched) {      
-                     @if(descripcioField.errors?.['required']) {
-                        <div class="invalido">Ompli la descripció del complement.</div>
-                    }
-                    @if(descripcioField.errors?.['minlength']) {
-                        <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
-                    }
-                    @if(descripcioField.errors?.['maxlength']) {
-                      <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
-                    }                 
-                  }
+                  <input type="text" class="form-control" formControlName="descripcio" id="descripcio">
+                  @if(complement.get('descripcio')?.touched && complement.get('descripcio')?.invalid) {
+                    <div class="invalido">
+                      @if(complement.get('descripcio')?.errors?.['required']) {
+                        Ompli la descripció del complement.  
+                      }
+                      @if(complement.get('descripcio')?.errors?.['minlength']) {
+                        Mínim obligat. {{ complement.get('descripcio')?.errors?.['minlength'].requiredLength }} 
+                      }
+                      @if(complement.get('descripcio')?.errors?.['maxlength']) {
+                        Màxim obligat. {{ complement.get('descripcio')?.errors?.['maxlength'].requiredLength }}  
+                      }                      
+                    </div>
+                  }                  
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-3">
                   <label>Preu</label>
-                  <input type="text" class="form-control" [(ngModel)]="complementSeleccionado.preu"                     
-                      pattern="^\d+(\.\d{1,2})?$" 
-                      #preuField="ngModel"
-                      name="preu" id="preu">
-                
-                      @if(preuField.invalid && preuField.touched) {      
-                        @if(preuField.errors?.['pattern']) {
-                           <div class="invalido">Només està permes números i el punt decimal.</div>
-                        }
-                     }                                           
+                  <input type="text" class="form-control" formControlName="preu" id="preu">
                 </div>
                 <div class="col-md-3">
                   <label>Actiu</label>
-                  <select class="form-select" [(ngModel)]="complementSeleccionado.actiu" name="actiu" id="actiu">
+                  <select class="form-select" formControlName="actiu" id="actiu">
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
                   </select>
                 </div>
-              </div>
-              
+                 @if(complement.get('preu')?.touched && complement.get('preu')?.invalid) {                
+                    <div class="invalido">
+                      @if(complement.get('preu')?.errors?.['pattern']) {
+                        Només està permes números i el punt decimal.
+                      }
+                    </div>                
+                 }
+              </div>              
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!complement.valid">Desar</button>
               <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>

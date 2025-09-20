@@ -255,27 +255,29 @@
                 <div class="col-md-3 mr-2"> 
                   <div class="form-group">
                     <label for="fecha">Data:</label>                    
-                    <input type="date" class="form-control" id="data_reserva" name="data_reserva" [(ngModel)]="data_reserva" size=10 required>
+                    <input type="date" class="form-control" id="data_reserva" name="data_reserva" [(ngModel)]="data_reserva" [disabled]="alta_reserva !== '0'" size=10 required>
                   </div>
                 </div>
                 <div class="col-md-4 mr-2"> 
                   <div class="form-group">
-                     <label for="sala">Sala:</label>
-                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva" (change)="actualizarMaximo()">
+                     <label for="sala">Sala: {{ sala_reserva }}</label>
+                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva" [disabled]="alta_reserva !== '0'" (change)="actualizarMaximo()">
                         @for (sala of sales; track sala.id; let id_sala = $index) {
                           <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
                         }
                      </select>
                    </div>
                 </div>                
-                <div class="col-md-3 mr-2"> 
-                  <label>&nbsp;</label>
-                  <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores" (click)="generate()"/>			     		                         
-                </div>
-                <div class="col-md-2 mr-2"> 
-                  <label>&nbsp;</label>                  
-                  <button type="button" class="form-control btn btn-danger" (click)="tancarModal()">Sortir</button>
-                </div>
+                @if(alta_reserva == '0') {
+                  <div class="col-md-3 mr-2"> 
+                    <label>&nbsp;</label>
+                    <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores" (click)="generate()"/>			     		                         
+                  </div>
+                  <div class="col-md-2 mr-2"> 
+                    <label>&nbsp;</label>                  
+                    <button type="button" class="form-control btn btn-danger" (click)="tancarModal()">Sortir</button>
+                  </div>
+                }
               </div>
               <div class="row">
                 <div class="col-md-2 mr-2"> 
@@ -308,14 +310,19 @@
                         }                     
                      </div>
                      <hr>
-                     <div class="row mb-2" id="extras">
-
+                     <div class="row mb-2" *ngIf="mostrarPeu">
+                          @for(comple of complements;  track comple.id; let id_comple = $index) {
+                              <label>
+                                <input type="checkbox" (click)="sumaComplement()" #checkComplemento/>
+                                {{ comple.descripcio }} - €{{ comple.preu }}
+                              </label>                            
+                          }                    
                      </div>
               </div>
               <div class="modal-footer">
                   <div *ngIf="mostrarPeu">      
                         <h1>Preu {{ this.preu_sala_total | PipePreu }}</h1>                  
-                        <button type="button" class="btn btn-primary m-2">Desar</button>
+                        <button type="button" class="btn btn-primary m-2" (click)="desarSala()">Desar</button>
                         <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
                   </div>
               </div>          

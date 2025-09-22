@@ -36,7 +36,6 @@
     </full-calendar>
   </div>
 
-
   <!-- Modal Login -->
   <div class="modal fade" id="loginModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[2] }">
     <div class="modal-dialog">
@@ -292,6 +291,13 @@
                     </select>                                                    
                 </div>                
               </div>
+              @if(missatge) {
+                <div class="row border rounded mt-4 bg-danger p-2">
+                  <div class="col-md-12">                    
+                    <h5>{{ missatge }}</h5>
+                  </div>
+                </div>
+              }                
               <div class="mt-3 container">
                      <div *ngIf="mostrarHourGrid">
                         @for(mira of mira_dia;track mira.id) {                         
@@ -302,6 +308,7 @@
                                     name="horesSelected"
                                     [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
                                     [disabled]="col.estado != 'No informado'" 
+                                    [disabled]="alta_reserva !== '0'" 
                                     (click)="triaHora($event)">                                
                                 {{col.hora_inici}}
                                 </button>
@@ -313,7 +320,10 @@
                      <div class="row mb-2" *ngIf="mostrarPeu">
                           @for(comple of complements;  track comple.id; let id_comple = $index) {
                               <label>
-                                <input type="checkbox" (click)="sumaComplement()" #checkComplemento/>
+                                <input type="checkbox" (click)="sumaComplement('bg-warning')" 
+                                                        #checkComplemento 
+                                                        [checked]="selectedComplements.includes(+comple.id)"
+                                                        [disabled]="alta_reserva !== '0'" />                                                                                        
                                 {{ comple.descripcio }} - €{{ comple.preu }}
                               </label>                            
                           }                    
@@ -322,8 +332,8 @@
               <div class="modal-footer">
                   <div *ngIf="mostrarPeu">      
                         <h1>Preu {{ this.preu_sala_total | PipePreu }}</h1>                  
-                        <button type="button" class="btn btn-primary m-2" (click)="desarSala()">Desar</button>
-                        <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
+                        <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="desarSala()">Desar</button>
+                        <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Sortir' : 'Cancel.lar' }}</button>                        
                   </div>
               </div>          
       </div>

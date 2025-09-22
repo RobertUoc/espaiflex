@@ -25,6 +25,7 @@ import { FormsModule } from '@angular/forms';
 import { Users } from '../../models/users.model';
 import { Sales } from '../../models/sales.model';
 import { Horas } from '../../models/horas.model';
+import { Reserva } from '../../models/reserva.model';
 import { Complements } from '../../models/complements.model';
 import { UsersService } from '../../service/users.service';
 import { SalesService } from '../../service/sales.service';
@@ -53,7 +54,7 @@ export class CalendariComponent implements OnInit {
     email: '',
     password: '',
   };
-
+  private TODAY_STR = new Date().toISOString().replace(/T.*$/, ''); // Avui
   public modalVisible = [false];
   public registerData = new Users();
   public eventGuid: number = 0;
@@ -61,6 +62,7 @@ export class CalendariComponent implements OnInit {
   public id_usuari: number = 0;
   public finestra: number = 0;
   public sales = [new Sales()];
+  public reservas = [new Reserva()];
   public salaSeleccionado = new Sales();
   public complements = [new Complements()];
   public dia: string = '';
@@ -68,6 +70,7 @@ export class CalendariComponent implements OnInit {
   public horas: string[] = [];
   public data_reserva: string = '';
   public sala_reserva: string = '';
+  public missatge: string = '';
   public max_sala: string = '1';
   public mostrarHourGrid: boolean = false;
   public mostrarPeu: boolean = false;
@@ -76,6 +79,7 @@ export class CalendariComponent implements OnInit {
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
   public horari: string = '1';
+  public selectedComplements: number[] = [];
   public eventos = signal([
     {
       id: '',
@@ -89,6 +93,7 @@ export class CalendariComponent implements OnInit {
     },
   ]);
   public alta_reserva: string = '0';
+  getInSiteForm: any;
 
   id_edifici: string = '';
 
@@ -137,7 +142,12 @@ export class CalendariComponent implements OnInit {
   }
 
   actualizarMaximo() {
-    this.max_sala = this.sales[parseInt(this.sala_reserva)].max_ocupacio;
+    this.max_sala =
+      this.sales.find((reg) => reg.id == this.sala_reserva)?.max_ocupacio ?? '';
+    this.horari =
+      this.sales.find((reg) => reg.id == this.sala_reserva)?.horari ?? '';
+    this.missatge =
+      this.sales.find((reg) => reg.id == this.sala_reserva)?.missatge ?? '';
   }
 
   getSales(id_edifici: string) {
@@ -194,11 +204,11 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  sumaComplement() {
+  sumaComplement(clase: string) {
     let total = 0;
     let btn = this.botones.toArray();
     let hihabtn = btn.filter((boton) =>
-      boton.nativeElement.classList.contains('bg-warning')
+      boton.nativeElement.classList.contains(clase)
     ).length;
     if (hihabtn > 0) {
       this.mostrarPeu = true;
@@ -215,7 +225,6 @@ export class CalendariComponent implements OnInit {
   tornar() {
     this.router.navigate(['/']);
   }
-
   onLoginSubmit() {
     this.id_usuari = 0;
     this.usuari = 'Visitant';
@@ -290,6 +299,7 @@ export class CalendariComponent implements OnInit {
   }
 
   reserva() {
+    this.selectedComplements = [];
     this.alta_reserva = '0';
     this.finestra = 90;
     this.mostrarHourGrid = false;
@@ -384,7 +394,7 @@ export class CalendariComponent implements OnInit {
       boton.classList.remove('bg-success');
       boton.classList.add('bg-warning');
     }
-    this.sumaComplement();
+    this.sumaComplement('bg-warning');
   }
 
   private calcularHoraFinal(horari: string, hora_inici: string): string {
@@ -472,12 +482,30 @@ export class CalendariComponent implements OnInit {
     this.modalVisible[this.finestra] = true;
     this.data_reserva = clickInfo.event.startStr;
     this.resetGenerate();
-    console.log(clickInfo.event);
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
 
+    this.calendariService.getDadesReserva(clickInfo.event.id).subscribe({
+      next: (data) => {
+        this.reservas = data;
+      },
+      error: (error) => {
+        console.log(error);
+      },
+      complete: () => {
+        this.preu_sala_total = this.reservas[0]?.import_sala;
+        this.max_sala = this.reservas[0]?.max_ocupacio;
+        this.horari = this.reservas[0]?.horari;
+        this.missatge = this.reservas[0].missatge;
+        this.selectedComplements = [];
+        this.selectedComplements = this.reservas.map((r) => +r.id_complements);
+
+        console.log(this.selectedComplements);
+      },
+    });
+
     this.calendariService
-      .getMiraDia(this.data_reserva, this.sala_reserva)
+      .getMiraReserva(this.data_reserva, this.sala_reserva, clickInfo.event.id)
       .subscribe({
         next: (data) => {
           this.creaHorari(data);
@@ -488,10 +516,12 @@ export class CalendariComponent implements OnInit {
         complete: () => {
           // Busco els complements de la sala
           this.preu_sala =
-          this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+            this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
           this.getcomplent(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
+          this.sumaComplement('bg-danger');
+          this.mostrarPeu = true;
           console.log('Ok');
         },
       });
@@ -506,15 +536,21 @@ export class CalendariComponent implements OnInit {
 
   desarSala() {
     this.tancarModal();
-    const TODAY_STR = new Date().toISOString().replace(/T.*$/, ''); // YYYY-MM-DD of today
     const nuevos = [...this.eventos()];
+
+    let fuc = '999008881';
+    let terminal = '1';
+    let orderId = 'pedido123'; // debe ser único
+    let amount = '1500';
+    let currency = '978';
+    let merchantURL = 'https://tuweb.com/resultado-pago';
 
     nuevos.push({
       id: '2',
       title: 'Este esta insertado',
-      groupId: '1',
-      start: `${TODAY_STR}T${'16:00:00'}`,
-      end: `${TODAY_STR}T${'17:30:00'}`,
+      groupId: this.sala_reserva,
+      start: `${this.data_reserva}T${'16:00:00'}`,
+      end: `${this.data_reserva}T${'17:30:00'}`,
       rendering: 'background',
       color: '#ffcccb',
       allDay: true,

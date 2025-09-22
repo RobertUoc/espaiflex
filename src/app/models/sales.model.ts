@@ -1,4 +1,5 @@
 export class Sales {
+
   constructor(
     public id: string = '0',
     public descripcio: string = '',
@@ -11,4 +12,5 @@ export class Sales {
     public max_ocupacio: string = '1',
     public horari: string = '1'
   ) {}
+  
 }

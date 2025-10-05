@@ -1,18 +1,18 @@
-<h1>Complements</h1>
+<h1>Complementos</h1>
 
 <div class="container mt-4">  
 
   <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
-    Crear nou complement
+    Crear nuevo complemento
   </button>
 
   <table class="table table-striped table-bordered">
     <thead class="table-dark">
       <tr>        
-        <th>Nom</th>
-        <th>Preu</th>
-        <th>Actiu</th>
-        <th>Accions</th>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Activo</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -37,9 +37,9 @@
   <pagination-controls 
     (pageChange)="paginaActual = $event"
     previousLabel="Anterior"
-    nextLabel="Següent"
-    screenReaderPageLabel="Pàgina"
-    screenReaderCurrentLabel="Pàgina Actual"
+    nextLabel="Siguiente"
+    screenReaderPageLabel="Página"
+    screenReaderCurrentLabel="Página Actual"
   ></pagination-controls>
 </div>
 
@@ -51,25 +51,25 @@
           <form  [formGroup]="complement" (ngSubmit)="saveComplement()">
             <div class="modal-header">
               <h5 class="modal-title">
-                {{ complement.get('id')?.value == '0' ? 'Crear Complement' : 'Modificar Complement' }}
+                {{ complement.get('id')?.value == '0' ? 'Crear Complemento' : 'Modificar Complemento' }}
              </h5>
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
-                  <label>Nom</label>
+                  <label>Nombre</label>
                   <input type="text" class="form-control" formControlName="descripcio" id="descripcio">
                   @if(complement.get('descripcio')?.touched && complement.get('descripcio')?.invalid) {
                     <div class="invalido">
                       @if(complement.get('descripcio')?.errors?.['required']) {
-                        Ompli la descripció del complement.  
+                        Rellene la descripción del complemento.  
                       }
                       @if(complement.get('descripcio')?.errors?.['minlength']) {
-                        Mínim obligat. {{ complement.get('descripcio')?.errors?.['minlength'].requiredLength }} 
+                        Mínimo obligado. {{ complement.get('descripcio')?.errors?.['minlength'].requiredLength }} 
                       }
                       @if(complement.get('descripcio')?.errors?.['maxlength']) {
-                        Màxim obligat. {{ complement.get('descripcio')?.errors?.['maxlength'].requiredLength }}  
+                        Màximo obligado. {{ complement.get('descripcio')?.errors?.['maxlength'].requiredLength }}  
                       }                      
                     </div>
                   }                  
@@ -77,11 +77,11 @@
               </div>
               <div class="row">
                 <div class="col-md-3">
-                  <label>Preu</label>
+                  <label>Precio</label>
                   <input type="text" class="form-control" formControlName="preu" id="preu">
                 </div>
                 <div class="col-md-3">
-                  <label>Actiu</label>
+                  <label>Activo</label>
                   <select class="form-select" formControlName="actiu" id="actiu">
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
@@ -90,15 +90,15 @@
                  @if(complement.get('preu')?.touched && complement.get('preu')?.invalid) {                
                     <div class="invalido">
                       @if(complement.get('preu')?.errors?.['pattern']) {
-                        Només està permes números i el punt decimal.
+                        Solo està permitido números y el punto decimal.
                       }
                     </div>                
                  }
               </div>              
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!complement.valid">Desar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!complement.valid">Grabar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
             </div>
           </form>
         </div>

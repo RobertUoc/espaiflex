@@ -34,6 +34,8 @@ import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
 import { PipeFechaPipe } from '../../pipe/pipeFecha.pipe';
 import { CalendariService } from '../../service/calendari.service';
 import Swal from 'sweetalert2';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-calendari',
@@ -45,6 +47,7 @@ import Swal from 'sweetalert2';
     CommonModule,
     PipePreuPipe,
     PipeFechaPipe,
+    ReactiveFormsModule,
   ],
   templateUrl: './calendari.component.html',
   styleUrls: ['./calendari.component.css'],
@@ -58,7 +61,7 @@ export class CalendariComponent implements OnInit {
   public modalVisible = [false];
   public registerData = new Users();
   public eventGuid: number = 0;
-  public usuari: string = 'Visitant';
+  public usuari: string = 'Visitante';
   public id_usuari: number = 0;
   public finestra: number = 0;
   public sales = [new Sales()];
@@ -68,7 +71,12 @@ export class CalendariComponent implements OnInit {
   public dia: string = '';
   public mira_dia: any[] = [];
   public horas: string[] = [];
-  public data_reserva: string = '';
+  // Formulario Reserva
+  public reservaForm!: FormGroup;
+
+  public data_reserva_ini: string = '';
+  public data_reserva_fin: string = '';
+  public frecuencia: string = "diaria";
   public sala_reserva: string = '';
   public missatge: string = '';
   public max_sala: string = '1';
@@ -126,6 +134,7 @@ export class CalendariComponent implements OnInit {
   currentEvents = signal<EventApi[]>([]);
 
   constructor(
+    private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetector: ChangeDetectorRef,
@@ -139,15 +148,48 @@ export class CalendariComponent implements OnInit {
     this.id_edifici = this.route.snapshot.paramMap.get('id') || '';
     this.getSales(this.id_edifici);
     this.carregaDies();
+    this.createForm();
+  }
+
+  createForm() {
+    // Formulario Reserva
+    this.reservaForm = this.fb.group({
+      fechaInicial: [new Date().toISOString().substring(0, 10), [Validators.required, Validators.maxLength(10)]],
+      fechaFinal: [new Date().toISOString().substring(0, 10), [Validators.required, Validators.maxLength(10)]],
+      frecuencia: ['diaria'], // diaria | semanal | mensual
+      diasSemana: this.fb.group({
+        lunes: [false],
+        martes: [false],
+        miercoles: [false],
+        jueves: [false],
+        viernes: [false],
+        sabado: [false],
+        domingo: [false]
+      }),
+      mensualidad: this.fb.group({
+        tipo : ['1'],
+        numeroDia: ['1'],        
+        periodo: ['primer'],
+        diaSemana: ['lunes'],
+      }),
+      sala_reserva: ['', [Validators.required, Validators.maxLength(6)]],
+      max_sala: [{ value: '', disabled: true}] ,
+      horari_sala: [{ value: '', disabled: true}] ,
+    })
   }
 
   actualizarMaximo() {
-    this.max_sala =
-      this.sales.find((reg) => reg.id == this.sala_reserva)?.max_ocupacio ?? '';
-    this.horari =
-      this.sales.find((reg) => reg.id == this.sala_reserva)?.horari ?? '';
-    this.missatge =
-      this.sales.find((reg) => reg.id == this.sala_reserva)?.missatge ?? '';
+    let salaId = this.reservaForm.get('sala_reserva')?.value;
+    let DadesSala = this.sales.find(reg => reg.id == salaId);
+    // this.max_sala = DadesSala?.max_ocupacio ?? '';
+    // this.horari_sala = DadesSala?.horari ?? '';
+    this.missatge = DadesSala?.missatge ?? '';
+
+    this.reservaForm.get('max_sala')?.setValue(DadesSala?.max_ocupacio ?? '');
+    this.reservaForm.get('horari_sala')?.setValue(DadesSala?.horari ?? '');
+
+    this.generate();
+
   }
 
   getSales(id_edifici: string) {
@@ -227,7 +269,7 @@ export class CalendariComponent implements OnInit {
   }
   onLoginSubmit() {
     this.id_usuari = 0;
-    this.usuari = 'Visitant';
+    this.usuari = 'Visitante';
     this.userService
       .getUser(this.loginData.email, this.loginData.password)
       .subscribe({
@@ -306,7 +348,8 @@ export class CalendariComponent implements OnInit {
     this.mostrarPeu = false;
     this.agrupado = {};
     this.modalVisible[this.finestra] = true;
-    this.data_reserva = new Date().toISOString().substring(0, 10);
+    this.data_reserva_ini = new Date().toISOString().substring(0, 10);
+    this.data_reserva_fin = new Date().toISOString().substring(0, 10);
     this.sala_reserva = '0';
   }
 
@@ -352,6 +395,8 @@ export class CalendariComponent implements OnInit {
   }
   generate() {
     this.resetGenerate();
+
+    this.sala_reserva = this.reservaForm.get('sala_reserva')?.value;    
     if (this.sala_reserva == '0') {
       this.mostrarAlertes(
         'Atenció!!!',
@@ -364,7 +409,7 @@ export class CalendariComponent implements OnInit {
     //
     //
     this.calendariService
-      .getMiraDia(this.data_reserva, this.sala_reserva)
+      .getMiraDia(this.data_reserva_ini, this.sala_reserva)
       .subscribe({
         next: (data) => {
           this.creaHorari(data);
@@ -480,7 +525,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarPeu = false;
     this.agrupado = {};
     this.modalVisible[this.finestra] = true;
-    this.data_reserva = clickInfo.event.startStr;
+    this.data_reserva_ini = clickInfo.event.startStr;
     this.resetGenerate();
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
@@ -505,7 +550,7 @@ export class CalendariComponent implements OnInit {
     });
 
     this.calendariService
-      .getMiraReserva(this.data_reserva, this.sala_reserva, clickInfo.event.id)
+      .getMiraReserva(this.data_reserva_ini, this.sala_reserva, clickInfo.event.id)
       .subscribe({
         next: (data) => {
           this.creaHorari(data);
@@ -535,27 +580,38 @@ export class CalendariComponent implements OnInit {
   }
 
   desarSala() {
-    this.tancarModal();
-    const nuevos = [...this.eventos()];
+    let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
+    let nom = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
+    // this.id_usuari
+    // this.preu_sala_total
 
-    let fuc = '999008881';
-    let terminal = '1';
-    let orderId = 'pedido123'; // debe ser único
-    let amount = '1500';
-    let currency = '978';
-    let merchantURL = 'https://tuweb.com/resultado-pago';
+    const horasMarcadas = this.botones
+    .filter(btn => btn.nativeElement.classList.contains('bg-warning'))
+    .map(btn => btn.nativeElement.textContent.trim().split(' a ')[0])
+    .join('#');
+
+    const complements = this.checkboxes
+    .filter(cb => cb.nativeElement.checked)
+    .map(cb => cb.nativeElement.name.trim().split('_')[1])
+    .join('#');    
+    
+
+    console.log(horasMarcadas);
+    
+    const nuevos = [...this.eventos()];
 
     nuevos.push({
       id: '2',
-      title: 'Este esta insertado',
+      title: nom,
       groupId: this.sala_reserva,
-      start: `${this.data_reserva}T${'16:00:00'}`,
-      end: `${this.data_reserva}T${'17:30:00'}`,
+      start: `${this.data_reserva_ini}T${'16:00:00'}`,
+      end: `${this.data_reserva_fin}T${'17:30:00'}`,
       rendering: 'background',
-      color: '#ffcccb',
+      color: color,
       allDay: true,
     });
     this.eventos.set(nuevos);
+    this.tancarModal();
   }
 
   carregaDies() {
@@ -582,5 +638,9 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {},
     });
+  }
+
+  saveReserva() {
+    
   }
 }

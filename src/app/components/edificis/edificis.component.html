@@ -1,8 +1,8 @@
-<h1>Edificis</h1>
+<h1>Edificios</h1>
 <div class="container mt-4">
   
   <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
-    Crear nou edifici
+    Crear nuevo edificio
   </button>
 
   <div class="row">
@@ -27,14 +27,14 @@
           <form (ngSubmit)="saveEdifici()" enctype="multipart/form-data" #form="ngForm">
             <div class="modal-header">
               <h5 class="modal-title">
-                {{ edificioSeleccionado.id == '0' ? 'Crear Edifici' : 'Modificar Edifici' }}
+                {{ edificioSeleccionado.id == '0' ? 'Crear Edificio' : 'Modificar Edificio' }}
              </h5>
               <button type="button" class="btn-close" (click)="tancarModal()"></button>
             </div>
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
-                  <label>Nom</label>
+                  <label>Nombre</label>
                   <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" 
                       required minlength="3" maxlength="50"
                       #nomField="ngModel"                  
@@ -42,13 +42,13 @@
 
                       @if(nomField.invalid && nomField.touched) {      
                          @if(nomField.errors?.['required']) {
-                            <div class="invalido">Ompli el nom de l'edifici.</div>
+                            <div class="invalido">Rellene el nombre del edificio.</div>
                         }
                         @if(nomField.errors?.['minlength']) {
-                            <div class="invalido">Mínim obligat. {{ nomField.errors?.['minlength'].requiredLength }}</div>
+                            <div class="invalido">Mínimo obligado. {{ nomField.errors?.['minlength'].requiredLength }}</div>
                         }
                         @if(nomField.errors?.['maxlength']) {
-                          <div class="invalido">Màxim obligat. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
+                          <div class="invalido">Màximo obligado. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
                         }                 
                       }
 
@@ -75,13 +75,13 @@
               </div>
               <div class="row">
                 <div class="col-md-12">
-                  <label>Descripció</label>
+                  <label>Descripción</label>
                   <textarea class="form-control" [(ngModel)]="edificioSeleccionado.descripcio" name="descripcio" id="descripcio"></textarea>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-3">
-                  <label>Actiu</label>
+                  <label>Activo</label>
                   <select class="form-select" [(ngModel)]="edificioSeleccionado.actiu" name="actiu" id="actiu">
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
@@ -90,7 +90,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Grabar</button>
               <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
             </div>
           </form>

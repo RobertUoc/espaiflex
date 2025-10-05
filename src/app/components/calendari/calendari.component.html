@@ -1,10 +1,10 @@
 <div class="d-flex justify-content-between align-items-center bg-light p-2">
     <div class="btn-group" role="group" aria-label="Admin menu">
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrar-se</button>
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actulitzar-se</button>
+      <button type="button" class="btn btn-outline-primary" (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
+      <button type="button" class="btn btn-outline-primary" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actulitzarse</button>
       <button type="button" class="btn btn-outline-primary" (click)="neteja(2)">Identificar-se</button>      
     </div>  
-    <button type="button" class="btn btn-outline-danger" (click)="tornar()">Sortir</button>
+    <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
 </div>
 
 <div class="btn-group" role="group" aria-label="Admin menu">
@@ -12,7 +12,7 @@
       {{ usuari }}
   </div>
   <div>
-    <button type="button" class="ms-2 btn btn-success" (click)="reserva()" [ngClass]="{ 'd-none': id_usuari === 0 }" (click)="reserva()">Nova Reserva</button>
+    <button type="button" class="ms-2 btn btn-success" (click)="reserva()" [ngClass]="{ 'd-none': id_usuari === 0 }" (click)="reserva()">Nueva Reserva</button>
   </div>
 </div>
 
@@ -36,32 +36,33 @@
     </full-calendar>
   </div>
 
+
   <!-- Modal Login -->
   <div class="modal fade" id="loginModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[2] }">
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
         <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Iniciar Sessió</h5>
+          <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
           <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
         </div>
         <div class="modal-body">
           <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm">
             <div class="row">
               <div class="col-md-12">
-                <label class="form-label">Correu electrònic</label>
+                <label class="form-label">Correo electrónico</label>
                 <input type="email" class="form-control" name="loginData.email" id="loginData.email" [(ngModel)]="loginData.email">
               </div>              
             </div>  
             <div class="row">
               <div class="col-md-6">                                  
-                <label class="form-label">Contrasenya</label>
+                <label class="form-label">Contraseña</label>
                 <input type="password" class="form-control" name="loginData.password" id="loginData.password" [(ngModel)]="loginData.password">
               </div>         
             </div>
             <hr>
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">Entrar</button>
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>            
+                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
             </div>
           </form>
         </div>
@@ -74,61 +75,61 @@
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
         <div class="modal-header">
-          <h5 class="modal-title" id="registerModalLabel">{{ finestra == 1 ? 'Registrar-se' : 'Actulitzar-se' }}</h5>
+          <h5 class="modal-title" id="registerModalLabel">{{ finestra == 1 ? 'Registrarse' : 'Actulitzarse' }}</h5>
           <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
         </div>
         <div class="modal-body">
           <form (ngSubmit)="onRegisterSubmit()"  #Registreform="ngForm">
             <div class="row">
               <div class="col-md-12">
-                <label class="form-label">Nom</label>
+                <label class="form-label">Nombre</label>
                 <input type="email" class="form-control" [(ngModel)]="registerData.nom"                
                        required minlength="3" maxlength="50" 
                        #nomField="ngModel"
                        name="nom" id="nom">
                        @if(nomField.invalid && nomField.touched) {      
                          @if(nomField.errors?.['required']) {
-                           <div class="invalido">Ompli el nom.</div>
+                           <div class="invalido">Relleno el nombre.</div>
                          }
                          @if(nomField.errors?.['minlength']) {
-                           <div class="invalido">Mínim obligat. {{ nomField.errors?.['minlength'].requiredLength }}</div>
+                           <div class="invalido">Mínimo obligado. {{ nomField.errors?.['minlength'].requiredLength }}</div>
                          }
                          @if(nomField.errors?.['maxlength']) {
-                           <div class="invalido">Màxim obligat. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
+                           <div class="invalido">Màximo obligado. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
                          }    
                        }            
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">                        
-                <label class="form-label">Correu electrònic</label>
+                <label class="form-label">Correo electrónic</label>
                 <input type="email" class="form-control" [(ngModel)]="registerData.email"
                        required minlength="3" maxlength="50" 
                        #emailField="ngModel"
                        name="email" id="email">
                        @if(emailField.invalid && emailField.touched) {      
                           @if(emailField.errors?.['required']) {
-                            <div class="invalido">Ompli el correu electrònic.</div>
+                            <div class="invalido">Relleno el correou electrónico.</div>
                           }
                           @if(emailField.errors?.['minlength']) {
-                            <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
+                            <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
                           }
                           @if(emailField.errors?.['maxlength']) {
-                            <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
+                            <div class="invalido">Màximo obligado. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
                           }    
                        }            
               </div>
             </div>
             <div class="row">
               <div class="col-md-6">                                                
-                <label class="form-label">Contrasenya</label>
+                <label class="form-label">Contraseña</label>
                 <input type="password" class="form-control" [(ngModel)]="registerData.password"
                        required minlength="3" maxlength="8" 
                        #passwordField="ngModel"
                        name="password" id="password">
               </div>
               <div class="col-md-6">
-                <label class="form-label">Confirmar contrasenya</label>
+                <label class="form-label">Confirmar contraseña</label>
                 <input type="password" class="form-control" [(ngModel)]="registerData.confirm"
                       #confirmField="ngModel"
                       name="confirm" id="confirm">              
@@ -136,24 +137,24 @@
               
               @if(passwordField.invalid && passwordField.touched) {      
                 @if(passwordField.errors?.['required']) {
-                  <div class="invalido">Ompli la contrasenya.</div>
+                  <div class="invalido">Rellene la contraseña.</div>
                 }
                 @if(passwordField.errors?.['minlength']) {
-                  <div class="invalido">Mínim obligat. {{ emailField.errors?.['minlength'].requiredLength }}</div>
+                  <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
                 }
                 @if(passwordField.errors?.['maxlength']) {
-                  <div class="invalido">Màxim obligat. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
+                  <div class="invalido">Màximo obligado. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
                 }    
               }            
 
               <div *ngIf="confirmField.touched && !passwordsMatch()" class="text-danger mt-1">
-                   <div class="invalido">Las contrasenyes no coincideixen.</div>
+                   <div class="invalido">Las contraseñas no coinciden.</div>
               </div>
             </div>
             <hr> 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrar-se' : 'Actulitzar-se' }}</button>
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>
+                <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrarse' : 'Actulitzarse' }}</button>
+                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>
             </div>
           </form>
         </div>
@@ -175,30 +176,30 @@
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
-                  <label>Nom</label>
+                  <label>Nombre</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" disabled name="descripcio" id="descripcio">
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <label>Edifici</label>
+                  <label>Edificio</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.nom_edifici" disabled name="nom_edifici" id="nom_edifici">
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-3">
-                  <label>Aforament</label>
+                  <label>Capacidad</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" disabled name="max" id="max">
                 </div>       
                 <div class="col-md-4">
-                  <label>Horari</label>
+                  <label>Horario</label>
                   <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari" disabled>
                         <option value="1">1 hora</option>
                         <option value="2">½ hora</option>
                   </select>
                 </div>         
                 <div class="col-md-3">
-                  <label>{{ salaSeleccionado.horari == '2' ? 'Preu ½ hora' : 'Preu hora' }}</label>
+                  <label>{{ salaSeleccionado.horari == '2' ? 'Precio ½ hora' : 'Precio hora' }}</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
                 </div>                                                
               </div>
@@ -215,8 +216,8 @@
                   <table class="table table-striped table-bordered">
                       <thead class="table-dark">
                         <tr>        
-                          <th>Complement</th>
-                          <th>Preu</th>
+                          <th>Complementos</th>
+                          <th>Precio</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -231,7 +232,7 @@
             </div>
             <hr>
             <div class="d-flex justify-content-between">               
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>            
+                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
             </div>
           </form>
         </div>
@@ -249,95 +250,170 @@
         <button type="button" class="btn-close" (click)="tancarModal()"></button>
       </div>
 
-      <div class="modal-body container-fluid">                
-              <div class="row">
-                <div class="col-md-3 mr-2"> 
-                  <div class="form-group">
-                    <label for="fecha">Data:</label>                    
-                    <input type="date" class="form-control" id="data_reserva" name="data_reserva" [(ngModel)]="data_reserva" [disabled]="alta_reserva !== '0'" size=10 required>
+      <form  [formGroup]="reservaForm" (ngSubmit)="saveReserva()">
+        <div class="modal-body container-fluid">                
+          <div class="row">
+            <div class="col-md-3 mr-2">               
+                <label>Fecha Incial:</label>                    
+                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial" [disabled]="alta_reserva !== '0'">            
+            </div>
+            <div class="col-md-3 mr-2">               
+                <label>Fecha Final:</label>                    
+                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal" [disabled]="alta_reserva !== '0'">              
+            </div>                        
+          </div>
+          <div class="row">
+            <div class="col-md-3 mr-2">              
+                <label>Frecuencia:</label>
+                <select class="form-control" id="frecuencia" formControlName="frecuencia" [disabled]="alta_reserva !== '0'">
+                  <option value="diaria">Diaria</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensual">Mensual</option>
+                </select>              
+            </div>      
+            <!-- Semanal -->
+            <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'semanal'">              
+                <label>Dias de la semana:</label>
+                <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">
+                  <label><input type="checkbox" formControlName="lunes"> Lunes </label>
+                  <label><input type="checkbox" formControlName="martes"> Martes</label>
+                  <label><input type="checkbox" formControlName="miercoles"> Miercoles</label>
+                  <label><input type="checkbox" formControlName="jueves"> Jueves</label>
+                  <label><input type="checkbox" formControlName="viernes"> Viernes</label>
+                  <label><input type="checkbox" formControlName="sabado"> Sabado</label>
+                  <label><input type="checkbox" formControlName="domingo"> Domingo</label>
+                </div>              
+            </div>                   
+            <!-- Mensual -->
+            <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'mensual'">              
+                <label for="fecha">Opciones Mensuales:</label>
+                <div class="row" formGroupName="mensualidad">
+                  <!-- Radio -->
+                  <div class="col-md-4 mr-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="tipo1" name="tipo" value="1" formControlName="tipo">
+                      <label class="form-check-label" for="byDay">Cada Día </label>
+                    </div>
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="radio" id="tipo2" name="tipo" value="2" formControlName="tipo">
+                      <label class="form-check-label" for="byPeriodicity">El </label>
+                    </div>                
+                  </div>
+                  <!-- Valores -->
+                  <div class="col-md-8 mr-2">
+                    <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 1">                   
+                      <div class="row">
+                      <div class="col-md-3 mr-2">
+                        <input type="number" id="numerodia" class="form-control" formControlName="numeroDia" min="1" max="31">
+                      </div>
+                      <div class="col-md-4">
+                        <label> de cada mes</label>
+                      </div>
+                      </div>
+                    </div>      
+                    <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 2" class="mt-2">
+                      <div class="row">
+                        <div class="col-md-4 mr-2">                    
+                            <select id="periodo" class="col-md-2 mr-2 form-control" formControlName="periodo">                    
+                              <option value="primer">Primer</option>
+                              <option value="segundo">Segundo</option>
+                              <option value="tercer">Tercer</option>
+                              <option value="cuarto">Cuarto</option>
+                              <option value="ultimo">Último</option>
+                            </select>                       
+                        </div>
+                        <div class="col-md-4 mr-2">                    
+                            <select id="diaSemana" class="form-control" formControlName="diaSemana">                    
+                              <option value="lunes">Lunes</option>
+                              <option value="martes">Martes</option>
+                              <option value="miercoles">Miercoles</option>
+                              <option value="jueves">Jueves</option>
+                              <option value="viernes">Viernes</option>
+                              <option value="sabado">Sabado</option>
+                              <option value="domingo">Domingo</option>
+                            </select>                                        
+                        </div>    
+                        <div class="col-md-4 mr-2">                    
+                          <label> de cada mes</label>
+                        </div>                    
+                      </div>
+                    </div>                                                          
                   </div>
                 </div>
-                <div class="col-md-4 mr-2"> 
-                  <div class="form-group">
-                     <label for="sala">Sala: {{ sala_reserva }}</label>
-                     <select class="form-control" id="sala_reserva" name="sala_reserva" required [(ngModel)]="sala_reserva" [disabled]="alta_reserva !== '0'" (change)="actualizarMaximo()">
-                        @for (sala of sales; track sala.id; let id_sala = $index) {
-                          <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
-                        }
-                     </select>
-                   </div>
-                </div>                
-                @if(alta_reserva == '0') {
-                  <div class="col-md-3 mr-2"> 
-                    <label>&nbsp;</label>
-                    <input class="form-control btn btn-warning mr-2" id="generate" type="button" value="Cercar Hores" (click)="generate()"/>			     		                         
-                  </div>
-                  <div class="col-md-2 mr-2"> 
-                    <label>&nbsp;</label>                  
-                    <button type="button" class="form-control btn btn-danger" (click)="tancarModal()">Sortir</button>
-                  </div>
-                }
+            </div>                      
+          <hr>
+          <div class="row">  
+            <div class="col-md-4 mr-2">               
+                 <label for="sala">Sala:</label>
+                 <select class="form-control" id="sala_reserva" formControlName="sala_reserva" [disabled]="alta_reserva !== '0'" (change)="actualizarMaximo()">
+                    @for (sala of sales; track sala.id; let id_sala = $index) {
+                      <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
+                    }
+                 </select>               
+            </div>   
+          </div>  
+          <div class="row">
+            <div class="col-md-2 mr-2"> 
+                <label for="fecha">Capacidad:</label>                    
+                <input type="input" class="form-control" id="max_sala" formControlName="max_sala" >
+            </div>
+            <div class="col-md-2 mr-2"> 
+                <label for="fecha">Horario:</label>        
+                <select class="form-select" id="horari_sala" formControlName="horari_sala" >
+                      <option value="1">1 hora</option>
+                      <option value="2">½ hora</option>
+                </select>                                                    
+            </div>                            
+          </div>   
+          <div *ngIf="mostrarHourGrid">
+            @for(mira of mira_dia;track mira.id) {                         
+              <div class="row text-center mt-2">
+                  @for(col of mira.items;track $index) {
+                    <button class="col-md-2 d-flex p-2 rounded text-white m-1"
+                        #horesSelected
+                        name="horesSelected"
+                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
+                        [disabled]="col.estado != 'No informado'" 
+                        [disabled]="alta_reserva !== '0'" 
+                        (click)="triaHora($event)">                                
+                    {{col.hora_inici}}
+                    </button>
+                  }                        
               </div>
-              <div class="row">
-                <div class="col-md-2 mr-2"> 
-                    <label for="fecha">Aforament:</label>                    
-                    <input type="input" class="form-control" id="max_sala" name="max_sala" [(ngModel)]="max_sala" size=5 disabled>
-                </div>
-                <div class="col-md-2 mr-2"> 
-                    <label for="fecha">Horari:</label>        
-                    <select class="form-select" [(ngModel)]="horari" name="horari" id="horari" disabled>
-                          <option value="1">1 hora</option>
-                          <option value="2">½ hora</option>
-                    </select>                                                    
-                </div>                
+              <hr>
+              <div class="row mb-2" *ngIf="mostrarPeu">
+                   @for(comple of complements;  track comple.id; let id_comple = $index) {
+                       <label>
+                         <input type="checkbox" (click)="sumaComplement('bg-warning')" 
+                                                 name = "chk_{{comple.id}}"
+                                                 #checkComplemento                                                         
+                                                 [checked]="selectedComplements.includes(+comple.id)"
+                                                 [disabled]="alta_reserva !== '0'" />                                                                                        
+                         {{ comple.descripcio }} - €{{ comple.preu }}
+                       </label>                            
+                   }                    
+              </div>              
+            }       
+            <div class="modal-footer">
+              <div *ngIf="mostrarPeu">      
+                    <h1>Precio {{ this.preu_sala_total | PipePreu }}</h1>                  
+                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="desarSala()">Guardar</button>
+                    <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>                        
               </div>
-              @if(missatge) {
-                <div class="row border rounded mt-4 bg-danger p-2">
-                  <div class="col-md-12">                    
-                    <h5>{{ missatge }}</h5>
-                  </div>
-                </div>
-              }                
-              <div class="mt-3 container">
-                     <div *ngIf="mostrarHourGrid">
-                        @for(mira of mira_dia;track mira.id) {                         
-                          <div class="row text-center">
-                              @for(col of mira.items;track $index) {
-                                <button class="col-md-2 d-flex p-2 rounded text-white m-1"
-                                    #horesSelected
-                                    name="horesSelected"
-                                    [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
-                                    [disabled]="col.estado != 'No informado'" 
-                                    [disabled]="alta_reserva !== '0'" 
-                                    (click)="triaHora($event)">                                
-                                {{col.hora_inici}}
-                                </button>
-                              }                        
-                          </div>
-                        }                     
-                     </div>
-                     <hr>
-                     <div class="row mb-2" *ngIf="mostrarPeu">
-                          @for(comple of complements;  track comple.id; let id_comple = $index) {
-                              <label>
-                                <input type="checkbox" (click)="sumaComplement('bg-warning')" 
-                                                        #checkComplemento 
-                                                        [checked]="selectedComplements.includes(+comple.id)"
-                                                        [disabled]="alta_reserva !== '0'" />                                                                                        
-                                {{ comple.descripcio }} - €{{ comple.preu }}
-                              </label>                            
-                          }                    
-                     </div>
-              </div>
-              <div class="modal-footer">
-                  <div *ngIf="mostrarPeu">      
-                        <h1>Preu {{ this.preu_sala_total | PipePreu }}</h1>                  
-                        <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="desarSala()">Desar</button>
-                        <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Sortir' : 'Cancel.lar' }}</button>                        
-                  </div>
-              </div>          
-      </div>
-    </div>
+          </div>                                    
+         </div>                            
+        </div>
+        @if(missatge) {
+          <div class="row border rounded mt-4 bg-danger p-2">
+            <div class="col-md-12">                    
+              <h5>{{ missatge }}</h5>
+            </div>
+          </div>
+        }                        
+        </div>
+      </form>
+         
+    </div>  
   </div>
 </div>    
 
@@ -368,7 +444,7 @@
         </div>   
         <hr>
         <div class="d-flex justify-content-between">               
-             <button type="button" class="btn btn-danger" (click)="tancarModal()">Sortir</button>            
+             <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
         </div>
       </div>    
     </div>

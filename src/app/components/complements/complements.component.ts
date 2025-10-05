@@ -102,5 +102,51 @@ export class ComplementsComponent implements OnInit {
       });
     }    
   }  
+
+  generarFechas(
+    startDate: Date,
+    endDate: Date,
+    frequency: 'diaria' | 'semanal' | 'mensual',
+    options: {
+      diasSemana?: number[]; // 0 (domingo) a 6 (sábado)
+      semanaDelMes?: ('primera' | 'segunda' | 'tercera' | 'cuarta' | 'ultima')[];
+      diaSemanaMensual?: number; // 0 a 6
+    }
+  ): Date[] {
+    const fechas: Date[] = [];
+    const actual = new Date(startDate);
   
+    while (actual <= endDate) {
+      const dia = actual.getDay();
+      const fecha = new Date(actual);
+  
+      if (frequency === 'diaria') {
+        fechas.push(fecha);
+      }
+  
+      if (frequency === 'semanal' && options.diasSemana?.includes(dia)) {
+        fechas.push(fecha);
+      }
+  
+      if (frequency === 'mensual' && options.semanaDelMes && options.diaSemanaMensual !== undefined) {
+        const semana = Math.floor((actual.getDate() - 1) / 7);
+        const esUltimaSemana = new Date(actual.getFullYear(), actual.getMonth(), actual.getDate() + 7).getMonth() !== actual.getMonth();
+  
+        const semanaActual = esUltimaSemana ? 'ultima' : ['primera', 'segunda', 'tercera', 'cuarta'][semana];
+  
+        if (
+          options.semanaDelMes.includes(semanaActual as any) &&
+          dia === options.diaSemanaMensual
+        ) {
+          fechas.push(fecha);
+        }
+      }
+  
+      actual.setDate(actual.getDate() + 1);
+    }
+  
+    return fechas;
+  }
+   
+
 }

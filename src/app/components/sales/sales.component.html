@@ -1,22 +1,22 @@
-<h1>Sales</h1>
+<h1>Salas</h1>
 
 <div class="container mt-4">  
 
   <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
-    Crear nova sala
+    Crear nueva sala
   </button>
 
   <table class="table table-striped table-bordered">
     <thead class="table-dark">
       <tr>        
-        <th>Nom</th>
-        <th>Edifici</th>
+        <th>Nombre</th>
+        <th>Edificio</th>
         <th>Color</th>        
-        <th>Ocupació</th>
-        <th>Horari</th>        
-        <th>Preu</th>
-        <th>Actiu</th>
-        <th>Accions</th>
+        <th>Capacidad</th>
+        <th>Horario</th>        
+        <th>Precio</th>
+        <th>Activa</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -45,9 +45,9 @@
   <pagination-controls 
     (pageChange)="paginaActual = $event"
     previousLabel="Anterior"
-    nextLabel="Seguent"
-    screenReaderPageLabel="Pàgina"
-    screenReaderCurrentLabel="Pàgina Actual"
+    nextLabel="Seguiente"
+    screenReaderPageLabel="Página"
+    screenReaderCurrentLabel="Página Actual"
   ></pagination-controls>
 </div>
 
@@ -65,27 +65,27 @@
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
-                  <label>Nom</label>
+                  <label>Nombre</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" 
                          required minlength="3" maxlength="50"
                          #descripcioField="ngModel"
                          name="descripcio" id="descripcio">
                          @if(descripcioField.invalid && descripcioField.touched) {      
                            @if(descripcioField.errors?.['required']) {
-                             <div class="invalido">Ompli la descripció de la sala.</div>
+                             <div class="invalido">Rellene el nombre de la sala.</div>
                            }
                            @if(descripcioField.errors?.['minlength']) {
-                             <div class="invalido">Mínim obligat. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
+                             <div class="invalido">Mínimo obligado. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
                            }
                            @if(descripcioField.errors?.['maxlength']) {
-                             <div class="invalido">Màxim obligat. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
+                             <div class="invalido">Màximo obligado. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
                            }                 
                          }
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <label>Edificis</label>
+                  <label>Edificios</label>
                   <select class="form-select" [(ngModel)]="salaSeleccionado.id_edifici" 
                           name="id_edifici" id="id_edifici" 
                           required
@@ -103,7 +103,7 @@
               </div>
               <div class="row">
                 <div class="col-md-12">
-                  <label>Missatge</label>
+                  <label>Mensaje</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" name="missatge" id="missatge">
                 </div>
               </div>
@@ -113,7 +113,7 @@
                   <input type="color" class="form-control h-75" [(ngModel)]="salaSeleccionado.color" name="color" id="color">
                 </div>
                 <div class="col-xl-2">
-                  <label>Ocupació</label>
+                  <label>Capacidad</label>
                   <input type="input" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" 
                         minlength="1" maxlength="3" required
                         pattern="[0-9]*$"
@@ -122,21 +122,21 @@
                         >
                 </div>                                
                 <div class="col-xl-2">
-                  <label>Actiu</label>
+                  <label>Activo</label>
                   <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
                         <option value="SI">SI</option>
                         <option value="NO">NO</option>
                   </select>
                 </div>   
                 <div class="col-xl-2">
-                  <label>Horari</label>
+                  <label>Horario</label>
                   <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari">
                           <option value="1">1 hora</option>
                           <option value="2">½ hora</option>
                   </select>
                 </div>              
                 <div class="col-xl-2">
-                  <label>{{ salaSeleccionado.horari == '2' ? 'Preu ½ hora' : 'Preu hora' }}</label>
+                  <label>{{ salaSeleccionado.horari == '2' ? 'Precio ½ hora' : 'Precio hora' }}</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" 
                       pattern="^\d+(\.\d{1,2})?$" 
                       #preuField="ngModel"
@@ -146,28 +146,28 @@
                 
                       @if(preuField.invalid && preuField.touched) {      
                         @if(preuField.errors?.['pattern']) {
-                           <div class="invalido mt-2">Només està permes números i el punt decimal.</div>
+                           <div class="invalido mt-2">Solo está permitido números y el punto decimal.</div>
                         }
                       }                                           
 
                       @if(max_ocupacioField.invalid && max_ocupacioField.touched) {      
                         @if(max_ocupacioField.errors?.['pattern']) {
-                           <div class="invalido mt-2">Només està permes números.</div>
+                           <div class="invalido mt-2">Solo está permitido números.</div>
                         }        
                         @if(max_ocupacioField.errors?.['required']) {
-                           <div class="invalido mt-2">Ompli l'ocupació de la sala.</div>
+                           <div class="invalido mt-2">Rellene la capacidad de la sala.</div>
                         }                                        
                         @if(max_ocupacioField.errors?.['minlength']) {
-                           <div class="invalido mt-2">Mínim obligat. {{ max_ocupacioField.errors?.['minlength'].requiredLength }}</div>
+                           <div class="invalido mt-2">Mínimo obligado. {{ max_ocupacioField.errors?.['minlength'].requiredLength }}</div>
                         }
                         @if(max_ocupacioField.errors?.['maxlength']) {
-                           <div class="invalido mt-2">Màxim obligat. {{ max_ocupacioField.errors?.['maxlength'].requiredLength }}</div>
+                           <div class="invalido mt-2">Màximo obligado. {{ max_ocupacioField.errors?.['maxlength'].requiredLength }}</div>
                         }        
                         @if(max_ocupacioField.errors?.['max']) {
-                           <div class="invalido mt-2">Número Màxim superat. {{ max_ocupacioField.errors?.['max'].requiredLength }}</div>
+                           <div class="invalido mt-2">Número Máxim superado. {{ max_ocupacioField.errors?.['max'].requiredLength }}</div>
                         }  
                         @if(max_ocupacioField.errors?.['min']) {
-                           <div class="invalido mt-2">Número Mínim superat. {{ max_ocupacioField.errors?.['min'].requiredLength }}</div>
+                           <div class="invalido mt-2">Número Mínimo superado. {{ max_ocupacioField.errors?.['min'].requiredLength }}</div>
                         }                                                                                                                                                     
                       }   
 
@@ -176,7 +176,7 @@
                          
               <div class="row mt-2">
                 <div class="col-xl-6">
-                  <label for="disponibles">Complements disponibles</label>
+                  <label for="disponibles">Complementos disponibles</label>
                   <select multiple class="form-select" id="disponibles" [(ngModel)]="selectedDisponibleId" name="disponibles">
                     <option *ngFor="let item of disponibles" [ngValue]="item.id">{{ item.descripcio }}</option>                                                            
                   </select>
@@ -188,7 +188,7 @@
                 </div>
           
                 <div class="col-xl-5">
-                  <label for="seleccionadas">Complements seleccionadas</label>
+                  <label for="seleccionadas">Complementos selecionados</label>
                   <select multiple class="form-select" id="seleccionados" [(ngModel)]="selectedSeleccionadoId" name="seleccionados">
                     <option *ngFor="let item of seleccionados" [ngValue]="item.id">{{ item.descripcio }}</option>
                   </select>
@@ -199,8 +199,8 @@
 
 
             <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Desar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancel.lar</button>
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Grabar</button>
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
             </div>
           </form>
         </div>

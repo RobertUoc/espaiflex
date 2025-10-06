@@ -53,8 +53,10 @@ export class SalesService {
     _missatge: string,
     _actiu: string,
     _max_ocupacio: string,
-    _horari: string,
-    _complement: string,    
+    _horari: string,    
+    _latitud: string,
+    _longitud: string,
+    _complement: string   
   ) {    
     return this.http.put(this.apiUrl + 'sales.php', {      
       descripcio: _descripcio,
@@ -64,7 +66,9 @@ export class SalesService {
       missatge: _missatge,      
       max_ocupacio: _max_ocupacio,
       actiu: _actiu,
-      horari: _horari,
+      horari: _horari,      
+      latitud: _latitud,
+      longitud: _longitud,
       complement: _complement,  
       id: _id,    
     });
@@ -79,7 +83,9 @@ export class SalesService {
     _actiu: string,
     _max_ocupacio: string,
     _horari: string,
-    _complement: string,    
+    _latitud: string,
+    _longitud: string,    
+    _complement: string  
   ) {
     return this.http.post(this.apiUrl + 'sales.php', {
       descripcio: _descripcio,
@@ -90,7 +96,9 @@ export class SalesService {
       actiu: _actiu,
       max_ocupacio: _max_ocupacio,
       horari : _horari,
-      complement: _complement,      
+      latitud: _latitud,
+      longitud: _longitud,
+      complement: _complement,            
     });
   }
 }

@@ -6,7 +6,9 @@ export class Edificis {
        public id_provincia:string = '',       
        public imatge:string = "",
        public descripcio:string = "",
-       public actiu:string = 'SI'
+       public actiu:string = 'SI',
+       public latitud:string = '0',
+       public longitud:string = '0',
     ) { }
     
 }

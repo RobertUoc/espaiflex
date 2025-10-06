@@ -10,7 +10,9 @@ export class Sales {
     public color: string = '',
     public missatge: string = '',
     public max_ocupacio: string = '1',
-    public horari: string = '1'
+    public horari: string = '1',
+    public latitud:string = '0',
+    public longitud:string = '0',
   ) {}
   
 }

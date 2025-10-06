@@ -30,7 +30,7 @@ export class EdificisService {
       return this.http.get<[]>( this.apiUrl + 'edificis.php?provincia=' + id);            
     }
 
-    putEdifici(_id:string,_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string) {      
+    putEdifici(_id:string,_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string,_latitud:string,_longitud:string) {      
       return this.http.put(this.apiUrl + 'edificis.php', {
         id: _id,
         nom: _nom,
@@ -38,16 +38,20 @@ export class EdificisService {
         imatge: _imatge,
         descripcio: _descripcio,
         actiu: _actiu,        
+        latitud: _latitud,
+        longitud: _longitud
       });
     }
     
-    insertEdifici(_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string) {
+    insertEdifici(_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string,_latitud:string,_longitud:string) {
       return this.http.post(this.apiUrl + 'edificis.php', {
         nom: _nom,
         idprovincia: _id_provincia,
         imatge: _imatge,
         descripcio: _descripcio,
-        actiu: _actiu
+        actiu: _actiu,
+        latitud: _latitud,
+        longitud: _longitud        
       });     
     }
     

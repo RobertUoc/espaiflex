@@ -87,6 +87,16 @@
                         <option value="NO">NO</option>
                   </select>
                 </div>
+                <div class="col-md-3">
+                  <label>Latitud</label>
+                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.latitud" 
+                      required minlength="1" maxlength="8" name="latitud" id="latitud">
+                </div>   
+                <div class="col-md-3">
+                  <label>Longitud</label>
+                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.longitud" 
+                      required minlength="1" maxlength="8" name="longitud" id="longitud">
+                </div>                                            
               </div>
             </div>
             <div class="modal-footer">

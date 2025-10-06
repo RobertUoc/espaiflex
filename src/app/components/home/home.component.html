@@ -2,18 +2,33 @@
   <app-login class="position-absolute top-0 end-0 m-3"></app-login>
 
   <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="text-center bg-white p-4 rounded shadow">
-      <input [(ngModel)]="poblacion" class="form-control mb-3" placeholder="Introduce la población">
-      <button class="btn btn-primary" (click)="buscar()">Buscar edificios</button>
+    <div class="d-flex flex-row gap-4 bg-white p-4 rounded shadow">
+      
+      <!-- Formulario -->
+      <div class="text-center">
+        <input [(ngModel)]="poblacion" class="form-control mb-3" placeholder="Introduce la población">
+        <button class="btn btn-primary" (click)="buscar()">Buscar edificios</button>
+      </div>
+
+      <!-- Mapa Leaflet -->
+      <div class="text-center">
+          <button class="btn btn-primary mb-2" (click)="getLocalizacion()">Mostrar Mi geolocalización</button>
+          <div id="map" style="width: 500px; height: 500px;" class="rounded border"></div>
+      </div>
+
     </div>
   </div>
+</div>
+
+
+
 
   <!-- Modal Bootstrap -->
   <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Espais en {{ poblacion }}</h5>
+          <h5 class="modal-title">Espacios en {{ poblacion }}</h5>
           <button type="button" class="btn-close" (click)="cerrarModal()"></button>
         </div>
         <div class="modal-body">
@@ -33,9 +48,10 @@
           
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="cerrarModal()">Tancar</button>
+          <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+

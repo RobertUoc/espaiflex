@@ -170,7 +170,18 @@
                            <div class="invalido mt-2">Número Mínimo superado. {{ max_ocupacioField.errors?.['min'].requiredLength }}</div>
                         }                                                                                                                                                     
                       }   
-
+              </div>
+              <div class="row mt-2">
+                <div class="col-md-2">
+                  <label>Latitud</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.latitud" 
+                      required minlength="1" maxlength="8" name="latitud" id="latitud">
+                </div>   
+                <div class="col-md-2">
+                  <label>Longitud</label>
+                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.longitud" 
+                      required minlength="1" maxlength="8" name="longitud" id="longitud">
+                </div>                                            
               </div>
               <hr>
                          
@@ -194,7 +205,6 @@
                   </select>
                 </div>          
               </div>
-
             </div>
 
 

@@ -72,7 +72,7 @@ export class EdificisComponent implements OnInit {
     else {
       this.EdificisServeis.getEdifici(id_edifici).subscribe({
         next: data => {                 
-            this.edificioSeleccionado = new Edificis(data.id,data.nom,data.id_provincia,data.imatge,data.descripcio,data.actiu);    
+            this.edificioSeleccionado = new Edificis(data.id,data.nom,data.id_provincia,data.imatge,data.descripcio,data.actiu,data.latitud,data.longitud);    
             this.previewUrl = data.imatge;
             this.imagenBase64 = 'data:image/jpeg;base64,' + data.imatge;
             console.log(this.edificioSeleccionado);
@@ -103,7 +103,9 @@ export class EdificisComponent implements OnInit {
         this.edificioSeleccionado.id_provincia,
         this.base64,
         this.edificioSeleccionado.descripcio,
-        this.edificioSeleccionado.actiu
+        this.edificioSeleccionado.actiu,
+        this.edificioSeleccionado.latitud,
+        this.edificioSeleccionado.longitud
       ).subscribe(response => {        
         this.tancarModal();
         this.getEdificis();
@@ -122,6 +124,8 @@ export class EdificisComponent implements OnInit {
         this.base64,
         this.edificioSeleccionado.descripcio,
         this.edificioSeleccionado.actiu,        
+        this.edificioSeleccionado.latitud,
+        this.edificioSeleccionado.longitud
       ).subscribe(response => {        
         this.tancarModal();
         this.getEdificis();

@@ -82,8 +82,7 @@ export class CalendariComponent implements OnInit {
   public max_sala: string = '1';
   public mostrarHourGrid: boolean = false;
   public mostrarPeu: boolean = false;
-  public agrupado: { [key: string]: { hora_inici: string; estado: string }[] } =
-    {};
+  public agrupado: { [key: string]: { hora_inici: string; estado: string }[] } = {};
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
   public horari: string = '1';
@@ -94,10 +93,11 @@ export class CalendariComponent implements OnInit {
       title: '',
       groupId: '',
       start: '',
-      end: '',
-      rendering: '',
-      color: '',
-      allDay: true,
+      end: '',          
+      backgroundColor: '',
+      borderColor: '',
+      textColor: '',      
+      allDay: false,
     },
   ]);
   public alta_reserva: string = '0';
@@ -594,10 +594,7 @@ export class CalendariComponent implements OnInit {
     .filter(cb => cb.nativeElement.checked)
     .map(cb => cb.nativeElement.name.trim().split('_')[1])
     .join('#');    
-    
-
-    console.log(horasMarcadas);
-    
+            
     const nuevos = [...this.eventos()];
 
     nuevos.push({
@@ -605,10 +602,11 @@ export class CalendariComponent implements OnInit {
       title: nom,
       groupId: this.sala_reserva,
       start: `${this.data_reserva_ini}T${'16:00:00'}`,
-      end: `${this.data_reserva_fin}T${'17:30:00'}`,
-      rendering: 'background',
-      color: color,
-      allDay: true,
+      end: `${this.data_reserva_fin}T${'17:30:00'}`,      
+      backgroundColor: color,
+      borderColor: '#dc3545',
+      textColor: '#000000',  
+      allDay: this.data_reserva_ini == this.data_reserva_fin? true: false,     
     });
     this.eventos.set(nuevos);
     this.tancarModal();
@@ -619,16 +617,17 @@ export class CalendariComponent implements OnInit {
     this.calendariService.getCarga(any, this.id_edifici).subscribe({
       next: (data) => {
         const nuevos = [...this.eventos()];
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {          
           nuevos.push({
             id: data[i].id,
             title: data[i].descripcio,
             groupId: data[i].sala,
-            start: `${data[i].dia}T${data[i].hora_inici}`,
-            end: `${data[i].dia}T${data[i].hora_fi}`,
-            rendering: 'background',
-            color: data[i].color,
-            allDay: true,
+            start: `${data[i].dia_inici}T${data[i].hora_inici}`,
+            end: `${data[i].dia_fi}T${data[i].hora_fi}`,                       
+            backgroundColor: data[i].color,
+            borderColor: '#dc3545',
+            textColor: '#000000',      
+            allDay: data[i].dia_inici == data[i].dia_fi? true: false,      
           });
         }
         this.eventos.set(nuevos);

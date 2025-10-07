@@ -34,7 +34,7 @@ export class HomeComponent implements OnInit {
   constructor(private router : Router, private EdificisServeis: EdificisService) {}
   
   ngOnInit() {    
-    this.getSales(); 
+    this.getEdificis(); 
   }
 
   private initMap() {
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  getSales() {
+  getEdificis() {
     // Edificis
     this.EdificisServeis.getEdificis().subscribe({
       next: data => {

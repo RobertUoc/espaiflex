@@ -21,8 +21,8 @@ export class UsersService {
       return this.http.get<Users[]>( this.apiUrl + 'users.php');      
     }
 
-    getUser(email:string,password:string): Observable<Users> {
-      return this.http.get<Users>( this.apiUrl + 'users.php?email=' + email + '&password=' + password);      
+    getUser(email:string,password:string,tipus:string): Observable<Users> {
+      return this.http.get<Users>( this.apiUrl + 'users.php?email=' + email + '&password=' + password + '&usuari=' + tipus);      
     }
 
     putUser(_id:string,_nom:string,_email:string,_password:string) {      

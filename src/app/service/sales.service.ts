@@ -45,18 +45,8 @@ export class SalesService {
   }
 
   putSala(
-    _id: string,
-    _descripcio: string,
-    _idedifici: string,
-    _preu: number,
-    _color: string,
-    _missatge: string,
-    _actiu: string,
-    _max_ocupacio: string,
-    _horari: string,    
-    _latitud: string,
-    _longitud: string,
-    _complement: string   
+    _id: string, _descripcio: string, _idedifici: string, _preu: number, _color: string, _missatge: string, _actiu: string, _max_ocupacio: string, _horari: string,    
+    _latitud: string, _longitud: string, _complement: string   
   ) {    
     return this.http.put(this.apiUrl + 'sales.php', {      
       descripcio: _descripcio,
@@ -75,18 +65,9 @@ export class SalesService {
   }
 
   insertSala(
-    _descripcio: string,
-    _idedifici: string,
-    _preu: number,
-    _color: string,
-    _missatge: string,
-    _actiu: string,
-    _max_ocupacio: string,
-    _horari: string,
-    _latitud: string,
-    _longitud: string,    
-    _complement: string  
-  ) {
+    _descripcio: string,  _idedifici: string, _preu: number, _color: string, _missatge: string, _actiu: string, _max_ocupacio: string,
+    _horari: string, _latitud: string, _longitud: string, _complement: string )
+   {
     return this.http.post(this.apiUrl + 'sales.php', {
       descripcio: _descripcio,
       idedifici: _idedifici,

@@ -9,9 +9,10 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
 export class LoginComponent implements OnInit {
   user : string = 'ceinvde@infonegocio.com';
-  password : string = 'admin';
+  password : string = '1234';
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -19,9 +20,13 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {    
-    if (this.authService.login(this.user,this.password)) {
-      this.router.navigate(['/admin']);      
-    }
+    this.authService.login(this.user, this.password).subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/admin']);
+      } else {        
+        console.log('Error en credenciales');
+      }
+    });    
   }
 
 }

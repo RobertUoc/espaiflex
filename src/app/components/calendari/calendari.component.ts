@@ -271,19 +271,13 @@ export class CalendariComponent implements OnInit {
     this.id_usuari = 0;
     this.usuari = 'Visitante';
     this.userService
-      .getUser(this.loginData.email, this.loginData.password)
+      .getUser(this.loginData.email, this.loginData.password, 'usuari')
       .subscribe({
         next: (data) => {
           if (data?.id) {
             this.id_usuari = parseInt(data.id);
             this.usuari = data.nom;
-            this.registerData = new Users(
-              data.id,
-              data.nom,
-              data.email,
-              data.password,
-              data.password
-            );
+            this.registerData = new Users(data.id, data.nom, data.email, data.password, data.password);
           }
         },
         error: (error) => {
@@ -393,9 +387,9 @@ export class CalendariComponent implements OnInit {
       items,
     }));
   }
+
   generate() {
     this.resetGenerate();
-
     this.sala_reserva = this.reservaForm.get('sala_reserva')?.value;    
     if (this.sala_reserva == '0') {
       this.mostrarAlertes(
@@ -504,12 +498,8 @@ export class CalendariComponent implements OnInit {
           items,
         }));
       },
-      error: (error) => {
-        console.log(error);
-      },
-      complete: () => {
-        console.log('Ok');
-      },
+      error: (error) => { console.log(error); },
+      complete: () => { console.log('Ok');  },
     });
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
@@ -517,9 +507,7 @@ export class CalendariComponent implements OnInit {
     this.modalVisible[this.finestra] = true;
   }
 
-  handleEventClick(clickInfo: EventClickArg) {
-    //
-    //
+  handleEventClick(clickInfo: EventClickArg) {        
     this.finestra = 90;
     this.mostrarHourGrid = false;
     this.mostrarPeu = false;
@@ -529,14 +517,9 @@ export class CalendariComponent implements OnInit {
     this.resetGenerate();
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
-
     this.calendariService.getDadesReserva(clickInfo.event.id).subscribe({
-      next: (data) => {
-        this.reservas = data;
-      },
-      error: (error) => {
-        console.log(error);
-      },
+      next: (data) => { this.reservas = data; },
+      error: (error) => { console.log(error); },
       complete: () => {
         this.preu_sala_total = this.reservas[0]?.import_sala;
         this.max_sala = this.reservas[0]?.max_ocupacio;
@@ -544,20 +527,14 @@ export class CalendariComponent implements OnInit {
         this.missatge = this.reservas[0].missatge;
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
-
         console.log(this.selectedComplements);
       },
     });
-
     this.calendariService
       .getMiraReserva(this.data_reserva_ini, this.sala_reserva, clickInfo.event.id)
       .subscribe({
-        next: (data) => {
-          this.creaHorari(data);
-        },
-        error: (error) => {
-          console.log(error);
-        },
+        next: (data) => { this.creaHorari(data); },
+        error: (error) => { console.log(error);  },
         complete: () => {
           // Busco els complements de la sala
           this.preu_sala =
@@ -569,9 +546,7 @@ export class CalendariComponent implements OnInit {
           this.mostrarPeu = true;
           console.log('Ok');
         },
-      });
-
-    //      clickInfo.event.remove();
+      });    
   }
 
   handleEvents(events: EventApi[]) {

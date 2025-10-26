@@ -77,7 +77,6 @@ export class HomeComponent implements OnInit {
 
   getLocalizacion() {
       if (navigator.geolocation) {
-
         const myIcon = L.icon({
           iconUrl:'../../../assets/marker.png', 
           iconSize: [ 25,41 ]
@@ -98,13 +97,10 @@ export class HomeComponent implements OnInit {
               console.log(position);
             })
           }
-
           this.map.setView(coords, 19);
-
-        }, () => {
+      }, () => {
           console.log('No lo encuentro');
         });
-
       }
   }
 

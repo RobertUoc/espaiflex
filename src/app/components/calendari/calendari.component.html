@@ -198,10 +198,13 @@
                         <option value="2">½ hora</option>
                   </select>
                 </div>         
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <label>{{ salaSeleccionado.horari == '2' ? 'Precio ½ hora' : 'Precio hora' }}</label>
                   <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
                 </div>                                                
+              </div>
+              <div class="row p-2">
+                <img src="{{ salaSeleccionado.imatge }}" class="card-img-top" alt="Foto del edificio">           
               </div>
               @if(salaSeleccionado.missatge) {
                 <div class="row border rounded mt-4 bg-danger p-2">
@@ -397,14 +400,21 @@
             <div class="modal-footer">
               <div *ngIf="mostrarPeu">      
                     <h1>Precio {{ this.preu_sala_total | PipePreu }}</h1>                  
-                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="desarSala()">Guardar</button>
+                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="saveReserva()">Guardar</button>
                     <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>                        
               </div>
           </div>                                    
          </div>                            
         </div>
+        @if(errorEntrada) {
+          <div class="row border rounded mt-4 bg-danger p-2 mb-2">
+            <div class="col-md-12">                    
+              <h5>{{ errorEntrada }}</h5>
+            </div>
+          </div>          
+        }
         @if(missatge) {
-          <div class="row border rounded mt-4 bg-danger p-2">
+          <div class="row border rounded mt-4 bg-warning p-2">
             <div class="col-md-12">                    
               <h5>{{ missatge }}</h5>
             </div>

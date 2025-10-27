@@ -22,6 +22,11 @@ export class SalesComponent implements OnInit {
   public paginaActual: number = 1;
   public edificis = [new Edificis()];
   public complements = [new Complements()];
+  public selectedFile: File | null = null;
+  public uploadedImageUrl: string | null = null;
+  public base64: string = '';
+  public imagenBase64: string = '';
+  public previewUrl: string = '';    
 
   
 disponibles = [new Complements()];
@@ -98,7 +103,10 @@ selectedSeleccionadoId: string | null = null;
     else {
       this.salesService.getSala(id_sala).subscribe({
         next: data => {                 
-            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge, data.max_ocupacio, data.horari, data.latitud, data.longitud);               
+            this.salaSeleccionado = new Sales(data.id,data.descripcio,data.id_edifici,data.nom_edifici,data.preu,data.actiu,data.color,data.missatge, data.max_ocupacio, data.horari, data.imatge);               
+            this.previewUrl = data.imatge;
+            this.imagenBase64 = 'data:image/jpeg;base64,' + data.imatge;
+            console.log(this.salaSeleccionado);
         },
         error: error => {
           console.log(error);
@@ -135,6 +143,10 @@ selectedSeleccionadoId: string | null = null;
     let complement = this.seleccionados.map(item => item.id).join('#');
     if (this.salaSeleccionado.id == '0') {
       // Insert
+      if (!this.selectedFile) {
+        this.base64 = this.previewUrl;
+        console.log('insert selected');
+      }      
       console.log('ALTA');                  
       this.salesService.insertSala(this.salaSeleccionado.descripcio, this.salaSeleccionado.id_edifici,
         this.salaSeleccionado.preu,                  
@@ -143,8 +155,7 @@ selectedSeleccionadoId: string | null = null;
         this.salaSeleccionado.actiu,        
         this.salaSeleccionado.max_ocupacio,
         this.salaSeleccionado.horari,
-        this.salaSeleccionado.latitud,
-        this.salaSeleccionado.longitud,
+        this.base64,
         complement
       ).subscribe(response => {        
         this.tancarModal();
@@ -157,8 +168,8 @@ selectedSeleccionadoId: string | null = null;
       this.salesService.putSala(this.salaSeleccionado.id,
         this.salaSeleccionado.descripcio,  this.salaSeleccionado.id_edifici ,this.salaSeleccionado.preu,
         this.salaSeleccionado.color, this.salaSeleccionado.missatge, this.salaSeleccionado.actiu,
-        this.salaSeleccionado.max_ocupacio, this.salaSeleccionado.horari, 
-        this.salaSeleccionado.latitud, this.salaSeleccionado.longitud, complement
+        this.salaSeleccionado.max_ocupacio, this.salaSeleccionado.horari, this.base64,
+        complement
       ).subscribe(response => {        
         this.tancarModal();
         this.getSales();
@@ -188,4 +199,16 @@ selectedSeleccionadoId: string | null = null;
     }
   }
   
+  onFileSeleccionada(event: any): void {
+    this.selectedFile = event.target.files[0];  
+    let nom_file = this.selectedFile?.name;
+    if (this.selectedFile) {            
+      const reader = new FileReader();      
+      reader.onload = (e: any) => {
+        this.previewUrl = e.target.result;        
+        this.base64 = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);      
+    }
+  }  
 }

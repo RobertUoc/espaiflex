@@ -36,6 +36,7 @@ import { CalendariService } from '../../service/calendari.service';
 import Swal from 'sweetalert2';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-calendari',
@@ -79,6 +80,7 @@ export class CalendariComponent implements OnInit {
   public frecuencia: string = "diaria";
   public sala_reserva: string = '';
   public missatge: string = '';
+  public errorEntrada: string = '';
   public max_sala: string = '1';
   public mostrarHourGrid: boolean = false;
   public mostrarPeu: boolean = false;
@@ -219,8 +221,9 @@ export class CalendariComponent implements OnInit {
           data.color,
           data.missatge,
           data.max_ocupacio,
-          data.horari
-        );
+          data.horari,
+          data.imatge
+        );        
       },
       error: (error) => {
         console.log(error);
@@ -345,6 +348,25 @@ export class CalendariComponent implements OnInit {
     this.data_reserva_ini = new Date().toISOString().substring(0, 10);
     this.data_reserva_fin = new Date().toISOString().substring(0, 10);
     this.sala_reserva = '0';
+    this.reservaForm.get('frecuencia')?.setValue('diaria');
+    this.reservaForm.get('diasSemana')?.patchValue({
+      lunes: false,
+      martes: false,
+      miercoles: false,
+      jueves: false,
+      viernes: false,
+      sabado: false,
+      domingo: false
+    });
+    this.reservaForm.get('mensualidad.tipo')?.setValue('1');
+    this.reservaForm.reset({
+      mensualidad: {
+        tipo: '1',
+        numeroDia: '1',
+        periodo: 'primer',
+        diaSemana: 'lunes'
+      }
+    });
   }
 
   mostrarAlertes(
@@ -555,6 +577,7 @@ export class CalendariComponent implements OnInit {
   }
 
   desarSala() {
+
     let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
     let nom = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
     // this.id_usuari
@@ -569,7 +592,7 @@ export class CalendariComponent implements OnInit {
     .filter(cb => cb.nativeElement.checked)
     .map(cb => cb.nativeElement.name.trim().split('_')[1])
     .join('#');    
-            
+                
     const nuevos = [...this.eventos()];
 
     nuevos.push({
@@ -614,7 +637,58 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  saveReserva() {
-    
+  saveReserva() {    
+    let frecuencia = this.reservaForm.get('frecuencia')?.value;  
+    let error = this.validaReserva(frecuencia);
+    if (error)  {
+      this.errorEntrada = error;
+      return;
+    }
+    // Validación general del formulario
+    if (this.reservaForm.invalid) {
+      this.errorEntrada = 'Hay campos obligatorios sin completar.';
+      return;
+    }
+    // Ok
+    this.errorEntrada = '';
+    this.desarSala();
+  }
+  
+  private validaReserva(frecuencia: string): string | null {
+    switch (frecuencia) {
+      case 'semanal':
+        return this.validaSemana();
+      case 'mensual':
+        return this.validaMes();
+      default:
+        return null; 
+    }
+  }
+
+  private validaSemana(): string | null {
+    const dias = this.reservaForm.get('diasSemana')?.value;
+    const algunDiaSeleccionado = Object.values(dias).some(v => v === true);
+    return !algunDiaSeleccionado ? 'Debes seleccionar al menos un día de la semana.' : null;
+  }
+
+  private validaMes(): string | null {
+    const mensualidad = this.reservaForm.get('mensualidad')?.value;  
+    switch (mensualidad.tipo) {
+      case '1':
+        const dia = parseInt(mensualidad.numeroDia, 10);
+        return isNaN(dia) || dia < 1 || dia > 31
+          ? 'El número de día debe estar entre 1 y 31.'
+          : null;
+  
+      case '2':
+        const periodoValido = ['primer', 'segundo', 'tercer', 'cuarto', 'ultimo'].includes(mensualidad.periodo);
+        const diaSemanaValido = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].includes(mensualidad.diaSemana);
+        return !periodoValido || !diaSemanaValido
+          ? 'Debes seleccionar un periodo y un día de la semana válidos.'
+          : null;
+  
+      default:
+        return 'Tipo de mensualidad inválido.';
+    }
   }
 }

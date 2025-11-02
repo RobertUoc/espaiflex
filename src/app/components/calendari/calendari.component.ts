@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
   QueryList,
   ViewChildren,
+  ViewChild,
   ElementRef,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,6 +38,10 @@ import Swal from 'sweetalert2';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { of } from 'rxjs';
+import esLocale from '@fullcalendar/core/locales/es';
+import { InsertEvent } from '../../models/insertEvent.model';
+import { response } from 'express';
+import { FullCalendarComponent } from '@fullcalendar/angular';
 
 @Component({
   selector: 'app-calendari',
@@ -53,6 +58,7 @@ import { of } from 'rxjs';
   templateUrl: './calendari.component.html',
   styleUrls: ['./calendari.component.css'],
 })
+
 export class CalendariComponent implements OnInit {
   loginData = {
     email: '',
@@ -68,7 +74,7 @@ export class CalendariComponent implements OnInit {
   public sales = [new Sales()];
   public reservas = [new Reserva()];
   public salaSeleccionado = new Sales();
-  public complements = [new Complements()];
+  public complements = [new Complements()];  
   public dia: string = '';
   public mira_dia: any[] = [];
   public horas: string[] = [];
@@ -118,7 +124,8 @@ export class CalendariComponent implements OnInit {
       },
       initialView: 'dayGridMonth',
       events: this.eventos(),
-      locale: 'ca',
+      locale: 'es',
+      locales: [ esLocale ],
       weekends: true,
       editable: true,
       selectable: true,
@@ -132,7 +139,7 @@ export class CalendariComponent implements OnInit {
 
   @ViewChildren('horesSelected') botones!: QueryList<ElementRef>;
   @ViewChildren('checkComplemento') checkboxes!: QueryList<ElementRef>;
-
+  
   currentEvents = signal<EventApi[]>([]);
 
   constructor(
@@ -143,7 +150,7 @@ export class CalendariComponent implements OnInit {
     private userService: UsersService,
     private salesService: SalesService,
     private complementService: ComplementsService,
-    private calendariService: CalendariService
+    private calendariService: CalendariService,        
   ) {}
 
   ngOnInit() {
@@ -180,18 +187,21 @@ export class CalendariComponent implements OnInit {
     })
   }
 
+  canviFrecuencia() {
+    this.errorEntrada = '';
+    this.missatge = '';
+  }
   actualizarMaximo() {
+    // Ok
+    this.errorEntrada = '';
     let salaId = this.reservaForm.get('sala_reserva')?.value;
     let DadesSala = this.sales.find(reg => reg.id == salaId);
-    // this.max_sala = DadesSala?.max_ocupacio ?? '';
-    // this.horari_sala = DadesSala?.horari ?? '';
+    this.max_sala = DadesSala?.max_ocupacio ?? '';
+    this.horari = DadesSala?.horari ?? '';
     this.missatge = DadesSala?.missatge ?? '';
-
     this.reservaForm.get('max_sala')?.setValue(DadesSala?.max_ocupacio ?? '');
-    this.reservaForm.get('horari_sala')?.setValue(DadesSala?.horari ?? '');
-
-    this.generate();
-
+    this.reservaForm.get('horari_sala')?.setValue(DadesSala?.horari ?? '');    
+    if (salaId != '') { this.generate(); }
   }
 
   getSales(id_edifici: string) {
@@ -230,7 +240,7 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {
         // Seleccionats
-        this.getcomplent(id_sala);
+        this.getcomplement(id_sala);
         console.log('Ok');
       },
     });
@@ -238,7 +248,7 @@ export class CalendariComponent implements OnInit {
     this.modalVisible[this.finestra] = true;
   }
 
-  getcomplent(id_sala: string) {
+  getcomplement(id_sala: string) {
     this.salesService.getSeleccionats(id_sala).subscribe({
       next: (data) => {
         this.complements = data;
@@ -265,6 +275,7 @@ export class CalendariComponent implements OnInit {
       });
     }
     this.preu_sala_total += total;
+    this.saveReserva();
   }
 
   tornar() {
@@ -337,36 +348,19 @@ export class CalendariComponent implements OnInit {
       : false;
   }
 
-  reserva() {
+  reserva() {    
+    this.createForm();
     this.selectedComplements = [];
     this.alta_reserva = '0';
     this.finestra = 90;
     this.mostrarHourGrid = false;
     this.mostrarPeu = false;
-    this.agrupado = {};
-    this.modalVisible[this.finestra] = true;
+    this.agrupado = {};    
     this.data_reserva_ini = new Date().toISOString().substring(0, 10);
     this.data_reserva_fin = new Date().toISOString().substring(0, 10);
     this.sala_reserva = '0';
-    this.reservaForm.get('frecuencia')?.setValue('diaria');
-    this.reservaForm.get('diasSemana')?.patchValue({
-      lunes: false,
-      martes: false,
-      miercoles: false,
-      jueves: false,
-      viernes: false,
-      sabado: false,
-      domingo: false
-    });
-    this.reservaForm.get('mensualidad.tipo')?.setValue('1');
-    this.reservaForm.reset({
-      mensualidad: {
-        tipo: '1',
-        numeroDia: '1',
-        periodo: 'primer',
-        diaSemana: 'lunes'
-      }
-    });
+    this.frecuencia = '';
+    this.modalVisible[this.finestra] = true;
   }
 
   mostrarAlertes(
@@ -415,8 +409,8 @@ export class CalendariComponent implements OnInit {
     this.sala_reserva = this.reservaForm.get('sala_reserva')?.value;    
     if (this.sala_reserva == '0') {
       this.mostrarAlertes(
-        'Atenció!!!',
-        "No s'ha seleccionat cap sala.",
+        'Atención!!!',
+        "No se ha seleccionado ningua sala.",
         'success',
         'Aceptar'
       );
@@ -437,10 +431,9 @@ export class CalendariComponent implements OnInit {
           // Busco els complements de la sala
           this.preu_sala =
             this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
-          this.getcomplent(this.sala_reserva);
+          this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
-          this.mostrarHourGrid = true;
-          console.log('Ok');
+          this.mostrarHourGrid = true;          
         },
       });
   }
@@ -454,7 +447,7 @@ export class CalendariComponent implements OnInit {
     } else {
       boton.classList.remove('bg-success');
       boton.classList.add('bg-warning');
-    }
+    }    
     this.sumaComplement('bg-warning');
   }
 
@@ -476,9 +469,6 @@ export class CalendariComponent implements OnInit {
   }
 
   CrearBotons(item: any, compara: string): string {
-    let horaStr = [];
-    let horaInicio = 0;
-    let horaFin = 0;
     let horaFinal = '';
     //
     let inici = '0';
@@ -539,6 +529,11 @@ export class CalendariComponent implements OnInit {
     this.resetGenerate();
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
+    if (this.alta_reserva != '0') {
+      this.reservaForm.get('fechaInicial')?.disable(); 
+      this.reservaForm.get('fechaFinal')?.disable(); 
+      this.reservaForm.get('frecuencia')?.disable(); 
+    }
     this.calendariService.getDadesReserva(clickInfo.event.id).subscribe({
       next: (data) => { this.reservas = data; },
       error: (error) => { console.log(error); },
@@ -561,12 +556,12 @@ export class CalendariComponent implements OnInit {
           // Busco els complements de la sala
           this.preu_sala =
             this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
-          this.getcomplent(this.sala_reserva);
+          this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
           this.sumaComplement('bg-danger');
           this.mostrarPeu = true;
-          console.log('Ok');
+          console.log('Lectura Ok');
         },
       });    
   }
@@ -574,40 +569,6 @@ export class CalendariComponent implements OnInit {
   handleEvents(events: EventApi[]) {
     this.currentEvents.set(events);
     this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
-  }
-
-  desarSala() {
-
-    let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
-    let nom = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
-    // this.id_usuari
-    // this.preu_sala_total
-
-    const horasMarcadas = this.botones
-    .filter(btn => btn.nativeElement.classList.contains('bg-warning'))
-    .map(btn => btn.nativeElement.textContent.trim().split(' a ')[0])
-    .join('#');
-
-    const complements = this.checkboxes
-    .filter(cb => cb.nativeElement.checked)
-    .map(cb => cb.nativeElement.name.trim().split('_')[1])
-    .join('#');    
-                
-    const nuevos = [...this.eventos()];
-
-    nuevos.push({
-      id: '2',
-      title: nom,
-      groupId: this.sala_reserva,
-      start: `${this.data_reserva_ini}T${'16:00:00'}`,
-      end: `${this.data_reserva_fin}T${'17:30:00'}`,      
-      backgroundColor: color,
-      borderColor: '#dc3545',
-      textColor: '#000000',  
-      allDay: this.data_reserva_ini == this.data_reserva_fin? true: false,     
-    });
-    this.eventos.set(nuevos);
-    this.tancarModal();
   }
 
   carregaDies() {
@@ -637,9 +598,10 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  saveReserva() {    
+  saveReserva() {        
     let frecuencia = this.reservaForm.get('frecuencia')?.value;  
-    let error = this.validaReserva(frecuencia);
+    let error = this.validaReserva(frecuencia);    
+    this.errorEntrada = '';
     if (error)  {
       this.errorEntrada = error;
       return;
@@ -649,9 +611,6 @@ export class CalendariComponent implements OnInit {
       this.errorEntrada = 'Hay campos obligatorios sin completar.';
       return;
     }
-    // Ok
-    this.errorEntrada = '';
-    this.desarSala();
   }
   
   private validaReserva(frecuencia: string): string | null {
@@ -678,17 +637,182 @@ export class CalendariComponent implements OnInit {
         const dia = parseInt(mensualidad.numeroDia, 10);
         return isNaN(dia) || dia < 1 || dia > 31
           ? 'El número de día debe estar entre 1 y 31.'
-          : null;
-  
+          : null;  
       case '2':
         const periodoValido = ['primer', 'segundo', 'tercer', 'cuarto', 'ultimo'].includes(mensualidad.periodo);
         const diaSemanaValido = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].includes(mensualidad.diaSemana);
         return !periodoValido || !diaSemanaValido
           ? 'Debes seleccionar un periodo y un día de la semana válidos.'
           : null;
-  
       default:
         return 'Tipo de mensualidad inválido.';
     }
+  }
+  desarSala() {
+    let feInicial = this.reservaForm.get('fechaInicial')?.value;  
+    let feFinal = this.reservaForm.get('fechaFinal')?.value;  
+    let horari = this.reservaForm.get('horari_sala')?.value;
+    let frecuencia = this.reservaForm.get('frecuencia')?.value;  
+    let matriuSeleccionats: string[] = [];
+    let diesSeleccionats = '';       
+    let reservaDias = this.reservaForm.get('diasSemana') as FormGroup;
+    Object.entries(reservaDias.controls).forEach(([dia, control]) => {
+      if (control.value) {
+        matriuSeleccionats.push(dia);
+      }
+    })
+    diesSeleccionats = matriuSeleccionats.join('#');
+    this.data_reserva_ini = new Date(feInicial).toISOString().substring(0, 10);    
+    this.data_reserva_fin = new Date(feFinal).toISOString().substring(0, 10);    
+    let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
+    let nom = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';   
+    const complements = this.checkboxes
+    .filter(cb => cb.nativeElement.checked)
+    .map(cb => cb.nativeElement.name.trim().split('_')[1])
+    .join('#');                    
+    // Agrupacio d'hores
+    let ranges = [];
+    let start = null;
+    let end = '';    
+    let selectedHours: string[] = [];
+    this.botones
+      .filter(btn => btn.nativeElement.classList.contains('bg-warning'))
+      .forEach(btn => {
+        let hora = btn.nativeElement.textContent.trim().split(' a ')[0];
+        if (/^\d{1,2}$/.test(hora)) {
+          hora = hora.padStart(2, '0') + ':00';
+        }
+        selectedHours.push(hora);
+      })
+    let suma_minutos = horari=='1'?60:30;
+    const diferenciaMinutos = (hora1: string, hora2: string): number => {
+      const [h1, m1] = hora1.split(':').map(Number);
+      const [h2, m2] = hora2.split(':').map(Number);
+      return (h2 * 60 + m2) - (h1 * 60 + m1);
+    };
+    for (let i = 0; i < selectedHours.length; i++) {
+      const inicio = selectedHours[i];
+      const [horas, minutos] = inicio.split(':').map(Number);
+      const nueva = new Date(0, 0, 0, horas, minutos);
+      nueva.setMinutes(nueva.getMinutes() + suma_minutos);
+      const final = nueva.toTimeString().slice(0, 5);  
+      if (start === null) {
+        start = inicio;
+        end = final;
+      } else if (diferenciaMinutos(end, inicio) === 0) {
+        end = final;
+      } else {
+        ranges.push({ inicio: start, final: end });
+        start = inicio;
+        end = final;
+      }
+    }  
+    if (start !== null) {
+      ranges.push({ inicio: start, final: end });
+    }
+    let horaslibres = 0;
+    // Miro si estan libres las horas o no
+    if (horaslibres > 0) {
+      this.errorEntrada = 'HORAS ocupadas!!!';
+    }
+    else {
+      for (let i = 0; i < ranges.length; i++) {            
+        let horaInici = ranges[i].inicio + ':00';
+        let horaFi = ranges[i].final + ':00';
+        let totDia = this.data_reserva_ini == this.data_reserva_fin?true:false;
+        // Diario        
+        if (frecuencia == 'diaria') {          
+          this.insertaDia(nom,this.sala_reserva,this.data_reserva_ini,this.data_reserva_fin,color,horaInici,horaFi,totDia,
+            this.id_usuari,this.preu_sala_total,frecuencia,0,0,0,0,0,0,0,complements);            
+        } 
+        // Semanal
+        if (frecuencia == 'semanal') {             
+          let dies = diesSeleccionats;          
+          let dayMap :Record<string, number> = {
+            'domingo': 0,
+            'lunes':1,
+            'martes':2,
+            'miercoles':3,
+            'jueves':4,
+            'viernes':5,
+            'sabado':6,
+          }
+          let week = dies
+                  .split('#')
+                  .map(day => dayMap[day.trim()]);
+          let start = new Date(this.data_reserva_ini);          
+          let end = new Date(this.data_reserva_fin);
+          end.setDate(end.getDate() + 1);
+          for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+            let fecha_dia = String(d.getDate()).padStart(2, '0');
+            let fecha_mes = String(d.getMonth() + 1).padStart(2, '0');
+            let fecha_ano = d.getFullYear();
+            let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
+            let dia = d.getDay();            
+            if (week.includes(dia)) {
+              // Inserta.                                         
+              let diaSemana = Array(7).fill(0);
+              diaSemana[dia] = 1;                  
+              this.insertaDia(nom,this.sala_reserva,fechaFormateada,fechaFormateada,color,horaInici,horaFi,true,  
+                this.id_usuari,this.preu_sala_total, frecuencia, diaSemana[0],diaSemana[1],diaSemana[2],diaSemana[3],diaSemana[4],diaSemana[5],diaSemana[6],
+                complements);                         
+            }
+          }
+        }
+        // Mensual
+        if (frecuencia == 'mensual') {                       
+        }
+      }
+    this.tancarModal();
+    }
+  }  
+
+  insertaDia(tit:string, sal_reserva:string, fIninic: string, fFi: string, color: string, hInici:string, hFi: string, totDia: boolean, i_usuari:number, pts:number, frecuencia: string,
+            dom:number, lun: number, mar: number, mie: number, jue: number, vie: number, sab: number,
+             _complements: string ) {    
+
+    let event_ini = fIninic+'T'+hInici;
+    let event_fi = fFi+'T'+hFi;
+    // Insert Base de datos
+    let ids = '0';
+    console.log('ALTA');            
+    this.calendariService.insertEvent(sal_reserva, 
+            fIninic, 
+            fFi, 
+            hInici, 
+            hFi, 
+            pts, 
+            i_usuari,
+            frecuencia,
+            dom,
+            lun,
+            mar,
+            mie,
+            jue,
+            vie,
+            sab,
+            _complements
+    ).subscribe( { 
+      next: (response: InsertEvent) => {
+        const ids = response.id;
+        const nuevos = [...this.eventos()];
+        nuevos.push({
+            id: ids,
+            title: tit,
+            groupId: sal_reserva,
+            start: `${event_ini}`,
+            end: `${event_fi}`,      
+            backgroundColor: color,
+            borderColor: '#dc3545',
+            textColor: '#000000',  
+            allDay: totDia,     
+        });
+        this.eventos.set(nuevos);        
+      },
+      error: (err) => {
+        console.error('Error', err);
+      },
+      complete: () => { }
+    });   
   }
 }

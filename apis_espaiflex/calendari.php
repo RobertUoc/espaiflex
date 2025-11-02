@@ -108,11 +108,15 @@ switch ($method) {
     // Insert
     case 'POST':
         $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['sala'], $data['dia_inici'], $data['dia_fi'], $data['hora_inici'], $data['hora_fi'], $data['import'], $data['id_user'], $data['complements'])) {
+        if (!isset($data['sala'], $data['dia_inici'], $data['dia_fi'], $data['hora_inici'], $data['hora_fi'], $data['import'], $data['id_user'], $data['frecuencia'],
+            $data['dom'], $data['lun'], $data['mar'], $data['mie'], $data['jue'], $data['vie'], $data['sab'],
+            $data['complements'])) {
             echo json_encode(['error' => 'Faltan campos']);
             exit;
         }
-        $stmt = $pdo->prepare("INSERT INTO _t_reserves (sala, dia_inici, dia_fi, hora_inici, hora_fi, import, id_user, actiu) VALUES (?, ?, ?, ?, ? ,?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO _t_reserves (sala, dia_inici, dia_fi, hora_inici, hora_fi, import, id_user, actiu, frequencia,
+                 diumenge, dilluns, dimarts, dimecres, dijous, divendres, dissabte) 
+                 VALUES (?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $success = $stmt->execute([                                  
             $data['sala'],
             $data['dia_inici'], 
@@ -121,19 +125,29 @@ switch ($method) {
             $data['hora_fi'],
             $data['import'],
             $data['id_user'],
-            'SI'
+            'SI',
+            $data['frecuencia'],
+            $data['dom'],
+            $data['lun'],
+            $data['mar'],
+            $data['mie'],
+            $data['jue'],
+            $data['vie'],
+            $data['sab'],
         ]);
         // Insert Complements
-        $lastId = $dpo->lastInsertId();
+        $lastId = $pdo->lastInsertId();
         
-        $ids = explode('#', $data['complement']);
+        $ids = explode('#', $data['complements']);
         $stmt = $pdo->prepare("INSERT INTO _t_reserves_in_complements (id_reserves, id_complements) VALUES (:id_reserves, :id_complements)");        
         // Insertar cada id_complementos
         foreach ($ids as $id_complemento) {
-            $stmt->execute([
-                ':id_sales' => $lastId,
-                ':id_complements' => $id_complemento
-            ]);
+            if ($id_complemento>0) {
+                $stmt->execute([
+                    ':id_sales' => $lastId,
+                    ':id_complements' => $id_complemento
+                ]);
+            }
         }                
         echo json_encode(['success' => $success, 'id' => $lastId]);
         break;

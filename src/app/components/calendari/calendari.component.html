@@ -28,7 +28,7 @@
 <hr>
 
   <div class='container mt-4'>
-    <full-calendar [options]='calendarOptions()'>
+    <full-calendar [options]='calendarOptions()' #calendar>
       <ng-template #eventContent let-arg>
         <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
@@ -171,8 +171,7 @@
           <h5 class="modal-title" id="loginModalLabel">Sala</h5>
           <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
         </div>
-        <div class="modal-body">
-          <form>            
+        <div class="modal-body">                   
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-12">
@@ -236,8 +235,7 @@
             <hr>
             <div class="d-flex justify-content-between">               
                 <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
-            </div>
-          </form>
+            </div>         
         </div>
       </div>
     </div>
@@ -258,17 +256,17 @@
           <div class="row">
             <div class="col-md-3 mr-2">               
                 <label>Fecha Incial:</label>                    
-                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial" [disabled]="alta_reserva !== '0'">            
+                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial">            
             </div>
             <div class="col-md-3 mr-2">               
                 <label>Fecha Final:</label>                    
-                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal" [disabled]="alta_reserva !== '0'">              
+                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal">              
             </div>                        
           </div>
           <div class="row">
             <div class="col-md-3 mr-2">              
                 <label>Frecuencia:</label>
-                <select class="form-control" id="frecuencia" formControlName="frecuencia" [disabled]="alta_reserva !== '0'">
+                <select class="form-control" id="frecuencia" formControlName="frecuencia" (change)="saveReserva()">
                   <option value="diaria">Diaria</option>
                   <option value="semanal">Semanal</option>
                   <option value="mensual">Mensual</option>
@@ -278,13 +276,13 @@
             <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'semanal'">              
                 <label>Dias de la semana:</label>
                 <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">
-                  <label><input type="checkbox" formControlName="lunes"> Lunes </label>
-                  <label><input type="checkbox" formControlName="martes"> Martes</label>
-                  <label><input type="checkbox" formControlName="miercoles"> Miercoles</label>
-                  <label><input type="checkbox" formControlName="jueves"> Jueves</label>
-                  <label><input type="checkbox" formControlName="viernes"> Viernes</label>
-                  <label><input type="checkbox" formControlName="sabado"> Sabado</label>
-                  <label><input type="checkbox" formControlName="domingo"> Domingo</label>
+                  <label><input type="checkbox" formControlName="lunes" (change)="saveReserva()"> Lunes </label>
+                  <label><input type="checkbox" formControlName="martes" (change)="saveReserva()"> Martes</label>
+                  <label><input type="checkbox" formControlName="miercoles" (change)="saveReserva()"> Miercoles</label>
+                  <label><input type="checkbox" formControlName="jueves" (change)="saveReserva()"> Jueves</label>
+                  <label><input type="checkbox" formControlName="viernes" (change)="saveReserva()"> Viernes</label>
+                  <label><input type="checkbox" formControlName="sabado" (change)="saveReserva()"> Sabado</label>
+                  <label><input type="checkbox" formControlName="domingo" (change)="saveReserva()"> Domingo</label>
                 </div>              
             </div>                   
             <!-- Mensual -->
@@ -307,7 +305,7 @@
                     <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 1">                   
                       <div class="row">
                       <div class="col-md-3 mr-2">
-                        <input type="number" id="numerodia" class="form-control" formControlName="numeroDia" min="1" max="31">
+                        <input type="number" id="numerodia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="saveReserva()">
                       </div>
                       <div class="col-md-4">
                         <label> de cada mes</label>
@@ -348,7 +346,7 @@
           <div class="row">  
             <div class="col-md-4 mr-2">               
                  <label for="sala">Sala:</label>
-                 <select class="form-control" id="sala_reserva" formControlName="sala_reserva" [disabled]="alta_reserva !== '0'" (change)="actualizarMaximo()">
+                 <select class="form-control" id="sala_reserva" formControlName="sala_reserva" (change)="actualizarMaximo()">
                     @for (sala of sales; track sala.id; let id_sala = $index) {
                       <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
                     }
@@ -366,7 +364,10 @@
                       <option value="1">1 hora</option>
                       <option value="2">½ hora</option>
                 </select>                                                    
-            </div>                            
+            </div>       
+            <div class="col-md-2 ms-auto" *ngIf="alta_reserva == '0'"> 
+              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Salir</button>                                             
+            </div>
           </div>   
           <div *ngIf="mostrarHourGrid">
             @for(mira of mira_dia;track mira.id) {                         
@@ -375,8 +376,7 @@
                     <button class="col-md-2 d-flex p-2 rounded text-white m-1"
                         #horesSelected
                         name="horesSelected"
-                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
-                        [disabled]="col.estado != 'No informado'" 
+                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"                        
                         [disabled]="alta_reserva !== '0'" 
                         (click)="triaHora($event)">                                
                     {{col.hora_inici}}
@@ -391,7 +391,7 @@
                                                  name = "chk_{{comple.id}}"
                                                  #checkComplemento                                                         
                                                  [checked]="selectedComplements.includes(+comple.id)"
-                                                 [disabled]="alta_reserva !== '0'" />                                                                                        
+                                                 />                                                                                        
                          {{ comple.descripcio }} - €{{ comple.preu }}
                        </label>                            
                    }                    
@@ -400,7 +400,7 @@
             <div class="modal-footer">
               <div *ngIf="mostrarPeu">      
                     <h1>Precio {{ this.preu_sala_total | PipePreu }}</h1>                  
-                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" (click)="saveReserva()">Guardar</button>
+                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" [disabled]="errorEntrada != ''" (click)="desarSala()">Guardar</button>
                     <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>                        
               </div>
           </div>                                    

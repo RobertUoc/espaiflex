@@ -76,7 +76,7 @@ export class SalesService {
       actiu: _actiu,
       max_ocupacio: _max_ocupacio,
       horari : _horari,
-      imarge : _imatge,
+      imatge : _imatge,
       complement: _complement,            
     });
   }

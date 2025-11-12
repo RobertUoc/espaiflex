@@ -5,6 +5,7 @@ import { Horas } from '../models/horas.model';
 import { Calendario } from '../models/calendario.model.';
 import { Reserva } from '../models/reserva.model';
 import { InsertEvent } from '../models/insertEvent.model';
+import { ErrorEvent } from '../models/errorEvent.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -55,7 +56,7 @@ export class CalendariService {
 
   insertEvent(
     _sala: string,  _dia_inici: string, _dia_fi: string, _hora_inici: string, _hora_fi:string, _import: number, _id_user:number, _frecuencia: string,
-           _dom:number, _lun:number, _mar:number, _mie:number, _jue:number, _vie:number, _sab:number,
+           _dom:number, _lun:number, _mar:number, _mie:number, _jue:number, _vie:number, _sab:number, _tipo: number, _dia_mes: number, _el_semana: string, _el_dia:string,
            _complements: string ):Observable<InsertEvent>
    {
     return this.http.post<InsertEvent>(this.apiUrl + 'calendari.php', {
@@ -73,9 +74,18 @@ export class CalendariService {
       mie: _mie,
       jue: _jue,
       vie: _vie,
-      sab: _sab,
+      sab: _sab,      
+      tipo: _tipo,
+      dia_mes: _dia_mes,
+      el_semana: _el_semana,
+      el_dia: _el_dia,
       complements: _complements,            
     });
+  }
+
+  buscarInsertDia( _sala: string,  _dia_inici: string, _dia_fi: string, _frecuencia: string, _hora_inici: string, _hora_fi:string): Observable<ErrorEvent[]> {
+    return this.http.get<ErrorEvent[]>(this.apiUrl + 'calendari.php?buscarSala=' + _sala + '&diaInici=' + _dia_inici  + '&diaFi=' + _dia_fi + '&horaInici=' + _hora_inici + '&horaFi=' + _hora_fi
+    );
   }
 
 }

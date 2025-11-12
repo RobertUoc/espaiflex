@@ -1,21 +1,34 @@
-export class Reserva { 
-
-    constructor(
-        public id: string = '0',
-        public dia: Date = new Date(),
-        public hora_inici: string = '',
-        public hora_fi: string = '',
-        public import_sala: number = 0,
-        public user: string = '',
-        public id_complements: string = '0',
-        public complement: string = '',
-        public preu: string = '0',
-        public nom_sala: string = '',
-        public id_edifici: string = '',
-        public preu_sala: string = '0',
-        public max_ocupacio: string = '0',
-        public missatge: string = '',
-        public horari: string = '1'
-    ) { }
-    
+export class Reserva {
+  constructor(
+    public id: string = '0',
+    public dia: Date = new Date(),
+    public hora_inici: string = '',
+    public hora_fi: string = '',
+    public import_sala: number = 0,
+    public id_user: string = '',
+    public id_complements: string = '0',
+    public complement: string = '',
+    public preu: string = '0',
+    public nom_sala: string = '',
+    public id_edifici: string = '',
+    public preu_sala: string = '0',
+    public max_ocupacio: string = '0',
+    public missatge: string = '',
+    public horari: string = '1',
+    public sala: string = '',
+    public frequencia: string = '',
+    public dilluns: number = 0,
+    public dimarts: number = 0,
+    public dimecres: number = 0,
+    public dijous: number = 0,
+    public divendres: number = 0,
+    public dissabte: number = 0,
+    public diumenge: number = 0,
+    public tipo: number = 0,
+    public dia_mes: number = 0,
+    public el_semana: string = '',
+    public el_dia: string = '',
+    public dia_inici: Date = new Date(),
+    public dia_fi: Date = new Date()
+  ) {}
 }

@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-between align-items-center bg-light p-2">
     <div class="btn-group" role="group" aria-label="Admin menu">
       <button type="button" class="btn btn-outline-primary" (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actulitzarse</button>
+      <button type="button" class="btn btn-outline-primary" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
       <button type="button" class="btn btn-outline-primary" (click)="neteja(2)">Identificar-se</button>      
     </div>  
     <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
@@ -75,7 +75,7 @@
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
         <div class="modal-header">
-          <h5 class="modal-title" id="registerModalLabel">{{ finestra == 1 ? 'Registrarse' : 'Actulitzarse' }}</h5>
+          <h5 class="modal-title" id="registerModalLabel">{{ finestra == 1 ? 'Registrarse' : 'Actualizarse' }}</h5>
           <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
         </div>
         <div class="modal-body">
@@ -89,7 +89,7 @@
                        name="nom" id="nom">
                        @if(nomField.invalid && nomField.touched) {      
                          @if(nomField.errors?.['required']) {
-                           <div class="invalido">Relleno el nombre.</div>
+                           <div class="invalido">Rellene el nombre.</div>
                          }
                          @if(nomField.errors?.['minlength']) {
                            <div class="invalido">Mínimo obligado. {{ nomField.errors?.['minlength'].requiredLength }}</div>
@@ -102,14 +102,14 @@
             </div>
             <div class="row">
               <div class="col-md-12">                        
-                <label class="form-label">Correo electrónic</label>
+                <label class="form-label">Correo electrónico</label>
                 <input type="email" class="form-control" [(ngModel)]="registerData.email"
                        required minlength="3" maxlength="50" 
                        #emailField="ngModel"
                        name="email" id="email">
                        @if(emailField.invalid && emailField.touched) {      
                           @if(emailField.errors?.['required']) {
-                            <div class="invalido">Relleno el correou electrónico.</div>
+                            <div class="invalido">Rellene el correou electrónico.</div>
                           }
                           @if(emailField.errors?.['minlength']) {
                             <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
@@ -153,7 +153,7 @@
             </div>
             <hr> 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrarse' : 'Actulitzarse' }}</button>
+                <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrarse' : 'Actualizarse' }}</button>
                 <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>
             </div>
           </form>
@@ -252,7 +252,13 @@
       </div>
 
       <form  [formGroup]="reservaForm" (ngSubmit)="saveReserva()">
-        <div class="modal-body container-fluid">                
+        <div class="modal-body container-fluid"> 
+          <div class="row d-none">
+            <div class="col-md-3 mr-2">               
+                <label>id_usuari:</label>                    
+                <input type="text" class="form-control" id="id_user" formControlName="id_user">            
+            </div>                         
+          </div>
           <div class="row">
             <div class="col-md-3 mr-2">               
                 <label>Fecha Incial:</label>                    
@@ -274,8 +280,8 @@
             </div>      
             <!-- Semanal -->
             <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'semanal'">              
-                <label>Dias de la semana:</label>
-                <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">
+                <label>Dias de la semana: </label>
+                <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">                  
                   <label><input type="checkbox" formControlName="lunes" (change)="saveReserva()"> Lunes </label>
                   <label><input type="checkbox" formControlName="martes" (change)="saveReserva()"> Martes</label>
                   <label><input type="checkbox" formControlName="miercoles" (change)="saveReserva()"> Miercoles</label>
@@ -305,7 +311,7 @@
                     <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 1">                   
                       <div class="row">
                       <div class="col-md-3 mr-2">
-                        <input type="number" id="numerodia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="saveReserva()">
+                        <input type="number" id="numeroDia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="saveReserva()">
                       </div>
                       <div class="col-md-4">
                         <label> de cada mes</label>
@@ -401,16 +407,41 @@
               <div *ngIf="mostrarPeu">      
                     <h1>Precio {{ this.preu_sala_total | PipePreu }}</h1>                  
                     <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" [disabled]="errorEntrada != ''" (click)="desarSala()">Guardar</button>
-                    <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>                        
+                    <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>      
+                    <button *ngIf="alta_reserva != '0' && id_usuari == reservaForm.get('id_user')?.value" type="button" class="btn btn-danger m-5" (click)="treureSala()">Borrar</button>
               </div>
           </div>                                    
          </div>                            
         </div>
-        @if(errorEntrada) {
+        @if(errorEntrada && alta_reserva == '0') {
           <div class="row border rounded mt-4 bg-danger p-2 mb-2">
             <div class="col-md-12">                    
               <h5>{{ errorEntrada }}</h5>
             </div>
+
+            <div id="tabla-consulta" *ngIf="datosConsulta">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Día Inicio</th>
+                    <th>Día Fin</th>                    
+                    <th>Hora Inicio</th>
+                    <th>Hora Fin</th>
+                  </tr>
+                </thead>
+                <tbody>          
+                  @for(datos of datosConsulta;track datos.dia_inici) {        
+                  <tr>
+                    <td>{{ datos.dia_inici }}</td>
+                    <td>{{ datos.dia_fi }}</td>                    
+                    <td>{{ datos.hora_inici }}</td>
+                    <td>{{ datos.hora_fi }}</td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
           </div>          
         }
         @if(missatge) {

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf, NgFor } from '@angular/common';
 import { EdificisService } from '../../service/edificis.service';
-import { Sales } from '../../models/sales.model';
 import * as L from 'leaflet';
 import { Edificis } from '../../models/edificis.model';
 
@@ -17,7 +16,7 @@ interface Edifici {
 
 @Component({
   selector: 'app-home',
-  imports: [ LoginComponent, FormsModule, NgIf, NgFor, ],
+  imports: [ LoginComponent, FormsModule, NgIf, NgFor ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

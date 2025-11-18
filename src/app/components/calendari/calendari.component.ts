@@ -164,7 +164,7 @@ export class CalendariComponent implements OnInit {
   createForm() {
     // Formulario Reserva
     this.reservaForm = this.fb.group({
-      id_user: [ '', ''],
+      id_user: ['', ''],
       id: ['0', ''],
       fechaInicial: [
         new Date().toISOString().substring(0, 10),
@@ -203,6 +203,7 @@ export class CalendariComponent implements OnInit {
   actualizarMaximo() {
     // Ok
     this.errorEntrada = '';
+    this.datosConsulta = [];
     let salaId = this.reservaForm.get('sala_reserva')?.value;
     let DadesSala = this.sales.find((reg) => reg.id == salaId);
     this.max_sala = DadesSala?.max_ocupacio ?? '';
@@ -368,6 +369,7 @@ export class CalendariComponent implements OnInit {
   reserva() {
     this.createForm();
     this.errorEntrada = '';
+    this.datosConsulta = [];
     this.selectedComplements = [];
     this.alta_reserva = '0';
     this.finestra = 90;
@@ -437,24 +439,26 @@ export class CalendariComponent implements OnInit {
     //
     //
     // this.data_reserva_ini
-    this.calendariService
-      .getMiraDia('1900-01-01', this.sala_reserva)
-      .subscribe({
-        next: (data) => {
-          this.creaHorari(data);
-        },
-        error: (error) => {
-          console.log(error);
-        },
-        complete: () => {
-          // Busco els complements de la sala
-          this.preu_sala =
-            this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
-          this.getcomplement(this.sala_reserva);
-          this.checkboxes.forEach((checkbox, i) => {});
-          this.mostrarHourGrid = true;
-        },
-      });
+    let fecha = '1900-01-01';
+    if (this.alta_reserva != '0') {
+      fecha = this.data_reserva_ini;
+    }
+    this.calendariService.getMiraDia(fecha, this.sala_reserva).subscribe({
+      next: (data) => {
+        this.creaHorari(data);
+      },
+      error: (error) => {
+        console.log(error);
+      },
+      complete: () => {
+        // Busco els complements de la sala
+        this.preu_sala =
+          this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+        this.getcomplement(this.sala_reserva);
+        this.checkboxes.forEach((checkbox, i) => {});
+        this.mostrarHourGrid = true;
+      },
+    });
   }
 
   triaHora(event: Event) {
@@ -502,6 +506,7 @@ export class CalendariComponent implements OnInit {
     if (inici < compara) {
       item.estado = compara;
     }
+    console.log(item.estado);
     this.agrupado[item.descripcio].push({
       hora_inici: horaFinal,
       estado: item.estado,
@@ -548,7 +553,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarPeu = false;
     this.agrupado = {};
     this.modalVisible[this.finestra] = true;
-    this.data_reserva_ini = clickInfo.event.startStr;
+    this.data_reserva_ini = clickInfo.event.startStr.substring(0, 10);
     this.resetGenerate();
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
@@ -565,7 +570,6 @@ export class CalendariComponent implements OnInit {
         console.log(error);
       },
       complete: () => {
-        console.log(this.reservas[0]);
         let dia_reserva = this.reservas[0];
 
         this.reservaForm.get('diasSemana')?.disable();
@@ -576,7 +580,6 @@ export class CalendariComponent implements OnInit {
         this.max_sala = dia_reserva.max_ocupacio;
         this.horari = dia_reserva.horari;
         this.missatge = dia_reserva.missatge;
-        
 
         this.reservaForm.patchValue({
           id_user: dia_reserva.id_user,
@@ -596,13 +599,15 @@ export class CalendariComponent implements OnInit {
           },
           mensualidad: {
             numeroDia: dia_reserva.dia_mes,
+            tipo: dia_reserva.tipo,
+            periodo: dia_reserva.el_semana,
+            diaSemana: dia_reserva.el_dia,
           },
         });
         this.actualizarMaximo();
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
         this.preu_sala_total = parseFloat(dia_reserva.preu_sala);
-        console.log(this.selectedComplements);
       },
     });
     this.calendariService
@@ -691,6 +696,7 @@ export class CalendariComponent implements OnInit {
 
   private validaSemana(): string | null {
     this.errorEntrada = '';
+    this.datosConsulta = [];
     const dias = this.reservaForm.get('diasSemana')?.value;
     const algunDiaSeleccionado = Object.values(dias).some((v) => v === true);
     return !algunDiaSeleccionado
@@ -700,9 +706,9 @@ export class CalendariComponent implements OnInit {
 
   private validaMes(): string | null {
     const mensualidad = this.reservaForm.get('mensualidad')?.value;
+    let dia = this.reservaForm.get('mensualidad.numeroDia')?.value;
     switch (mensualidad.tipo) {
       case '1':
-        const dia = parseInt(mensualidad.numeroDia, 10);
         return isNaN(dia) || dia < 1 || dia > 31
           ? 'El número de día debe estar entre 1 y 31.'
           : null;
@@ -731,6 +737,7 @@ export class CalendariComponent implements OnInit {
     }
   }
   desarSala() {
+    this.datosConsulta = [];
     let feInicial = this.reservaForm.get('fechaInicial')?.value;
     let feFinal = this.reservaForm.get('fechaFinal')?.value;
     let horari = this.reservaForm.get('horari_sala')?.value;
@@ -826,6 +833,8 @@ export class CalendariComponent implements OnInit {
           },
           complete: () => {
             if (horaslibres == 0) {
+              // Grabo Factura.
+              this.grabaFactura(this.id_usuari, this.preu_sala_total);
               for (let i = 0; i < ranges.length; i++) {
                 let horaInici = ranges[i].inicio + ':00';
                 let horaFi = ranges[i].final + ':00';
@@ -1029,8 +1038,8 @@ export class CalendariComponent implements OnInit {
                             0,
                             seleccio_mensual,
                             0,
-                            nombreDia,
                             El1,
+                            nombreDia,
                             complements
                           );
                         }
@@ -1126,8 +1135,57 @@ export class CalendariComponent implements OnInit {
       });
   }
 
-  treureSala() {
-
+  grabaFactura(i_usuari: number, pts: number) {
+    console.log('ALTA FACTURA');
+    let iva = 21;
+    let iva_importe = pts * 0.21;
+    let total = pts + iva_importe;
+    let fecha = new Date().toISOString().substring(0, 10);
+    this.calendariService
+      .grabaFactura(i_usuari, fecha, pts, iva, iva_importe, total)
+      .subscribe({
+        next: () => {
+          console.log('Factura Grabada');
+        },
+        error: (err) => {
+          console.error('Error', err);
+        },
+        complete: () => {},
+      });
   }
 
+  treureSala() {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log('Confirmado');
+        // Generar Abono
+        this.grabaFactura(this.id_usuari, this.preu_sala_total * -1);
+        // Anular Event
+        this.calendariService.deleteEvent(this.alta_reserva).subscribe({
+          next: () => {
+            // Treure Event
+            const actuales = [...this.eventos()];
+            const filtrados = actuales.filter(
+              (ev) => ev.id != this.alta_reserva
+            );
+            this.eventos.set(filtrados);
+            this.tancarModal();
+          },
+          error: (err) => {
+            console.error('Error', err);
+          },
+          complete: () => {},
+        });
+      } else if (result.isDismissed) {
+        console.log('Cancelado');
+      }
+    });
+  }
 }

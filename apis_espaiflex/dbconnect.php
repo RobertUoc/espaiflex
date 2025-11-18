@@ -1,10 +1,10 @@
 <?php
     header("Access-Control-Allow-Origin: *");
    
-    $host = 'localhost';
+    $host = '168.231.77.239';
     $db = 'db_espaiflex';
-    $user = 'root';
-    $pass = '';
+    $user = 'user_espaiflex';
+    $pass = 'user_admin';
 
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);

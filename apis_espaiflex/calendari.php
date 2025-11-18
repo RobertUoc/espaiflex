@@ -85,17 +85,16 @@ class CalendariAPI {
            $horainici = $this->limpiarString($_GET['horaInici']);
            $horafi    = $this->limpiarString($_GET['horaFi']);        
            if ($diainici == $diafi) {
-               $stmt = $this->db->prepare("
-                                SELECT res.dia_inici,res.dia_fi,res.sala,res.hora_inici,res.hora_fi
+               $stmt = $this->db->prepare("SELECT res.dia_inici,res.dia_fi,res.sala,res.hora_inici,res.hora_fi
 			                      FROM _t_reserves res
 			                      LEFT JOIN _t_sales sal ON (sal.id = res.sala)
-			                      WHERE res.sala = :sala
+			                      WHERE res.sala = :sala AND res.data_delete is null
 			                     AND (
 			                        (res.hora_inici > :horainici1 AND res.hora_inici < :horafi1 OR res.hora_fi > :horainici2 AND res.hora_fi < :horafi2)
 				                        or res.hora_inici = :horainici3
                                         or res.hora_fi = :horafi3
                                     )
-				                AND (res.dia_inici <= :diainici and res.dia_fi >= :diafi
+				                AND (res.dia_inici <= :diainici and res.dia_fi >= :diafi)
                ");
                $stmt->execute([':sala' => $sala,
                             ':horainici1' => $horainici,':horafi1' => $horafi,
@@ -107,11 +106,10 @@ class CalendariAPI {
                return $this->json($data);
           }
           else {
-               $stmt = $this->db->prepare("
-                                SELECT res.dia_inici,res.dia_fi,res.sala,res.hora_inici,res.hora_fi
+               $stmt = $this->db->prepare("SELECT res.dia_inici,res.dia_fi,res.sala,res.hora_inici,res.hora_fi
 			                      FROM _t_reserves res
 			                      LEFT JOIN _t_sales sal ON (sal.id = res.sala)
-			                      WHERE res.sala = :sala
+			                      WHERE res.sala = :sala AND res.data_delete is null
 			                     AND (
 			                        (res.hora_inici > :horainici1 AND res.hora_inici < :horafi1 OR res.hora_fi > :horainici2 AND res.hora_fi < :horafi2)
 				                        or res.hora_inici = :horainici3
@@ -140,11 +138,10 @@ class CalendariAPI {
     public function get_dia_edifici() {
             $dia     = $this->limpiarString($_GET['dia']);
             $edifici = $this->limpiarInt($_GET['edifici']);        
-            $stmt = $this->db->prepare("        
-                           SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
+            $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
                                 FROM _t_hores h
                            INNER JOIN _t_sales sal On sal.id_edifici = :edifici And sal.actiu = 'SI' And h.tipus = sal.horari
-                           LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.dia_inici <= :dia1 and res.dia_fi >= :dia2 GROUP BY sala,hora_inici) r ON h.hora = r.hora_inici and r.sala = sal.id
+                           LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.data_delete is null and res.dia_inici <= :dia1 and res.dia_fi >= :dia2 GROUP BY sala,hora_inici) r ON h.hora = r.hora_inici and r.sala = sal.id
                            WHERE h.activa = 'SI'
                            ORDER BY sal.descripcio,h.hora");
             $stmt->execute([':edifici' => $edifici, 'dia1' => $dia, 'dia2' => $dia]);                               
@@ -161,11 +158,10 @@ class CalendariAPI {
         $dia     = $this->limpiarString($_GET['dia']);
         $sala    = $this->limpiarInt($_GET['sala']);
         $reserva = $this->limpiarInt($_GET['reserva']);
-        $stmt = $this->db->prepare("       
-                              SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
+        $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
                                 FROM _t_hores h
                           INNER JOIN _t_sales sal On sal.id = :sala And sal.actiu = 'SI' And h.tipus = sal.horari
-                          LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.dia_inici = :dia AND res.id = :reserva GROUP BY sala,hora_inici) r ON h.hora = r.hora_inici and r.sala = sal.id
+                          LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.data_delete is null and res.dia_inici = :dia AND res.id = :reserva GROUP BY sala,hora_inici) r ON h.hora = r.hora_inici and r.sala = sal.id
                          WHERE h.activa = 'SI'
                           ORDER BY sal.descripcio,h.hora");
         $stmt->execute([':sala' => $sala, 'dia' => $dia, 'reserva' => $reserva]);
@@ -182,11 +178,10 @@ class CalendariAPI {
     public function get_dia_sala() {
         $dia     = $this->limpiarString($_GET['dia']);
         $sala    = $this->limpiarInt($_GET['sala']);
-        $stmt = $this->db->prepare("        
-                              SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
+        $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
                                 FROM _t_hores h
                           INNER JOIN _t_sales sal On sal.id = :sala And sal.actiu = 'SI' And h.tipus = sal.horari
-                          LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.dia_inici = :dia GROUP BY sala,hora_inici,hora_fi) r ON h.hora = r.hora_inici and r.sala = sal.id
+                          LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.data_delete is null and res.dia_inici = :dia GROUP BY sala,hora_inici,hora_fi) r ON h.hora = r.hora_inici and r.sala = sal.id
                          WHERE h.activa = 'SI'
                           ORDER BY sal.descripcio,h.hora");
         $stmt->execute([':sala' => $sala, 'dia' => $dia]);
@@ -202,11 +197,10 @@ class CalendariAPI {
     public function get_any_edifici() {
         $any     = $this->limpiarInt($_GET['any']);
         $edifici = $this->limpiarInt($_GET['edifici']);
-        $stmt = $this->db->prepare("        
-                                  SELECT res.id,res.dia_inici,res.dia_fi,res.hora_inici,res.hora_fi,sal.color, sal.descripcio, res.sala
+        $stmt = $this->db->prepare("SELECT res.id,res.dia_inici,res.dia_fi,res.hora_inici,res.hora_fi,sal.color, sal.descripcio, res.sala
                                    FROM _t_reserves res
                                     LEFT JOIN _t_sales sal ON (res.sala = sal.id)
-                                   WHERE res.actiu = 'SI'
+                                   WHERE res.actiu = 'SI' and res.data_delete is null
                                      AND year(res.dia_inici) = :any
                                      and sal.id_edifici = :edifici");
         $stmt->execute([':any' => $any, 'edifici' => $edifici]);
@@ -221,21 +215,34 @@ class CalendariAPI {
      */
     public function get_reserva() {
         $reserva = $this->limpiarInt($_GET['reserva']);
-        $stmt = $this->db->prepare("                
-                                       SELECT res.id, res.dia_inici, res.dia_fi, res.hora_inici, res.hora_fi, res.import as preu_sala, res.id_user,
+        $stmt = $this->db->prepare("SELECT res.id, res.dia_inici, res.dia_fi, res.hora_inici, res.hora_fi, res.import as preu_sala, res.id_user,
                                               ric.id_complements, com.descripcio, com.preu, res.sala, res.frequencia,
                                               res.dilluns, res.dimarts, res.dimecres, res.dijous, res.divendres, res.dissabte, res.diumenge, res.tipo, res.dia_mes, res.el_semana, res.el_dia,
                                               sal.descripcio, sal.id_edifici, sal.preu, sal.max_ocupacio, sal.missatge, sal.horari
-                                        FROM db_espaiflex._t_reserves res
+                                        FROM _t_reserves res
                                         LEFT JOIN _t_reserves_in_complements ric ON  res.id = ric.id_reserves
                                         LEFT JOIN _t_complements com ON ric.id_complements = com.id
                                         LEFT JOIN _t_sales sal ON res.sala = sal.id
-                                        WHERE res.id = :reserva");
-        $stmt->execute([':reserva' => $reserva]);
+                                        WHERE res.id = ?");
+        //$stmt->execute([':reserva' => $reserva]);
+        $stmt->execute([$reserva]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $this->json($data);
     }
-        
+
+    /**
+     *
+     * Lectura per dia x sala
+     *
+     */
+    public function delete_reserva() {
+        $reserva = $this->limpiarInt($_GET['delete_event']);
+        $stmt = $this->db->prepare("UPDATE _t_reserves SET data_delete = NOW(), actiu = ? WHERE id = ?");                                        
+        $stmt->execute(['NO', $reserva]);
+        $ok = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->json(["success" => $ok, "id" => $reserva]);        
+    }
+    
     
     /**
      * INSERT post.
@@ -258,7 +265,7 @@ class CalendariAPI {
         $hora_fi    = $this->limpiarString($data['hora_fi']);
         $import     = $this->limpiarFloat($data['import']);
         $id_user    = $this->limpiarInt($data['id_user']);
-        $frecuencia = $this->limpiarInt($data['frecuencia']);
+        $frecuencia = $this->limpiarString($data['frecuencia']);
         $dom        = $this->limpiarInt($data['dom']);
         $lun        = $this->limpiarInt($data['lun']);
         $mar        = $this->limpiarInt($data['mar']);
@@ -268,16 +275,16 @@ class CalendariAPI {
         $sab        = $this->limpiarInt($data['sab']);
         $tipo       = $this->limpiarInt($data['tipo']);
         $dia_mes    = $this->limpiarInt($data['dia_mes']);
-        $el_semana  = $this->limpiarInt($data['el_semana']);
-        $el_dia     = $this->limpiarInt($data['el_dia']);        
+        $el_semana  = $this->limpiarString($data['el_semana']);
+        $el_dia     = $this->limpiarString($data['el_dia']);        
         // Update Taula sales.
-        $stmt       = $this->db->prepare("INSERT INTO _t_reserves (sala, dia_inici, dia_fi, hora_inici, hora_fi, import, id_user, actiu, frequencia,
+        $stmt       = $this->db->prepare("INSERT INTO _t_reserves (sala, dia_inici, dia_fi, hora_inici, hora_fi, import, id_user, frequencia,
                                                                    diumenge, dilluns, dimarts, dimecres, dijous, divendres, dissabte, tipo, dia_mes, el_semana, el_dia)
-                                          VALUES (?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                                          VALUES (?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
         $ok         = $stmt->execute([ $sala, $dia_inici, $dia_fi, $hora_inici, $hora_fi, $import, $id_user, $frecuencia, $dom, $lun, $mar, $mie, $jue, $vie, $sab, $tipo, $dia_mes, $el_semana, $el_dia]);
         $lastId = $this->db->lastInsertId();
         // Inserto els Nous Complements
-        $ids = explode('#', $data['complement']);
+        $ids = explode('#', $data['complements']);
         $validos = [];
         foreach ($ids as $id) {
             $id = $this->limpiarInt($id);
@@ -297,6 +304,22 @@ class CalendariAPI {
      *
      */
     public function put() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!isset($data['usuario'], $data['fecha'], $data['base'], $data['iva'], $data['iva_importe'], $data['total'])) {
+                echo json_encode(['error' => 'Faltan campos']);
+                exit;
+        }
+            
+        $usuario     = $this->limpiarString($data['usuario']);
+        $fecha       = $this->limpiarString($data['fecha']);
+        $base        = $this->limpiarFloat($data['base']);
+        $iva         = $this->limpiarFloat($data['iva']);
+        $iva_importe = $this->limpiarFloat($data['iva_importe']);
+        $total       = $this->limpiarFloat($data['total']);
+        $stmt       = $this->db->prepare("INSERT INTO _t_factures (id_user, data_factura, base, iva, iva_import, total_factura)                                                                   
+                                          VALUES (?, ?, ?, ?, ? ,? )");
+        $ok         = $stmt->execute([ $usuario, $fecha, $base, $iva, $iva_importe, $total]);
+        return $this->json(["success" => $ok, "id" => $this->db->lastInsertId()]);
         
     }
 }
@@ -314,6 +337,7 @@ switch ($method) {
         if (($tots == 0)&&(isset($_GET['dia']))&&(isset($_GET['sala']))&&(isset($_GET['reserva']))) { $api->get_dia_reserva(); $tots = 1; }
         if (($tots == 0)&&(isset($_GET['dia']))&&(isset($_GET['sala'])))                            { $api->get_dia_sala(); $tots = 1;}        
         if (($tots == 0)&&(isset($_GET['any']))&&(isset($_GET['edifici'])))                         { $api->get_any_edifici(); $tots = 1;}
+        if (($tots == 0)&&(isset($_GET['delete_event'])))                                           { $api->delete_reserva(); $tots = 1;}
         if (($tots == 0)&&(isset($_GET['reserva'])))                                                { $api->get_reserva(); $tots = 1;}
         break;
     case 'POST':

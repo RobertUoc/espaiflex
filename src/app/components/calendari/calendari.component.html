@@ -310,7 +310,7 @@
                   <div class="col-md-8 mr-2">
                     <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 1">                   
                       <div class="row">
-                      <div class="col-md-3 mr-2">
+                      <div class="col-md-4 mr-2">
                         <input type="number" id="numeroDia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="saveReserva()">
                       </div>
                       <div class="col-md-4">
@@ -386,7 +386,7 @@
                         [disabled]="alta_reserva !== '0'" 
                         (click)="triaHora($event)">                                
                     {{col.hora_inici}}
-                    </button>
+                    </button>                    
                   }                        
               </div>
               <hr>
@@ -418,8 +418,8 @@
             <div class="col-md-12">                    
               <h5>{{ errorEntrada }}</h5>
             </div>
-
-            <div id="tabla-consulta" *ngIf="datosConsulta">
+            
+            <div id="tabla-consulta" *ngIf="datosConsulta.length>0">
               <table class="table table-bordered table-hover">
                 <thead>
                   <tr>

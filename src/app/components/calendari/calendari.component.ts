@@ -42,7 +42,6 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { InsertEvent } from '../../models/insertEvent.model';
 import { ErrorEvent } from '../../models/errorEvent.model';
 import { response } from 'express';
-import { FullCalendarComponent } from '@fullcalendar/angular';
 
 @Component({
   selector: 'app-calendari',
@@ -95,7 +94,8 @@ export class CalendariComponent implements OnInit {
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
   public horari: string = '1';
-  public selectedComplements: number[] = [];
+  public selectedComplements: number[] = [];  
+  public verResenas: boolean = false;
   public eventos = signal([
     {
       id: '',
@@ -144,7 +144,7 @@ export class CalendariComponent implements OnInit {
   currentEvents = signal<EventApi[]>([]);
 
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder,    
     private route: ActivatedRoute,
     private router: Router,
     private changeDetector: ChangeDetectorRef,
@@ -323,6 +323,7 @@ export class CalendariComponent implements OnInit {
   }
 
   tancarModal() {
+    console.log(this.finestra);
     this.modalVisible[this.finestra] = false;
   }
 
@@ -505,8 +506,7 @@ export class CalendariComponent implements OnInit {
     }
     if (inici < compara) {
       item.estado = compara;
-    }
-    console.log(item.estado);
+    }    
     this.agrupado[item.descripcio].push({
       hora_inici: horaFinal,
       estado: item.estado,
@@ -549,12 +549,12 @@ export class CalendariComponent implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg) {
     this.finestra = 90;
-    this.mostrarHourGrid = false;
-    this.mostrarPeu = false;
+    this.mostrarHourGrid = false;    
     this.agrupado = {};
     this.modalVisible[this.finestra] = true;
     this.data_reserva_ini = clickInfo.event.startStr.substring(0, 10);
     this.resetGenerate();
+    this.mostrarPeu = true;
     this.sala_reserva = clickInfo.event.groupId;
     this.alta_reserva = clickInfo.event.id;
     if (this.alta_reserva != '0') {
@@ -626,7 +626,7 @@ export class CalendariComponent implements OnInit {
         complete: () => {
           // Busco els complements de la sala
           this.preu_sala =
-            this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+          this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
           this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
@@ -1114,6 +1114,7 @@ export class CalendariComponent implements OnInit {
       .subscribe({
         next: (response: InsertEvent) => {
           const ids = response.id;
+          console.log(ids);
           const nuevos = [...this.eventos()];
           nuevos.push({
             id: ids,
@@ -1188,4 +1189,17 @@ export class CalendariComponent implements OnInit {
       }
     });
   }
+
+  ponOpinion() {
+    this.verResenas = true;
+  }
+
+  tancarOpinion() {
+    this.verResenas = false;
+  }
+
+  guardarOpinion() {
+    this.verResenas = false;
+  }
+
 }

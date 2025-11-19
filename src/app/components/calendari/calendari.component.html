@@ -402,15 +402,57 @@
                        </label>                            
                    }                    
               </div>              
-            }       
-            <div class="modal-footer">
-              <div *ngIf="mostrarPeu">      
-                    <h1>Precio {{ this.preu_sala_total | PipePreu }}</h1>                  
-                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary m-2" [disabled]="errorEntrada != ''" (click)="desarSala()">Guardar</button>
-                    <button type="button" class="btn btn-secondary" (click)="tancarModal()">{{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>      
-                    <button *ngIf="alta_reserva != '0' && id_usuari == reservaForm.get('id_user')?.value" type="button" class="btn btn-danger m-5" (click)="treureSala()">Borrar</button>
+            }                   
+
+            <div class="container mt-3" *ngIf="mostrarPeu">
+              <div *ngIf="mostrarPeu">    
+                <h1 class="text-end">Precio {{ preu_sala_total | PipePreu }}</h1>   
+                <hr>                  
+                <div class="d-flex">                  
+                  <div>                    
+                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary me-2" 
+                            [disabled]="errorEntrada != ''" (click)="desarSala()">
+                      Guardar</button>                              
+                    <button *ngIf="alta_reserva != '0'" type="button" class="btn btn-primary me-2"                                                         
+                            (click)="ponOpinion()">
+                      Reseñas</button>
+                    <button *ngIf="alta_reserva != '0' && id_usuari == reservaForm.get('id_user')?.value" 
+                            type="button" class="btn btn-danger me-2" 
+                            (click)="treureSala()">
+                      Borrar</button>
+                  </div>                            
+                  <div class="ms-auto">
+                    <button type="button" class="btn btn-secondary" 
+                            (click)="tancarModal()">
+                      {{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>
+                  </div>
+                </div>      
               </div>
-          </div>                                    
+            </div>
+            @if(verResenas) {
+              <div class="container mt-2">                
+                  <h5 class="text-title">Tu opinión sobre la reserva</h5>
+                  <div class="mb-3">
+                    <label for="reseña" class="form-label">Opinión</label>
+                    <textarea id="opinion" class="form-control" rows="4" name="opinion"></textarea>
+                  </div>                  
+                  <!-- Puntuación -->
+                  <div class="col-md-3 mb-3">
+                    <label for="puntuacion" class="form-label">Puntuación</label>
+                    <select id="puntuacion" class="form-select" name="puntuacion">
+                      <option value="1">⭐</option>
+                      <option value="2">⭐⭐</option>
+                      <option value="3">⭐⭐⭐</option>
+                      <option value="4">⭐⭐⭐⭐</option>
+                      <option value="5">⭐⭐⭐⭐⭐</option>
+                    </select>
+                  </div>                                            
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" (click)="tancarOpinion()">Cancelar</button>
+                      <button type="button" class="btn btn-primary" (click)="guardarOpinion()">Enviar</button>
+                  </div>                  
+              </div>
+            }                        
          </div>                            
         </div>
         @if(errorEntrada && alta_reserva == '0') {

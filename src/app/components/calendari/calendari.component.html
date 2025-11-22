@@ -390,7 +390,7 @@
                   }                        
               </div>
               <hr>
-              <div class="row mb-2" *ngIf="mostrarPeu">
+              <div class="row mb-2" *ngIf="(mostrarPeu) && (alta_reserva!= '0')">
                    @for(comple of complements;  track comple.id; let id_comple = $index) {
                        <label>
                          <input type="checkbox" (click)="sumaComplement('bg-warning')" 
@@ -434,12 +434,12 @@
                   <h5 class="text-title">Tu opinión sobre la reserva</h5>
                   <div class="mb-3">
                     <label for="reseña" class="form-label">Opinión</label>
-                    <textarea id="opinion" class="form-control" rows="4" name="opinion"></textarea>
+                    <textarea id="opinion" class="form-control" rows="4" name="opinion" formControlName="opinion"></textarea>
                   </div>                  
                   <!-- Puntuación -->
                   <div class="col-md-3 mb-3">
                     <label for="puntuacion" class="form-label">Puntuación</label>
-                    <select id="puntuacion" class="form-select" name="puntuacion">
+                    <select id="puntuacion" class="form-select" name="puntuacion" formControlName="puntuacion">
                       <option value="1">⭐</option>
                       <option value="2">⭐⭐</option>
                       <option value="3">⭐⭐⭐</option>

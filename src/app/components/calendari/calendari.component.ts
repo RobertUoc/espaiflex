@@ -30,6 +30,7 @@ import { Reserva } from '../../models/reserva.model';
 import { Complements } from '../../models/complements.model';
 import { UsersService } from '../../service/users.service';
 import { SalesService } from '../../service/sales.service';
+import { ComentariService } from '../../service/comentaris.service';
 import { ComplementsService } from '../../service/complements.service';
 import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
 import { PipeFechaPipe } from '../../pipe/pipeFecha.pipe';
@@ -94,7 +95,7 @@ export class CalendariComponent implements OnInit {
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
   public horari: string = '1';
-  public selectedComplements: number[] = [];  
+  public selectedComplements: number[] = [];
   public verResenas: boolean = false;
   public eventos = signal([
     {
@@ -144,12 +145,13 @@ export class CalendariComponent implements OnInit {
   currentEvents = signal<EventApi[]>([]);
 
   constructor(
-    private fb: FormBuilder,    
+    private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private changeDetector: ChangeDetectorRef,
     private userService: UsersService,
     private salesService: SalesService,
+    private comentariService: ComentariService,
     private complementService: ComplementsService,
     private calendariService: CalendariService
   ) {}
@@ -193,6 +195,8 @@ export class CalendariComponent implements OnInit {
       sala_reserva: ['', [Validators.required, Validators.maxLength(6)]],
       max_sala: [{ value: '', disabled: true }],
       horari_sala: [{ value: '', disabled: true }],
+      opinion: [''],
+      puntuacion: ['1'],
     });
   }
 
@@ -506,7 +510,7 @@ export class CalendariComponent implements OnInit {
     }
     if (inici < compara) {
       item.estado = compara;
-    }    
+    }
     this.agrupado[item.descripcio].push({
       hora_inici: horaFinal,
       estado: item.estado,
@@ -549,7 +553,7 @@ export class CalendariComponent implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg) {
     this.finestra = 90;
-    this.mostrarHourGrid = false;    
+    this.mostrarHourGrid = false;
     this.agrupado = {};
     this.modalVisible[this.finestra] = true;
     this.data_reserva_ini = clickInfo.event.startStr.substring(0, 10);
@@ -626,7 +630,7 @@ export class CalendariComponent implements OnInit {
         complete: () => {
           // Busco els complements de la sala
           this.preu_sala =
-          this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+            this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
           this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
@@ -1192,6 +1196,10 @@ export class CalendariComponent implements OnInit {
 
   ponOpinion() {
     this.verResenas = true;
+    this.reservaForm.patchValue({
+      puntuacion: 1,
+      opinion: '',
+    });
   }
 
   tancarOpinion() {
@@ -1200,6 +1208,13 @@ export class CalendariComponent implements OnInit {
 
   guardarOpinion() {
     this.verResenas = false;
-  }
+    let puntuacion = this.reservaForm.get('puntuacion')?.value;
+    let opinion = this.reservaForm.get('opinion')?.value;
 
+    this.comentariService
+      .insertComentari(this.alta_reserva, this.id_usuari, opinion, puntuacion)
+      .subscribe((response) => {
+        console.log(response);
+      });
+  }
 }

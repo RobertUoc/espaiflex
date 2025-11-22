@@ -6,10 +6,11 @@ import { MenuComponent } from "../menu/menu.component";
 import { ComplementsComponent } from '../complements/complements.component';
 import { EdificisComponent } from '../edificis/edificis.component';
 import { SalesComponent } from '../sales/sales.component';
+import { ComentarisComponent } from '../comentaris/comentaris.component';
 
 @Component({
   selector: 'app-administracio',
-  imports: [FormsModule, MenuComponent, ComplementsComponent, EdificisComponent, SalesComponent,],
+  imports: [FormsModule, MenuComponent, ComplementsComponent, EdificisComponent, SalesComponent, ComentarisComponent],
   templateUrl: './administracio.component.html',
   styleUrls: ['./administracio.component.css']
 })

@@ -6,7 +6,6 @@ import { ProvinciesService } from '../../service/provincies..service';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { config } from '../../models/config';
 
 @Component({
   selector: 'app-edificis',

@@ -14,7 +14,7 @@ export class MenuComponent implements OnInit {
   ngOnInit() {
   }
 
-  selectOption(option: string) {
+  selectOption(option: string) {    
     this.selectedOption.emit(option);    
   }
 

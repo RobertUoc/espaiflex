@@ -1,0 +1,64 @@
+<h1>Comentarios</h1>
+<div class="container mt-4">
+  
+
+    <div>
+
+
+        <div class="row">
+            <div class="col-md-3">
+              <label>Filtrar por Sala</label>
+              <select class="form-select" [(ngModel)]="filtroSala" 
+                      name="nom_sala" id="nom_sala">                                            
+                      <option [value]='0'>Todas</option>
+                      @for(edi of sales; track edi.id ) {
+                        <option [value]="edi.descripcio">{{ edi.descripcio }}</option>
+                      }
+              </select>
+            </div>
+            <div class="col-md-3">
+
+                <label>Filtrar por usuario</label>
+                <input type="input" class="form-control" [(ngModel)]="filtroUsuario"                                           
+                      >
+            </div>
+          </div>      
+      </div>
+      
+      <table class="table table-striped table-bordered mt-2">
+        <thead class="table-dark">      
+          <tr>
+            <th>Usuario</th>
+            <th>Sala</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Hora inicio</th>
+            <th>Hora fin</th>
+            <th>Comentario</th>
+            <th>Puntuación</th>
+            <th>Creado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of getComentariosFiltrados()">
+            <td>{{ c.nom }}</td>
+            <td>{{ c.descripcio }}</td>
+            <td>{{ c.dia_inici }}</td>
+            <td>{{ c.dia_fi }}</td>
+            <td>{{ c.hora_inici }}</td>
+            <td>{{ c.hora_fi }}</td>
+            <td>{{ c.comentari }}</td>
+            <td>{{ c.puntuacio }}</td>
+            <td>{{ c.creat | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>    
+      <pagination-controls 
+      (pageChange)="paginaActual = $event"
+      previousLabel="Anterior"
+      nextLabel="Seguiente"
+      screenReaderPageLabel="Página"
+      screenReaderCurrentLabel="Página Actual"
+    ></pagination-controls>
+</div>
+  

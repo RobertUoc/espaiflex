@@ -1,0 +1,13 @@
+.menu-btn {
+    border: 1px solid transparent; /* borde opcional */
+    border-radius: .25rem;
+    padding: .375rem .75rem;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .menu-btn:hover {
+    background-color: #ffc107; /* amarillo Bootstrap */
+    color: #000;               /* texto negro para contraste */
+    border-color: #ffc107;     /* borde amarillo */
+  }
+  

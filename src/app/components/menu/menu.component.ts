@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
+declare var bootstrap: any;
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
@@ -8,6 +9,7 @@ import { Router } from '@angular/router';
 })
 export class MenuComponent implements OnInit {
   @Output() selectedOption = new EventEmitter;
+ 
 
   constructor(private router: Router) { }
 
@@ -15,6 +17,7 @@ export class MenuComponent implements OnInit {
   }
 
   selectOption(option: string) {    
+    this.closeMenu();
     this.selectedOption.emit(option);    
   }
 
@@ -22,4 +25,13 @@ export class MenuComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  closeMenu() {
+    const menu = document.getElementById('adminMenu');
+    if (menu) {
+      const bsCollapse = bootstrap.Collapse.getInstance(menu);
+      if (bsCollapse) {
+        bsCollapse.hide();
+      }
+    }
+  }  
 }

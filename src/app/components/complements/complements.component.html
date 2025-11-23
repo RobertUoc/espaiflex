@@ -6,46 +6,47 @@
     Crear nuevo complemento
   </button>
 
-  <table class="table table-striped table-bordered">
-    <thead class="table-dark">
-      <tr>        
-        <th>Nombre</th>
-        <th>Precio</th>
-        <th>Activo</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for(complement of complements | paginate: { itemsPerPage: 5, currentPage: paginaActual };  track complement.id; let id_complement = $index) {
-      <tr>        
-        <td class="w-50">{{ complement.descripcio }}</td>
-        <td class="w-10 text-end">{{ complement.preu | PipePreu }} €</td>
-        <td class="w-10 text-center">
-          <span [class.text-success]="complement.actiu == 'SI'" [class.text-danger]="complement.actiu != 'NO'">
-            {{ complement.actiu }}
-          </span>
-        </td>
-        <td class="w-10 text-center">
-          <button class="btn btn-primary btn-sm" (click)="obrirModal(complement.id)">
-            <i class="bi bi-pencil-square"></i> Modificar
-          </button>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
-  <pagination-controls 
-    (pageChange)="paginaActual = $event"
-    previousLabel="Anterior"
-    nextLabel="Siguiente"
-    screenReaderPageLabel="Página"
-    screenReaderCurrentLabel="Página Actual"
-  ></pagination-controls>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead class="table-dark">
+        <tr>        
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Activo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(complement of complements | paginate: { itemsPerPage: 5, currentPage: paginaActual };  track complement.id; let id_complement = $index) {
+        <tr>        
+          <td class="w-50">{{ complement.descripcio }}</td>
+          <td class="w-10 text-end">{{ complement.preu | PipePreu }} €</td>
+          <td class="w-10 text-center">
+            <span [class.text-success]="complement.actiu == 'SI'" [class.text-danger]="complement.actiu != 'NO'">
+              {{ complement.actiu }}
+            </span>
+          </td>
+          <td class="w-10 text-center">
+            <button class="btn btn-primary btn-sm w-100 mb-2" (click)="obrirModal(complement.id)">
+              <i class="bi bi-pencil-square"></i> Modificar
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <pagination-controls 
+      (pageChange)="paginaActual = $event"
+      previousLabel="Anterior"
+      nextLabel="Siguiente"
+      screenReaderPageLabel="Página"
+      screenReaderCurrentLabel="Página Actual"></pagination-controls>
+  </div>  
 </div>
 
     <!-- Modal -->
     <div class="modal" tabindex="-1" id="modalNuevoComplemento" [ngClass]="{ 'show d-block': modalVisible }">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-warning">
 
           <form  [formGroup]="complement" (ngSubmit)="saveComplement()">
@@ -76,11 +77,11 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-3">
+                <div class="col-12 col-md-3 mb-3">
                   <label>Precio</label>
                   <input type="text" class="form-control" formControlName="preu" id="preu">
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3 mb-3">
                   <label>Activo</label>
                   <select class="form-select" formControlName="actiu" id="actiu">
                         <option value="SI">SI</option>

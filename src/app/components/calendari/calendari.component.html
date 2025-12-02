@@ -390,13 +390,14 @@
                   }                        
               </div>
               <hr>
-              <div class="row mb-2" *ngIf="(mostrarPeu) && (alta_reserva!= '0')">
+              <div class="row mb-2" *ngIf="(mostrarPeu)">
                    @for(comple of complements;  track comple.id; let id_comple = $index) {
                        <label>
                          <input type="checkbox" (click)="sumaComplement('bg-warning')" 
                                                  name = "chk_{{comple.id}}"
                                                  #checkComplemento                                                         
-                                                 [checked]="selectedComplements.includes(+comple.id)"
+                                                 [checked]="selectedComplements.includes(+comple.id)"     
+                                                 [disabled]="(alta_reserva!= '0')"
                                                  />                                                                                        
                          {{ comple.descripcio }} - €{{ comple.preu }}
                        </label>                            

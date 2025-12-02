@@ -50,8 +50,7 @@ export class ComentarisComponent {
         console.log(error);
       },
       complete: () => {
-        console.log('Ok');
-        // this.actualizarGrafico(this.getComentariosFiltrados());
+        console.log('Ok');        
       },
     });
   }

@@ -141,7 +141,7 @@ class CalendariAPI {
             $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, h.hora AS hora_inici, COALESCE(r.hora_fi, 'No informado') AS estado, h.tipus
                                 FROM _t_hores h
                            INNER JOIN _t_sales sal On sal.id_edifici = :edifici And sal.actiu = 'SI' And h.tipus = sal.horari
-                           LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.data_delete is null and res.dia_inici <= :dia1 and res.dia_fi >= :dia2 GROUP BY sala,hora_inici) r ON h.hora = r.hora_inici and r.sala = sal.id
+                           LEFT JOIN (SELECT hora_inici,hora_fi,sala FROM _t_reserves res WHERE res.data_delete is null and res.dia_inici <= :dia1 and res.dia_fi >= :dia2 GROUP BY sala,hora_inici,hora_fi) r ON h.hora = r.hora_inici and r.sala = sal.id
                            WHERE h.activa = 'SI'
                            ORDER BY sal.descripcio,h.hora");
             $stmt->execute([':edifici' => $edifici, 'dia1' => $dia, 'dia2' => $dia]);                               

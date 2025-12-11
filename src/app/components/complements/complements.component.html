@@ -48,7 +48,6 @@
     <div class="modal" tabindex="-1" id="modalNuevoComplemento" [ngClass]="{ 'show d-block': modalVisible }">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-warning">
-
           <form  [formGroup]="complement" (ngSubmit)="saveComplement()">
             <div class="modal-header">
               <h5 class="modal-title">
@@ -101,7 +100,7 @@
               <button type="submit" class="btn btn-success" [disabled]="!complement.valid">Grabar</button>
               <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
             </div>
-          </form>
+          </form>          
         </div>
       </div>
     </div>

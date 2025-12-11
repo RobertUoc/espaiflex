@@ -42,7 +42,8 @@ import { of } from 'rxjs';
 import esLocale from '@fullcalendar/core/locales/es';
 import { InsertEvent } from '../../models/insertEvent.model';
 import { ErrorEvent } from '../../models/errorEvent.model';
-import { response } from 'express';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-calendari',
@@ -116,27 +117,40 @@ export class CalendariComponent implements OnInit {
   id_edifici: string = '';
 
   calendarVisible = signal(true);
+
   calendarOptions = computed(
-    (): CalendarOptions => ({
-      plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-      },
-      initialView: 'dayGridMonth',
-      events: this.eventos(),
-      locale: 'es',
-      locales: [esLocale],
-      weekends: true,
-      editable: true,
-      selectable: true,
-      selectMirror: true,
-      dayMaxEvents: true,
-      select: this.handleDateSelect.bind(this),
-      eventClick: this.handleEventClick.bind(this),
-      eventsSet: this.handleEvents.bind(this),
-    })
+    (): CalendarOptions => {
+      const isMobile = window.innerWidth < 768; 
+      return {
+        plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
+        headerToolbar: {
+          left: isMobile 
+            ? 'prev,next'
+            : 'prev,next today',
+          center: 'title',
+          right: isMobile 
+            ? 'today' 
+            : 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        initialView: 'dayGridMonth',
+        contentHeight: 'auto',
+        aspectRatio: isMobile ? 0.7 : 1.5,
+        events: this.eventos(),
+        locale: 'es',
+        locales: [esLocale],
+        weekends: true,
+        editable: true,
+        selectable: true,
+        selectMirror: true,
+        dayMaxEvents: true,
+        titleFormat: isMobile 
+        ? { month: 'long' } // solo mes
+        : { month: 'long', year: 'numeric' },        
+        select: this.handleDateSelect.bind(this),
+        eventClick: this.handleEventClick.bind(this),
+        eventsSet: this.handleEvents.bind(this),
+      };
+    }
   );
 
   @ViewChildren('horesSelected') botones!: QueryList<ElementRef>;
@@ -336,7 +350,23 @@ export class CalendariComponent implements OnInit {
     if (neteja < 3) {
       this.registerData = new Users();
     }
+    if (neteja == 4) {
+      this.id_usuari = 0;
+      this.usuari = 'Visitante';
+    }
+
     this.modalVisible[this.finestra] = true;
+    this.closeMenu();
+  }
+
+  closeMenu() {
+    const menu = document.getElementById('menuOpciones');
+    if (menu) {
+      const bsCollapse = bootstrap.Collapse.getInstance(menu);
+      if (bsCollapse) {
+        bsCollapse.hide();
+      }
+    }
   }
 
   onRegisterSubmit() {

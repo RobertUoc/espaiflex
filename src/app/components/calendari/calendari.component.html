@@ -1,11 +1,30 @@
-<div class="d-flex justify-content-between align-items-center bg-light p-2">
-    <div class="btn-group" role="group" aria-label="Admin menu">
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
-      <button type="button" class="btn btn-outline-primary" (click)="neteja(2)">Identificar-se</button>      
-    </div>  
-    <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
-</div>
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+  <div class="container-fluid">
+    <!-- Botón hamburguesa -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuOpciones"
+      aria-controls="menuOpciones" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Menú colapsable -->
+    <div class="collapse navbar-collapse" id="menuOpciones">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+            <button type="button" class="btn btn-link nav-link menu-btn"  (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
+        </li>
+        <li class="nav-item" *ngIf="id_usuari === 0">
+            <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(2)">Identificarse</button>
+        </li>
+        <li class="nav-item" *ngIf="id_usuari != 0">
+          <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(4)">Logout</button>
+        </li>       
+      </ul>      
+      <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
+    </div>
+  </div>
+</nav>
 
 <div class="btn-group" role="group" aria-label="Admin menu">
   <div [ngClass]="id_usuari === 0 ? 'ms-2 p-2 text-danger bg-dark rounded d-inline-block' : 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">
@@ -15,6 +34,7 @@
     <button type="button" class="ms-2 btn btn-success" (click)="reserva()" [ngClass]="{ 'd-none': id_usuari === 0 }" (click)="reserva()">Nueva Reserva</button>
   </div>
 </div>
+
 
 <hr> 
 
@@ -27,7 +47,7 @@
 
 <hr>
 
-  <div class='container mt-4'>
+  <div class='container-fluid mt-4'>
     <full-calendar [options]='calendarOptions()' #calendar>
       <ng-template #eventContent let-arg>
         <b>{{ arg.timeText }}</b>
@@ -38,37 +58,71 @@
 
 
   <!-- Modal Login -->
+
   <div class="modal fade" id="loginModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[2] }">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-sm">
       <div class="modal-content bg-dark text-white">
-        <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
-          <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
-        </div>
-        <div class="modal-body">
-          <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm">
+  
+        <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Iniciar Sesión</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
+          </div>
+          <div class="modal-body">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-12 col-md-12">
                 <label class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" name="loginData.email" id="loginData.email" [(ngModel)]="loginData.email">
-              </div>              
-            </div>  
-            <div class="row">
-              <div class="col-md-6">                                  
+                <input type="email" class="form-control" [(ngModel)]="loginData.email" name="loginData.email">
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-12 col-md-12">
                 <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" name="loginData.password" id="loginData.password" [(ngModel)]="loginData.password">
-              </div>         
+                <input type="password" class="form-control" [(ngModel)]="loginData.password" name="loginData.password">
+              </div>
             </div>
             <hr>
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Entrar</button>
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
+              <button type="submit" class="btn btn-primary">Entrar</button>
+              <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
+  
       </div>
     </div>
   </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   <!-- Modal Registro Insert o Update -->
   <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[1] || modalVisible[3] }">

@@ -1,0 +1,37 @@
+/* Tipografía */
+h1 {
+  color: #212529;
+}
+
+/* Tabla */
+.table td,
+.table th {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+/* Botones táctiles */
+.btn {
+  min-height: 44px;
+}
+
+/* Punto de color */
+.color-dot {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #ced4da;
+}
+
+/* Modal */
+.modal {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+}

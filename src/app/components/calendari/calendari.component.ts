@@ -8,6 +8,7 @@ import {
   ViewChildren,
   ViewChild,
   ElementRef,
+  HostAttributeToken,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -24,6 +25,7 @@ import listPlugin from '@fullcalendar/list';
 import { CommonModule, NgClass, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Users } from '../../models/users.model';
+import { HoraItem } from '../../models/horaItem.model';
 import { Sales } from '../../models/sales.model';
 import { Horas } from '../../models/horas.model';
 import { Reserva } from '../../models/reserva.model';
@@ -32,16 +34,21 @@ import { UsersService } from '../../service/users.service';
 import { SalesService } from '../../service/sales.service';
 import { ComentariService } from '../../service/comentaris.service';
 import { ComplementsService } from '../../service/complements.service';
-import { PipePreuPipe } from '../../pipe/pipePreu.pipe';
-import { PipeFechaPipe } from '../../pipe/pipeFecha.pipe';
 import { CalendariService } from '../../service/calendari.service';
 import Swal from 'sweetalert2';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { of } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 import esLocale from '@fullcalendar/core/locales/es';
 import { InsertEvent } from '../../models/insertEvent.model';
 import { ErrorEvent } from '../../models/errorEvent.model';
+import { RegisterModalComponent } from './modals/register-modal/register-modal.component';
+import { LoginModalComponent } from './modals/login-modal/login-modal.component';
+import { MostrarDiaModalComponent } from './modals/mostrar-dia-modal/mostrar-dia-modal.component';
+import { SalaModalComponent } from './modals/sala-modal/sala-modal.component';
+import { ReservaModalComponent } from './modals/reserva-modal/reserva-modal.component';
 
 declare var bootstrap: any;
 
@@ -52,10 +59,14 @@ declare var bootstrap: any;
     FullCalendarModule,
     NgIf,
     NgClass,
-    CommonModule,
-    PipePreuPipe,
-    PipeFechaPipe,
+    CommonModule,  
     ReactiveFormsModule,
+    RegisterModalComponent,
+    LoginModalComponent,
+    MostrarDiaModalComponent,
+    SalaModalComponent,
+    ReactiveFormsModule,
+    ReservaModalComponent
   ],
   templateUrl: './calendari.component.html',
   styleUrls: ['./calendari.component.css'],
@@ -91,13 +102,14 @@ export class CalendariComponent implements OnInit {
   public max_sala: string = '1';
   public mostrarHourGrid: boolean = false;
   public mostrarPeu: boolean = false;
-  public agrupado: { [key: string]: { hora_inici: string; estado: string }[] } =
+  public agrupado: { [key: string]: { hora_inici: string; estado: string, cssClass: string, seleccionada: boolean }[] } =
     {};
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
   public horari: string = '1';
   public selectedComplements: number[] = [];
   public verResenas: boolean = false;
+  public totalPrecio: number = 0;
   public eventos = signal([
     {
       id: '',
@@ -115,43 +127,44 @@ export class CalendariComponent implements OnInit {
   getInSiteForm: any;
 
   id_edifici: string = '';
+  public mostrarRegister = false;
+  public mostrarLogin = false;
+  public mostrarDia = false;
+  public mostrarSala = false;
+  public mostrarReserva = false;
 
   calendarVisible = signal(true);
 
-  calendarOptions = computed(
-    (): CalendarOptions => {
-      const isMobile = window.innerWidth < 768; 
-      return {
-        plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
-        headerToolbar: {
-          left: isMobile 
-            ? 'prev,next'
-            : 'prev,next today',
-          center: 'title',
-          right: isMobile 
-            ? 'today' 
-            : 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-        },
-        initialView: 'dayGridMonth',
-        contentHeight: 'auto',
-        aspectRatio: isMobile ? 0.7 : 1.5,
-        events: this.eventos(),
-        locale: 'es',
-        locales: [esLocale],
-        weekends: true,
-        editable: true,
-        selectable: true,
-        selectMirror: true,
-        dayMaxEvents: true,
-        titleFormat: isMobile 
+  calendarOptions = computed((): CalendarOptions => {
+    const isMobile = window.innerWidth < 768;
+    return {
+      plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
+      headerToolbar: {
+        left: isMobile ? 'prev,next' : 'prev,next today',
+        center: 'title',
+        right: isMobile
+          ? 'today'
+          : 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+      },
+      initialView: 'dayGridMonth',
+      contentHeight: 'auto',
+      aspectRatio: isMobile ? 0.7 : 1.5,
+      events: this.eventos(),
+      locale: 'es',
+      locales: [esLocale],
+      weekends: true,
+      editable: true,
+      selectable: true,
+      selectMirror: true,
+      dayMaxEvents: true,
+      titleFormat: isMobile
         ? { month: 'long' } // solo mes
-        : { month: 'long', year: 'numeric' },        
-        select: this.handleDateSelect.bind(this),
-        eventClick: this.handleEventClick.bind(this),
-        eventsSet: this.handleEvents.bind(this),
-      };
-    }
-  );
+        : { month: 'long', year: 'numeric' },
+      select: this.handleDateSelect.bind(this),
+      eventClick: this.handleEventClick.bind(this),
+      eventsSet: this.handleEvents.bind(this),
+    };
+  });
 
   @ViewChildren('horesSelected') botones!: QueryList<ElementRef>;
   @ViewChildren('checkComplemento') checkboxes!: QueryList<ElementRef>;
@@ -270,12 +283,10 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {
         // Seleccionats
-        this.getcomplement(id_sala);
-        console.log('Ok');
+        this.getcomplement(id_sala);        
       },
     });
-    this.finestra = 99;
-    this.modalVisible[this.finestra] = true;
+    this.mostrarSala = true;
   }
 
   getcomplement(id_sala: string) {
@@ -289,73 +300,14 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  sumaComplement(clase: string) {
-    let total = 0;
-    let btn = this.botones.toArray();
-    let hihabtn = btn.filter((boton) =>
-      boton.nativeElement.classList.contains(clase)
-    ).length;
-    if (hihabtn > 0) {
-      this.mostrarPeu = true;
-      this.preu_sala_total = this.preu_sala * hihabtn;
-      this.checkboxes.forEach((checkbox, i) => {
-        if (checkbox.nativeElement.checked) {
-          total += this.complements[i].preu;
-        }
-      });
-    }
-    this.preu_sala_total += total;
-    this.saveReserva();
-  }
-
   tornar() {
     this.router.navigate(['/']);
   }
-  onLoginSubmit() {
+
+  neteja() {
+    this.registerData = new Users();
     this.id_usuari = 0;
-    this.usuari = 'Visitante';
-    this.userService
-      .getUser(this.loginData.email, this.loginData.password, 'usuari')
-      .subscribe({
-        next: (data) => {
-          if (data?.id) {
-            this.id_usuari = parseInt(data.id);
-            this.usuari = data.nom;
-            this.registerData = new Users(
-              data.id,
-              data.nom,
-              data.email,
-              data.password,
-              data.password
-            );
-          }
-        },
-        error: (error) => {
-          console.log(error);
-        },
-        complete: () => {
-          this.tancarModal();
-          console.log('Ok');
-        },
-      });
-  }
-
-  tancarModal() {
-    console.log(this.finestra);
-    this.modalVisible[this.finestra] = false;
-  }
-
-  neteja(neteja: number) {
-    this.finestra = neteja;
-    if (neteja < 3) {
-      this.registerData = new Users();
-    }
-    if (neteja == 4) {
-      this.id_usuari = 0;
-      this.usuari = 'Visitante';
-    }
-
-    this.modalVisible[this.finestra] = true;
+    this.usuari = 'Visitante';   
     this.closeMenu();
   }
 
@@ -369,53 +321,23 @@ export class CalendariComponent implements OnInit {
     }
   }
 
-  onRegisterSubmit() {
-    // Insert
-    if (this.registerData.id == '0') {
-      this.userService
-        .insertUser(
-          this.registerData.nom,
-          this.registerData.email,
-          this.registerData.password
-        )
-        .subscribe((response) => {});
-    } else {
-      this.userService
-        .putUser(
-          this.registerData.id,
-          this.registerData.nom,
-          this.registerData.email,
-          this.registerData.password
-        )
-        .subscribe((response) => {
-          console.log(response);
-        });
-      this.usuari = this.registerData.nom;
-    }
-    this.tancarModal();
-  }
-
-  passwordsMatch(): boolean {
-    return this.registerData.password === this.registerData.confirm
-      ? true
-      : false;
-  }
-
-  reserva() {
-    this.createForm();
+  reserva(todo:boolean) {    
+    if (todo) {
+      this.createForm();
+      this.data_reserva_ini = new Date().toISOString().substring(0, 10);
+      this.data_reserva_fin = new Date().toISOString().substring(0, 10);
+      this.frecuencia = '';          
+    }    
     this.errorEntrada = '';
     this.datosConsulta = [];
     this.selectedComplements = [];
     this.alta_reserva = '0';
-    this.finestra = 90;
+    this.mostrarReserva = true;    
     this.mostrarHourGrid = false;
     this.mostrarPeu = false;
     this.agrupado = {};
-    this.data_reserva_ini = new Date().toISOString().substring(0, 10);
-    this.data_reserva_fin = new Date().toISOString().substring(0, 10);
-    this.sala_reserva = '0';
-    this.frecuencia = '';
-    this.modalVisible[this.finestra] = true;
+    // Reset Campos
+    this.reservaForm.get('sala_reserva')?.reset();  
   }
 
   mostrarAlertes(
@@ -452,11 +374,12 @@ export class CalendariComponent implements OnInit {
       this.horari = item.tipus;
       compara = this.CrearBotons(item, compara);
     });
-    this.horas = this.horas.sort();
+    this.horas = this.horas.
+    sort();    
     this.mira_dia = Object.entries(this.agrupado).map(([id, items]) => ({
       id,
-      items,
-    }));
+      items
+    }));    
   }
 
   generate() {
@@ -496,19 +419,6 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  triaHora(event: Event) {
-    this.mostrarPeu = false;
-    const boton = event.target as HTMLElement;
-    if (boton.classList.contains('bg-warning')) {
-      boton.classList.remove('bg-warning');
-      boton.classList.add('bg-success');
-    } else {
-      boton.classList.remove('bg-success');
-      boton.classList.add('bg-warning');
-    }
-    this.sumaComplement('bg-warning');
-  }
-
   private calcularHoraFinal(horari: string, hora_inici: string): string {
     const [hora, minuto] = hora_inici.split(':');
     const horaNum = +hora;
@@ -543,8 +453,11 @@ export class CalendariComponent implements OnInit {
     }
     this.agrupado[item.descripcio].push({
       hora_inici: horaFinal,
-      estado: item.estado,
+      estado: item.estado, 
+      cssClass: item.estado === 'No informado' ? 'bg-success' : 'bg-danger',
+      seleccionada: false
     });
+
     return compara;
   }
 
@@ -577,15 +490,13 @@ export class CalendariComponent implements OnInit {
     });
     const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
-    this.finestra = 80;
-    this.modalVisible[this.finestra] = true;
+    this.mostrarDia = true;
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    this.finestra = 90;
+    this.mostrarReserva = true;
     this.mostrarHourGrid = false;
-    this.agrupado = {};
-    this.modalVisible[this.finestra] = true;
+    this.agrupado = {};    
     this.data_reserva_ini = clickInfo.event.startStr.substring(0, 10);
     this.resetGenerate();
     this.mostrarPeu = true;
@@ -638,7 +549,7 @@ export class CalendariComponent implements OnInit {
             diaSemana: dia_reserva.el_dia,
           },
         });
-        this.actualizarMaximo();
+        this.actualizarMaximo();             
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
         this.preu_sala_total = parseFloat(dia_reserva.preu_sala);
@@ -664,7 +575,13 @@ export class CalendariComponent implements OnInit {
           this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
-          this.sumaComplement('bg-danger');
+
+          console.log('final');
+          
+          this.recalcularPrecio();
+          console.log(this.reservas);
+          this.preu_sala_total = parseFloat(this.reservas[0].preu_sala);
+
           this.mostrarPeu = true;
           console.log('Lectura Ok');
         },
@@ -704,15 +621,16 @@ export class CalendariComponent implements OnInit {
   }
 
   saveReserva() {
-    let frecuencia = this.reservaForm.get('frecuencia')?.value;
+    let frecuencia = this.reservaForm.get('frecuencia')?.value;    
     let error = this.validaReserva(frecuencia);
     if (error) {
-      this.errorEntrada = error;
+      this.errorEntrada = error;    
       return;
     }
     // Validación general del formulario
     if (this.reservaForm.invalid) {
       this.errorEntrada = 'Hay campos obligatorios sin completar.';
+      this.reserva(true);
       return;
     }
   }
@@ -770,7 +688,7 @@ export class CalendariComponent implements OnInit {
         return 'Tipo de mensualidad inválido.';
     }
   }
-  desarSala() {
+  desarSala() {   
     this.datosConsulta = [];
     let feInicial = this.reservaForm.get('fechaInicial')?.value;
     let feFinal = this.reservaForm.get('fechaFinal')?.value;
@@ -802,23 +720,30 @@ export class CalendariComponent implements OnInit {
     // Agrupacio d'hores
     let ranges = [];
     let start = null;
-    let end = '';
-    let selectedHours: string[] = [];
-    this.botones
-      .filter((btn) => btn.nativeElement.classList.contains('bg-warning'))
-      .forEach((btn) => {
-        let hora = btn.nativeElement.textContent.trim().split(' a ')[0];
-        if (/^\d{1,2}$/.test(hora)) {
-          hora = hora.padStart(2, '0') + ':00';
-        }
-        selectedHours.push(hora);
-      });
+    let end = '';  
+
+      let selectedHours: string[] = [];      
+
+      this.mira_dia.forEach((bloque) => {
+        bloque.items.forEach((hora: HoraItem) => {
+          if (hora.seleccionada) {
+            let h = hora.hora_inici.trim().split(' a ')[0];            
+            if (/^\d{1,2}$/.test(h)) {
+              h = h.padStart(2, '0') + ':00';
+            }      
+            selectedHours.push(h);
+          }
+        });
+      });      
+
     let suma_minutos = horari == '1' ? 60 : 30;
     const diferenciaMinutos = (hora1: string, hora2: string): number => {
       const [h1, m1] = hora1.split(':').map(Number);
       const [h2, m2] = hora2.split(':').map(Number);
       return h2 * 60 + m2 - (h1 * 60 + m1);
-    };
+    };    
+
+    
     for (let i = 0; i < selectedHours.length; i++) {
       const inicio = selectedHours[i];
       const [horas, minutos] = inicio.split(':').map(Number);
@@ -838,63 +763,132 @@ export class CalendariComponent implements OnInit {
     }
     if (start !== null) {
       ranges.push({ inicio: start, final: end });
-    }
-    let horaslibres = 0;
-    // Miro si estan libres las horas o no
+    }   
 
+
+    console.log(ranges);     
+
+    let horaslibres = 0;    
+    const observables = [];
+    
+    // Miro si están libres las horas o no
     for (let i = 0; i < ranges.length; i++) {
       let horaInici = ranges[i].inicio + ':00';
-      let horaFi = ranges[i].final + ':00';
-      // Llamo al servicio
-      this.calendariService
-        .buscarInsertDia(
-          this.sala_reserva,
-          this.data_reserva_ini,
-          this.data_reserva_fin,
-          frecuencia,
-          horaInici,
-          horaFi
-        )
-        .subscribe({
-          next: (response) => {
-            this.datosConsulta = response;
-            if (this.datosConsulta.length > 0) {
-              horaslibres = 1;
+      let horaFi = ranges[i].final + ':00';          
+      const observable = this.calendariService.buscarInsertDia(
+        this.sala_reserva,
+        this.data_reserva_ini,
+        this.data_reserva_fin,
+        frecuencia,
+        horaInici,
+        horaFi
+      ).pipe(        
+        map(response => {
+          this.datosConsulta = response;
+          if (this.datosConsulta.length > 0) {
+            console.log(this.datosConsulta);
+            horaslibres = 1;
+          }
+        })
+      );
+      observables.push(observable);
+    }    
+    // Usamos forkJoin para esperar que todos los observables se completen
+    forkJoin(observables).subscribe({
+      next: () => {
+        console.log(horaslibres);
+        if (horaslibres == 1) {
+          this.errorEntrada = 'HORAS ocupadas!!!';
+        }
+      },
+      error: (err) => {
+        console.error('Error', err);
+      },
+      complete: () => {        
+        console.log('Todas las peticiones se han completado.');
+
+        if (horaslibres == 0) {
+          this.errorEntrada = '';
+          // Grabo Factura.
+          this.grabaFactura(this.id_usuari, this.preu_sala_total);
+          for (let i = 0; i < ranges.length; i++) {
+            let horaInici = ranges[i].inicio + ':00';
+            let horaFi = ranges[i].final + ':00';
+            let totDia = this.data_reserva_ini == this.data_reserva_fin ? true : false;
+            // Diario
+            if (frecuencia == 'diaria') {
+              console.log(this.data_reserva_ini);
+              this.insertaDia(
+                nom,
+                this.sala_reserva,
+                this.data_reserva_ini,
+                this.data_reserva_fin,
+                color,
+                horaInici,
+                horaFi,
+                totDia,
+                this.id_usuari,
+                this.preu_sala_total,
+                frecuencia,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                '',
+                '',
+                complements
+              );
             }
-          },
-          error: (err) => {
-            console.error('Error', err);
-          },
-          complete: () => {
-            if (horaslibres == 0) {
-              // Grabo Factura.
-              this.grabaFactura(this.id_usuari, this.preu_sala_total);
-              for (let i = 0; i < ranges.length; i++) {
-                let horaInici = ranges[i].inicio + ':00';
-                let horaFi = ranges[i].final + ':00';
-                let totDia =
-                  this.data_reserva_ini == this.data_reserva_fin ? true : false;
-                // Diario
-                if (frecuencia == 'diaria') {
+            // Semanal
+            if (frecuencia == 'semanal') {
+              let dies = diesSeleccionats;
+              let dayMap: Record<string, number> = {
+                domingo: 0,
+                lunes: 1,
+                martes: 2,
+                miercoles: 3,
+                jueves: 4,
+                viernes: 5,
+                sabado: 6,
+              };
+              let week = dies.split('#').map((day) => dayMap[day.trim()]);
+              let start = new Date(this.data_reserva_ini);
+              let end = new Date(this.data_reserva_fin);
+              end.setDate(end.getDate() + 1);
+              for (let d = new Date(start);d < end;d.setDate(d.getDate() + 1)) {
+                let fecha_dia = String(d.getDate()).padStart(2, '0');
+                let fecha_mes = String(d.getMonth() + 1).padStart(2, '0');
+                let fecha_ano = d.getFullYear();
+                let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
+                let dia = d.getDay();
+                if (week.includes(dia)) {
+                  // Inserta.
+                  let diaSemana = Array(7).fill(0);
+                  diaSemana[dia] = 1;
                   this.insertaDia(
                     nom,
                     this.sala_reserva,
-                    this.data_reserva_ini,
-                    this.data_reserva_fin,
+                    fechaFormateada,
+                    fechaFormateada,
                     color,
                     horaInici,
                     horaFi,
-                    totDia,
+                    true,
                     this.id_usuari,
                     this.preu_sala_total,
                     frecuencia,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
+                    diaSemana[0],
+                    diaSemana[1],
+                    diaSemana[2],
+                    diaSemana[3],
+                    diaSemana[4],
+                    diaSemana[5],
+                    diaSemana[6],
                     0,
                     0,
                     '',
@@ -902,36 +896,95 @@ export class CalendariComponent implements OnInit {
                     complements
                   );
                 }
-                // Semanal
-                if (frecuencia == 'semanal') {
-                  let dies = diesSeleccionats;
-                  let dayMap: Record<string, number> = {
-                    domingo: 0,
-                    lunes: 1,
-                    martes: 2,
-                    miercoles: 3,
-                    jueves: 4,
-                    viernes: 5,
-                    sabado: 6,
-                  };
-                  let week = dies.split('#').map((day) => dayMap[day.trim()]);
-                  let start = new Date(this.data_reserva_ini);
-                  let end = new Date(this.data_reserva_fin);
-                  end.setDate(end.getDate() + 1);
-                  for (
-                    let d = new Date(start);
-                    d < end;
-                    d.setDate(d.getDate() + 1)
-                  ) {
-                    let fecha_dia = String(d.getDate()).padStart(2, '0');
-                    let fecha_mes = String(d.getMonth() + 1).padStart(2, '0');
-                    let fecha_ano = d.getFullYear();
-                    let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
-                    let dia = d.getDay();
-                    if (week.includes(dia)) {
-                      // Inserta.
-                      let diaSemana = Array(7).fill(0);
-                      diaSemana[dia] = 1;
+              }
+            }
+            // Mensual
+            if (frecuencia == 'mensual') {
+               // Un Dia
+               if (seleccio_mensual == 1) {
+                let start = new Date(this.data_reserva_ini);
+                let end = new Date(this.data_reserva_fin);
+                end.setDate(end.getDate() + 1);
+                for (
+                  let d = new Date(start);
+                  d < end;
+                  d.setDate(d.getDate() + 1)
+                ) {
+                  let fecha_dia = String(d.getDate()).padStart(2, '0');
+                  let fecha_mes = String(d.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+                  let fecha_ano = d.getFullYear();
+                  let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
+                  let day = d.getDate();
+                  if (dia_seleccionado == day) {
+                    this.insertaDia(
+                      nom,
+                      this.sala_reserva,
+                      fechaFormateada,
+                      fechaFormateada,
+                      color,
+                      horaInici,
+                      horaFi,
+                      true,
+                      this.id_usuari,
+                      this.preu_sala_total,
+                      frecuencia,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      seleccio_mensual,
+                      dia_seleccionado,
+                      '',
+                      '',
+                      complements
+                    );
+                  }
+                }
+              }
+              // Periode
+              if (seleccio_mensual == 2) {
+                let nombresDias = [
+                  'domingo',
+                  'lunes',
+                  'martes',
+                  'miercoles',
+                  'jueves',
+                  'viernes',
+                  'sabado',
+                ];
+                let semanaMap: { [key: string]: number } = {
+                  primer: 1,
+                  segundo: 2,
+                  tercer: 3,
+                  cuarto: 4,
+                  ultimo: 5,
+                };
+                let start = new Date(this.data_reserva_ini);
+                let end = new Date(this.data_reserva_fin);
+                end.setDate(end.getDate() + 1);
+                for (let d = new Date(start);d < end;d.setDate(d.getDate() + 1)) {
+                  let fecha_dia = String(d.getDate()).padStart(2, '0');
+                  let fecha_mes = String(d.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+                  let fecha_ano = d.getFullYear();
+                  let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
+                  let diaSemana = d.getDay();
+                  let diames = d.getDate();
+                  let nombreDia = nombresDias[diaSemana];
+                  if (nombreDia == El2) {
+                    let primerDiaMes = new Date(
+                      d.getFullYear(),
+                      d.getMonth(),
+                      1
+                    );
+                    let offset =
+                      primerDiaMes.getDay() === 0
+                        ? 6
+                        : primerDiaMes.getDay() - 1;
+                    let semanaDelMes = Math.ceil((diames + offset) / 7);
+                    if (semanaDelMes == semanaMap[El1]) {
                       this.insertaDia(
                         nom,
                         this.sala_reserva,
@@ -944,153 +997,38 @@ export class CalendariComponent implements OnInit {
                         this.id_usuari,
                         this.preu_sala_total,
                         frecuencia,
-                        diaSemana[0],
-                        diaSemana[1],
-                        diaSemana[2],
-                        diaSemana[3],
-                        diaSemana[4],
-                        diaSemana[5],
-                        diaSemana[6],
                         0,
                         0,
-                        '',
-                        '',
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        seleccio_mensual,
+                        0,
+                        El1,
+                        nombreDia,
                         complements
                       );
                     }
                   }
                 }
-                // Mensual
-                if (frecuencia == 'mensual') {
-                  // Un Dia
-                  if (seleccio_mensual == 1) {
-                    let start = new Date(this.data_reserva_ini);
-                    let end = new Date(this.data_reserva_fin);
-                    end.setDate(end.getDate() + 1);
-                    for (
-                      let d = new Date(start);
-                      d < end;
-                      d.setDate(d.getDate() + 1)
-                    ) {
-                      let fecha_dia = String(d.getDate()).padStart(2, '0');
-                      let fecha_mes = String(d.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
-                      let fecha_ano = d.getFullYear();
-                      let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
-                      let day = d.getDate();
-                      if (dia_seleccionado == day) {
-                        this.insertaDia(
-                          nom,
-                          this.sala_reserva,
-                          fechaFormateada,
-                          fechaFormateada,
-                          color,
-                          horaInici,
-                          horaFi,
-                          true,
-                          this.id_usuari,
-                          this.preu_sala_total,
-                          frecuencia,
-                          0,
-                          0,
-                          0,
-                          0,
-                          0,
-                          0,
-                          0,
-                          seleccio_mensual,
-                          dia_seleccionado,
-                          '',
-                          '',
-                          complements
-                        );
-                      }
-                    }
-                  }
-                  // Periode
-                  if (seleccio_mensual == 2) {
-                    let nombresDias = [
-                      'domingo',
-                      'lunes',
-                      'martes',
-                      'miercoles',
-                      'jueves',
-                      'viernes',
-                      'sabado',
-                    ];
-                    let semanaMap: { [key: string]: number } = {
-                      primer: 1,
-                      segundo: 2,
-                      tercer: 3,
-                      cuarto: 4,
-                      ultimo: 5,
-                    };
-                    let start = new Date(this.data_reserva_ini);
-                    let end = new Date(this.data_reserva_fin);
-                    end.setDate(end.getDate() + 1);
-                    for (
-                      let d = new Date(start);
-                      d < end;
-                      d.setDate(d.getDate() + 1)
-                    ) {
-                      let fecha_dia = String(d.getDate()).padStart(2, '0');
-                      let fecha_mes = String(d.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
-                      let fecha_ano = d.getFullYear();
-                      let fechaFormateada = `${fecha_ano}-${fecha_mes}-${fecha_dia}`;
-                      let diaSemana = d.getDay();
-                      let diames = d.getDate();
-                      let nombreDia = nombresDias[diaSemana];
-                      if (nombreDia == El2) {
-                        let primerDiaMes = new Date(
-                          d.getFullYear(),
-                          d.getMonth(),
-                          1
-                        );
-                        let offset =
-                          primerDiaMes.getDay() === 0
-                            ? 6
-                            : primerDiaMes.getDay() - 1;
-                        let semanaDelMes = Math.ceil((diames + offset) / 7);
-                        if (semanaDelMes == semanaMap[El1]) {
-                          this.insertaDia(
-                            nom,
-                            this.sala_reserva,
-                            fechaFormateada,
-                            fechaFormateada,
-                            color,
-                            horaInici,
-                            horaFi,
-                            true,
-                            this.id_usuari,
-                            this.preu_sala_total,
-                            frecuencia,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            seleccio_mensual,
-                            0,
-                            El1,
-                            nombreDia,
-                            complements
-                          );
-                        }
-                      }
-                    }
-                  }
-                }
               }
-              this.tancarModal();
             }
-            if (horaslibres == 1) {
-              this.errorEntrada = 'HORAS ocupadas!!!';
-            }
-          },
-        });
-    }
-  }
+            this.tancarSala();         
+          }      
+        }    
+
+
+
+
+
+
+
+      }
+    });
+
+}
 
   insertaDia(
     tit: string,
@@ -1211,7 +1149,7 @@ export class CalendariComponent implements OnInit {
               (ev) => ev.id != this.alta_reserva
             );
             this.eventos.set(filtrados);
-            this.tancarModal();
+            this.tancarSala();           
           },
           error: (err) => {
             console.error('Error', err);
@@ -1222,6 +1160,11 @@ export class CalendariComponent implements OnInit {
         console.log('Cancelado');
       }
     });
+  }
+
+  tancarSala() {
+    this.verResenas = false;
+    this.mostrarReserva = false
   }
 
   ponOpinion() {
@@ -1247,4 +1190,94 @@ export class CalendariComponent implements OnInit {
         console.log(response);
       });
   }
+
+  getHoraClass(col: string): string {
+    console.log(col);
+    return col == 'No informado' ? 'bg-success' : 'bg-danger';
+  }
+
+  abrirActualizar() {
+    if (this.id_usuari === 0) return;
+  
+    this.mostrarRegister = true;
+  }  
+
+  onUserUpdated(user: Users) {
+    this.registerData = user;
+    this.usuari = user.nom;
+    this.id_usuari = Number(user.id);
+  }  
+
+  onLogin(user: Users) {
+    this.registerData = user;
+    this.usuari = user.nom;
+    this.id_usuari = Number(user.id);
+  }
+
+  canDeleteReserva(): boolean {
+    return (
+      this.alta_reserva !== '0' &&
+      this.id_usuari === this.reservaForm.get('id_user')?.value
+    );
+  }
+
+  sumaComplement(clase: string) {
+    let total = 0;
+    let btn = this.botones.toArray();
+    let hihabtn = btn.filter((boton) =>
+      boton.nativeElement.classList.contains(clase)
+    ).length;
+    if (hihabtn > 0) {
+      this.mostrarPeu = true;
+      this.preu_sala_total = this.preu_sala * hihabtn;
+      this.checkboxes.forEach((checkbox, i) => {
+        if (checkbox.nativeElement.checked) {
+          total += this.complements[i].preu;
+        }
+      });
+    }
+    this.preu_sala_total += total;
+    this.saveReserva();
+  }
+
+  recalcularPrecio() {    
+    const horasSeleccionadas = this.mira_dia
+      .flatMap(d => d.items)
+      .filter((h: HoraItem) => h.seleccionada);    
+    this.preu_sala_total = horasSeleccionadas.length * this.preu_sala;   
+    let totalComplementos = 0;  
+    for (const id of this.selectedComplements) {
+      const comp = this.complements.find(c => +c.id === id);
+      if (comp) {
+        totalComplementos += comp.preu;
+      }
+    }  
+    this.preu_sala_total += totalComplementos;  
+    this.mostrarPeu = horasSeleccionadas.length > 0;
+  }
+
+  triaHora(hora: HoraItem) {
+    this.mostrarPeu = false;
+    this.errorEntrada = '';
+    hora.seleccionada = !hora.seleccionada;
+    if (hora.seleccionada) {
+      hora.cssClass = 'bg-warning';
+    } else {
+      hora.cssClass = 'bg-success';
+    }
+    this.recalcularPrecio();
+  }
+  
+  onToggleComplement(compleId: number) {
+    if (this.selectedComplements.includes(compleId)) {
+      this.selectedComplements =
+        this.selectedComplements.filter(id => id !== compleId);
+    }     
+    else {
+      this.selectedComplements = [...this.selectedComplements, compleId];
+    }
+    this.recalcularPrecio();
+  }
+  
+
 }

@@ -1,0 +1,260 @@
+<!-- Reserva modal -->
+<div class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="loginModalLabel">Reserva Sala</h5>
+        <button type="button" class="btn-close" (click)="close.emit()"></button>
+      </div>
+
+      <form [formGroup]="form">
+        <div class="modal-body container-fluid"> 
+          <div class="row d-none">
+            <div class="col-md-3 mr-2">               
+                <label>id_usuari:</label>                    
+                <input type="text" class="form-control" id="id_user" formControlName="id_user">            
+            </div>                         
+          </div>
+          <div class="row">
+            <div class="col-md-3 mr-2">               
+                <label>Fecha Incial:</label>                    
+                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial">            
+            </div>
+            <div class="col-md-3 mr-2">               
+                <label>Fecha Final:</label>                    
+                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal">              
+            </div>                        
+          </div>
+          <div class="row">
+            <div class="col-md-3 mr-2">              
+                <label>Frecuencia:</label>
+                <select class="form-control" id="frecuencia" formControlName="frecuencia" (change)="frecuenciaChange.emit()">
+                  <option value="diaria">Diaria</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensual">Mensual</option>
+                </select>              
+            </div>      
+            <!-- Semanal -->
+            <div class="col-md-8 mr-2 border mt-2" *ngIf="form.get('frecuencia')?.value === 'semanal'">              
+                <label>Dias de la semana: </label>
+                <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">                  
+                  <label><input type="checkbox" formControlName="lunes" (change)="frecuenciaChange.emit()"> Lunes </label>
+                  <label><input type="checkbox" formControlName="martes" (change)="frecuenciaChange.emit()"> Martes</label>
+                  <label><input type="checkbox" formControlName="miercoles" (change)="frecuenciaChange.emit()"> Miercoles</label>
+                  <label><input type="checkbox" formControlName="jueves" (change)="frecuenciaChange.emit()"> Jueves</label>
+                  <label><input type="checkbox" formControlName="viernes" (change)="frecuenciaChange.emit()"> Viernes</label>
+                  <label><input type="checkbox" formControlName="sabado" (change)="frecuenciaChange.emit()"> Sabado</label>
+                  <label><input type="checkbox" formControlName="domingo" (change)="frecuenciaChange.emit()"> Domingo</label>
+                </div>              
+            </div>                   
+            <!-- Mensual -->
+            <div class="col-md-8 mr-2 border mt-2" *ngIf="form.get('frecuencia')?.value === 'mensual'">              
+                <label for="fecha">Opciones Mensuales:</label>
+                <div class="row" formGroupName="mensualidad">
+                  <!-- Radio -->
+                  <div class="col-md-4 mr-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="tipo1" name="tipo" value="1" formControlName="tipo">
+                      <label class="form-check-label" for="byDay">Cada Día </label>
+                    </div>
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="radio" id="tipo2" name="tipo" value="2" formControlName="tipo">
+                      <label class="form-check-label" for="byPeriodicity">El </label>
+                    </div>                
+                  </div>
+                  <!-- Valores -->
+                  <div class="col-md-8 mr-2">
+                    <div *ngIf="form.get('mensualidad.tipo')?.value == 1">                   
+                      <div class="row">
+                      <div class="col-md-4 mr-2">
+                        <input type="number" id="numeroDia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="frecuenciaChange.emit()">
+                      </div>
+                      <div class="col-md-4">
+                        <label> de cada mes</label>
+                      </div>
+                      </div>
+                    </div>      
+                    <div *ngIf="form.get('mensualidad.tipo')?.value == 2" class="mt-2">
+                      <div class="row">
+                        <div class="col-md-4 mr-2">                    
+                            <select id="periodo" class="col-md-2 mr-2 form-control" formControlName="periodo">                    
+                              <option value="primer">Primer</option>
+                              <option value="segundo">Segundo</option>
+                              <option value="tercer">Tercer</option>
+                              <option value="cuarto">Cuarto</option>
+                              <option value="ultimo">Último</option>
+                            </select>                       
+                        </div>
+                        <div class="col-md-4 mr-2">                    
+                            <select id="diaSemana" class="form-control" formControlName="diaSemana">                    
+                              <option value="lunes">Lunes</option>
+                              <option value="martes">Martes</option>
+                              <option value="miercoles">Miercoles</option>
+                              <option value="jueves">Jueves</option>
+                              <option value="viernes">Viernes</option>
+                              <option value="sabado">Sabado</option>
+                              <option value="domingo">Domingo</option>
+                            </select>                                        
+                        </div>    
+                        <div class="col-md-4 mr-2">                    
+                          <label> de cada mes</label>
+                        </div>                    
+                      </div>
+                    </div>                                                          
+                  </div>
+                </div>
+            </div>                      
+          <hr class="mt-2">
+          <div class="row">  
+            <div class="col-md-4 mr-2">               
+                 <label for="sala">Sala:</label>
+                 <select class="form-control" id="sala_reserva" formControlName="sala_reserva" (change)="salaChange.emit()">
+                    @for (sala of sales; track sala.id; let id_sala = $index) {
+                      <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
+                    }
+                 </select>               
+            </div>   
+          </div>  
+          <div class="row">
+            <div class="col-md-2 mr-2"> 
+                <label for="fecha">Capacidad:</label>                    
+                <input type="input" class="form-control" id="max_sala" formControlName="max_sala" >
+            </div>
+            <div class="col-md-2 mr-2"> 
+                <label for="fecha">Horario:</label>        
+                <select class="form-select" id="horari_sala" formControlName="horari_sala" >
+                      <option value="1">1 hora</option>
+                      <option value="2">½ hora</option>
+                </select>                                                    
+            </div>       
+            <div class="col-md-2 ms-auto" *ngIf="isNew"> 
+              <button type="button" class="btn btn-secondary" (click)="close.emit()">Salir</button>                                             
+            </div>
+          </div>   
+          <div *ngIf="mostrarHourGrid">
+
+            @for (mira of miraDia; track mira.id) {
+                <div class="row text-center mt-2">
+                  @for (col of mira.items; track $index) {
+                    <button
+                      class="col-md-2 d-flex p-2 text-white rounded m-1"
+                      [ngClass]="col.cssClass"  
+                      [disabled]="!isNew"
+                      (click)="toggleHora.emit(col)">
+                      {{ col.hora_inici }}
+                    </button>
+                  }
+                </div>
+              
+                <hr>
+              
+                <div class="row mb-2" *ngIf="mostrarPeu">
+                  @for (comple of complements; track comple.id) {
+                    <label>
+                      <input
+                        type="checkbox"
+                        [checked]="selectedComplements.includes(+comple.id)"
+                        [disabled]="!isNew"
+                        (change)="toggleComplement.emit(+comple.id)" />
+                      {{ comple.descripcio }} - €{{ comple.preu }}
+                    </label>
+                  }
+                </div>
+              }             
+
+            <div class="container mt-3" *ngIf="mostrarPeu">
+              <div *ngIf="mostrarPeu">    
+                <h1 class="text-end">Precio {{ totalPrecio | PipePreu }}</h1>   
+                <hr>                  
+                <div class="d-flex">                  
+                  <div>                    
+                    <button *ngIf="isNew" type="button" class="btn btn-primary me-2" 
+                            [disabled]="hasError" 
+                            (click)="save.emit()">
+                      Guardar</button>                              
+                    <button *ngIf="!isNew" type="button" class="btn btn-primary me-2"                                                         
+                            (click)="opinion.emit()">
+                      Reseñas</button>
+                    <button *ngIf="canDelete" type="button" class="btn btn-danger me-2"
+                            (click)="borrar.emit()">
+                      Borrar</button>                    
+                  </div>                            
+                  <div class="ms-auto">
+                    <button type="button" class="btn btn-secondary" 
+                            (click)="close.emit()">
+                      {{ isNew ? 'Salir' : 'Cancelar' }}</button>
+                  </div>
+                </div>      
+              </div>
+            </div>
+
+            @if(showReviews) {
+              <div class="container mt-2">                
+                  <h5 class="text-title">Tu opinión sobre la reserva</h5>
+                  <div class="mb-3">
+                    <label for="reseña" class="form-label">Opinión</label>
+                    <textarea id="opinion" class="form-control" rows="4" name="opinion" formControlName="opinion"></textarea>
+                  </div>                  
+                  <!-- Puntuación -->
+                  <div class="col-md-3 mb-3">
+                    <label for="puntuacion" class="form-label">Puntuación</label>
+                    <select id="puntuacion" class="form-select" name="puntuacion" formControlName="puntuacion">
+                      <option value="1">⭐</option>
+                      <option value="2">⭐⭐</option>
+                      <option value="3">⭐⭐⭐</option>
+                      <option value="4">⭐⭐⭐⭐</option>
+                      <option value="5">⭐⭐⭐⭐⭐</option>
+                    </select>
+                  </div>                                            
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" (click)="close.emit()">Cancelar</button>
+                      <button type="button" class="btn btn-primary" (click)="saveOpinion.emit()">Enviar</button>
+                  </div>                  
+              </div>
+            }                        
+         </div>                            
+        </div>
+        @if(errorEntrada && isNew) {
+          <div class="row border rounded mt-4 bg-danger p-2 mb-2">
+            <div class="col-md-12">                    
+              <h5>{{ errorEntrada }}</h5>
+            </div>
+            
+            <div id="tabla-consulta" *ngIf="erroresConsulta.length>0">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Día Inicio</th>
+                    <th>Día Fin</th>                    
+                    <th>Hora Inicio</th>
+                    <th>Hora Fin</th>
+                  </tr>
+                </thead>
+                <tbody>          
+                  @for(err of erroresConsulta;track err.dia_inici) {        
+                  <tr>
+                    <td>{{ err.dia_inici }}</td>
+                    <td>{{ err.dia_fi }}</td>                    
+                    <td>{{ err.hora_inici }}</td>
+                    <td>{{ err.hora_fi }}</td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+          </div>          
+        }
+        @if(missatge) {
+          <div class="row border rounded mt-4 bg-warning p-2">
+            <div class="col-md-12">                    
+              <h5>{{ missatge }}</h5>
+            </div>
+          </div>
+        }                        
+        </div>
+      </form>         
+    </div>  
+  </div>
+</div>    
+

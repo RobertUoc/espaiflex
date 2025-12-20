@@ -1,0 +1,19 @@
+.card {
+    border-radius: 0.75rem;
+  }
+  
+  .table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+  
+  canvas {
+    max-height: 300px;
+  }
+  
+  @media (max-width: 768px) {
+    canvas {
+      max-height: 200px;
+    }
+  }
+  

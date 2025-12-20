@@ -1,111 +1,89 @@
-<h1>Edificios</h1>
-<div class="container mt-4">
-  
-  <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
-    Crear nuevo edificio
-  </button>
-
-  <div class="row">
-    @for (edifici of edificis; track edifici.id; let id_edifici = $index) {
-      <div class="col-md-4">
-        <div class="card mb-3">            
-          <img src="{{ edifici.imatge }}" class="card-img-top" alt="Foto del edificio">           
-          <div class="card-body">
-            <h5 class="card-title">{{ edifici.nom }}</h5>
-            <p class="card-text">{{ edifici.descripcio }}</p>
-            <button class="btn btn-primary" (click)="obrirModal(edifici.id)">Modificar</button>
+<div class="container py-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+    <h1 class="fs-4 fw-semibold m-0">Edificios</h1>
+    <button  type="button"  class="btn btn-primary" (click)="obrirModal('0')"><i class="bi bi-plus-lg me-1"></i>Nuevo edificio</button>
+  </div>
+  <div class="row g-4">
+    @for (edifici of edificis; track edifici.id) {
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <div class="card h-100 shadow-sm">
+          <div class="ratio ratio-4x3">
+            <img [src]="edifici.imatge" class="card-img-top object-fit-cover"  alt="Foto del edificio {{ edifici.nom }}">
+          </div>
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-semibold">{{ edifici.nom }}</h5>
+            <p class="card-text text-muted small flex-grow-1">{{ edifici.descripcio || 'Sin descripción' }}</p>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <span class="badge" [ngClass]="edifici.actiu === 'SI'? 'bg-success-subtle text-success': 'bg-secondary-subtle text-secondary'">
+                {{ edifici.actiu === 'SI' ? 'Activo' : 'Inactivo' }}
+              </span>
+              <button class="btn btn-outline-secondary btn-sm" (click)="obrirModal(edifici.id)"><i class="bi bi-pencil"></i>Modificar</button>
+            </div>
           </div>
         </div>
       </div>
     }
   </div>
+</div>
 
-    <!-- Modal -->
-    <div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible }">
-      <div class="modal-dialog">
-        <div class="modal-content bg-warning">
-          <form (ngSubmit)="saveEdifici()" enctype="multipart/form-data" #form="ngForm">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                {{ edificioSeleccionado.id == '0' ? 'Crear Edificio' : 'Modificar Edificio' }}
-             </h5>
-              <button type="button" class="btn-close" (click)="tancarModal()"></button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Nombre</label>
-                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" 
-                      required minlength="3" maxlength="50"
-                      #nomField="ngModel"                  
-                      name="nom" id="nom">
-
-                      @if(nomField.invalid && nomField.touched) {      
-                         @if(nomField.errors?.['required']) {
-                            <div class="invalido">Rellene el nombre del edificio.</div>
-                        }
-                        @if(nomField.errors?.['minlength']) {
-                            <div class="invalido">Mínimo obligado. {{ nomField.errors?.['minlength'].requiredLength }}</div>
-                        }
-                        @if(nomField.errors?.['maxlength']) {
-                          <div class="invalido">Màximo obligado. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
-                        }                 
-                      }
-
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Provincia</label>
-                  <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia" id="id_provincia">
-                      @for(pro of provincies; track pro.id ) {
-                        <option [value]="pro.id">{{ pro.nom }}</option>
-                      }
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Fotografia </label>
-                  <input type="file" (change)="onFileSeleccionada($event)" class="form-control mb-2">
-                  <div *ngIf="previewUrl" class="mb-3">                    
-                      <img [src]="previewUrl" class="img-thumbnail" width="200">
-                  </div>                                                                              
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Descripción</label>
-                  <textarea class="form-control" [(ngModel)]="edificioSeleccionado.descripcio" name="descripcio" id="descripcio"></textarea>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <label>Activo</label>
-                  <select class="form-select" [(ngModel)]="edificioSeleccionado.actiu" name="actiu" id="actiu">
-                        <option value="SI">SI</option>
-                        <option value="NO">NO</option>
-                  </select>
-                </div>
-                <div class="col-md-3">
-                  <label>Latitud</label>
-                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.latitud" 
-                      required minlength="1" maxlength="8" name="latitud" id="latitud">
-                </div>   
-                <div class="col-md-3">
-                  <label>Longitud</label>
-                  <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.longitud" 
-                      required minlength="1" maxlength="8" name="longitud" id="longitud">
-                </div>                                            
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Grabar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
-            </div>
-          </form>
+<!-- MODAL -->
+<div class="modal fade" [class.show]="modalVisible" [style.display]="modalVisible ? 'block' : 'none'"  tabindex="-1" role="dialog" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form (ngSubmit)="saveEdifici()" #form="ngForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ edificioSeleccionado.id === '0'? 'Crear edificio': 'Modificar edificio' }}</h5>
+          <button type="button" class="btn-close" (click)="tancarModal()"></button>
         </div>
-      </div>
+        <div class="modal-body">          
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" [(ngModel)]="edificioSeleccionado.nom" name="nom" required minlength="3" maxlength="50" #nomField="ngModel" [class.is-invalid]="nomField.invalid && nomField.touched">
+            <div class="invalid-feedback">
+              El nombre es obligatorio (3–50 caracteres).
+            </div>
+          </div>          
+          <div class="mb-3">
+            <label class="form-label">Provincia</label>
+            <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia">
+              @for (pro of provincies; track pro.id) {
+                <option [value]="pro.id">{{ pro.nom }}</option>
+              }
+            </select>
+          </div>          
+          <div class="mb-3">
+            <label class="form-label">Fotografía</label>
+            <input type="file" class="form-control" (change)="onFileSeleccionada($event)">
+            <img *ngIf="previewUrl" [src]="previewUrl" class="img-thumbnail mt-2"  width="200">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="edificioSeleccionado.descripcio" name="descripcio"></textarea>
+          </div>
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <label class="form-label">Estado</label>
+              <select class="form-select" [(ngModel)]="edificioSeleccionado.actiu" name="actiu">
+                <option value="SI">Activo</option>
+                <option value="NO">Inactivo</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">Latitud</label>
+              <input type="number" step="any" class="form-control" [(ngModel)]="edificioSeleccionado.latitud" name="latitud">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">Longitud</label>
+              <input type="number" step="any" class="form-control" [(ngModel)]="edificioSeleccionado.longitud" name="longitud">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Guardar</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="tancarModal()">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
-  
+</div>
+<div class="modal-backdrop fade show" *ngIf="modalVisible"></div>

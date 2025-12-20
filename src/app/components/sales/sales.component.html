@@ -1,219 +1,272 @@
-<h1>Salas</h1>
+<div class="container py-4">
 
-<div class="container mt-4">  
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+    <h1 class="fs-4 fw-semibold m-0">Salas</h1>
 
-  <button type="button" class="btn btn-success mb-3" (click)="obrirModal('0')">
-    Crear nueva sala
-  </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="obrirModal('0')">
+      <i class="bi bi-plus-lg me-1"></i>
+      Nueva sala
+    </button>
+  </div>
 
-  <div class="table-responsive mt-2">
-      <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-          <tr>        
-            <th>Nombre</th>
-            <th>Edificio</th>
-            <th>Color</th>        
-            <th>Capacidad</th>
-            <th>Horario</th>        
-            <th>Precio</th>
-            <th>Activa</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for(sala of sales | paginate: { itemsPerPage: 5, currentPage: paginaActual };  track sala.id; let id_sala = $index) {
-          <tr>        
-            <td class="w-40">{{ sala.descripcio }}</td>
-            <td class="w-40">{{ sala.nom_edifici }}</td>
-            <td class="w-10" [ngStyle]="{'background-color': sala.color}">&nbsp;</td>        
-            <td class="w-10 text-end">{{ sala.max_ocupacio }}</td>
-            <td>{{ sala.horari == '1' ? '1 hora' : '½ hora' }} </td>
-            <td class="w-10 text-end">{{ sala.preu | PipePreu }} €</td>
-            <td class="w-10 text-center">
-              <span [class.text-success]="sala.actiu == 'SI'" [class.text-danger]="sala.actiu != 'NO'">
-                {{ sala.actiu }}
+  <!-- Tabla -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th class="d-none d-md-table-cell">Edificio</th>
+          <th class="d-none d-md-table-cell text-center">Color</th>
+          <th class="d-none d-lg-table-cell text-end">Cap.</th>
+          <th class="d-none d-lg-table-cell">Horario</th>
+          <th class="d-none d-md-table-cell text-end">Precio</th>
+          <th class="d-none d-md-table-cell text-center">Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (
+          sala of sales | paginate: { itemsPerPage: 5, currentPage: paginaActual };
+          track sala.id
+        ) {
+          <tr>
+            <td class="fw-medium">{{ sala.descripcio }}</td>
+
+            <td class="d-none d-md-table-cell">{{ sala.nom_edifici }}</td>
+
+            <td class="d-none d-md-table-cell text-center">
+              <span
+                class="color-dot"
+                [ngStyle]="{ 'background-color': sala.color }"
+                aria-label="Color sala">
               </span>
             </td>
-            <td class="w-10 text-center">
-              <button class="btn btn-primary btn-sm w-100 mb-2" (click)="obrirModal(sala.id)">
-                <i class="bi bi-pencil-square"></i> Modificar
+
+            <td class="d-none d-lg-table-cell text-end">
+              {{ sala.max_ocupacio }}
+            </td>
+
+            <td class="d-none d-lg-table-cell">
+              {{ sala.horari === '1' ? '1 hora' : '½ hora' }}
+            </td>
+
+            <td class="d-none d-md-table-cell text-end">
+              {{ sala.preu | PipePreu }} €
+            </td>
+
+            <td class="d-none d-md-table-cell text-center">
+              <span
+                class="badge"
+                [ngClass]="sala.actiu === 'SI'
+                  ? 'bg-success-subtle text-success'
+                  : 'bg-secondary-subtle text-secondary'">
+                {{ sala.actiu === 'SI' ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+
+            <td class="text-center">
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                (click)="obrirModal(sala.id)"
+                aria-label="Modificar sala">
+                <i class="bi bi-pencil"></i>
               </button>
             </td>
           </tr>
-          }
-        </tbody>
-      </table>
-      <pagination-controls 
-        (pageChange)="paginaActual = $event"
-        previousLabel="Anterior"
-        nextLabel="Seguiente"
-        screenReaderPageLabel="Página"
-        screenReaderCurrentLabel="Página Actual"
-      ></pagination-controls>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="d-flex justify-content-left mt-3">
+    <pagination-controls
+      (pageChange)="paginaActual = $event"
+      previousLabel="Anterior"
+      nextLabel="Siguiente">
+    </pagination-controls>
   </div>
 </div>
 
-    <!-- Modal -->
-    <div class="modal" tabindex="-1" id="modalNuevoEdificio" [ngClass]="{ 'show d-block': modalVisible }">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-warning">
-          <form (ngSubmit)="saveComplement()" #form="ngForm">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                {{ salaSeleccionado.id == '0' ? 'Crear Sala' : 'Modificar Sala' }}
-             </h5>
-              <button type="button" class="btn-close" (click)="tancarModal()"></button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Nombre</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" 
-                         required minlength="3" maxlength="50"
-                         #descripcioField="ngModel"
-                         name="descripcio" id="descripcio">
-                         @if(descripcioField.invalid && descripcioField.touched) {      
-                           @if(descripcioField.errors?.['required']) {
-                             <div class="invalido">Rellene el nombre de la sala.</div>
-                           }
-                           @if(descripcioField.errors?.['minlength']) {
-                             <div class="invalido">Mínimo obligado. {{ descripcioField.errors?.['minlength'].requiredLength }}</div>
-                           }
-                           @if(descripcioField.errors?.['maxlength']) {
-                             <div class="invalido">Màximo obligado. {{ descripcioField.errors?.['maxlength'].requiredLength }}</div>
-                           }                 
-                         }
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12 col-md-6 mb-3">
-                  <label>Edificios</label>
-                  <select class="form-select" [(ngModel)]="salaSeleccionado.id_edifici" 
-                          name="id_edifici" id="id_edifici" 
-                          required
-                          #edificiField="ngModel">
-                          @for(edi of edificis; track edi.id ) {
-                            <option [value]="edi.id">{{ edi.nom }}</option>
-                          }
-                          @if(edificiField.invalid && edificiField.touched) {      
-                            @if(edificiField.errors?.['required']) {
-                               <div class="invalido">Trii un edifici.</div>
-                            }
-                          }    
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Mensaje</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.missatge" name="missatge" id="missatge">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12 col-md-4 col-lg-2 mb-3">
-                  <label>Color</label>
-                  <input type="color" class="form-control h-75" [(ngModel)]="salaSeleccionado.color" name="color" id="color">
-                </div>
-                <div class="col-12 col-md-4 col-lg-2 mb-3">
-                  <label>Capacidad</label>
-                  <input type="input" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" 
-                        minlength="1" maxlength="3" required
-                        pattern="[0-9]*$"
-                        #max_ocupacioField="ngModel"
-                        name="max_ocupacio" id="max_ocupacio"
-                        >
-                </div>                                
-                <div class="col-12 col-md-4 col-lg-2 mb-3">
-                  <label>Activo</label>
-                  <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu" id="actiu">
-                        <option value="SI">SI</option>
-                        <option value="NO">NO</option>
-                  </select>
-                </div>   
-                <div class="col-xl-2">
-                  <label>Horario</label>
-                  <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari">
-                          <option value="1">1 hora</option>
-                          <option value="2">½ hora</option>
-                  </select>
-                </div>              
-                <div class="col-xl-2">
-                  <label>{{ salaSeleccionado.horari == '2' ? 'Precio ½ hora' : 'Precio hora' }}</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" 
-                      pattern="^\d+(\.\d{1,2})?$" 
-                      #preuField="ngModel"
-                      name="preu" id="preu">
-                </div>                            
-                
-                
-                      @if(preuField.invalid && preuField.touched) {      
-                        @if(preuField.errors?.['pattern']) {
-                           <div class="invalido mt-2">Solo está permitido números y el punto decimal.</div>
-                        }
-                      }                                           
+<!-- MODAL -->
+<div
+  class="modal fade"
+  [class.show]="modalVisible"
+  [style.display]="modalVisible ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true">
 
-                      @if(max_ocupacioField.invalid && max_ocupacioField.touched) {      
-                        @if(max_ocupacioField.errors?.['pattern']) {
-                           <div class="invalido mt-2">Solo está permitido números.</div>
-                        }        
-                        @if(max_ocupacioField.errors?.['required']) {
-                           <div class="invalido mt-2">Rellene la capacidad de la sala.</div>
-                        }                                        
-                        @if(max_ocupacioField.errors?.['minlength']) {
-                           <div class="invalido mt-2">Mínimo obligado. {{ max_ocupacioField.errors?.['minlength'].requiredLength }}</div>
-                        }
-                        @if(max_ocupacioField.errors?.['maxlength']) {
-                           <div class="invalido mt-2">Màximo obligado. {{ max_ocupacioField.errors?.['maxlength'].requiredLength }}</div>
-                        }        
-                        @if(max_ocupacioField.errors?.['max']) {
-                           <div class="invalido mt-2">Número Máxim superado. {{ max_ocupacioField.errors?.['max'].requiredLength }}</div>
-                        }  
-                        @if(max_ocupacioField.errors?.['min']) {
-                           <div class="invalido mt-2">Número Mínimo superado. {{ max_ocupacioField.errors?.['min'].requiredLength }}</div>
-                        }                                                                                                                                                     
-                      }   
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-xl-6">
-                  <label>Fotografia </label>
-                  <input type="file" (change)="onFileSeleccionada($event)" class="form-control mb-2">
-                  <div *ngIf="previewUrl" class="mb-3">                    
-                      <img [src]="previewUrl" class="img-fluid rouded" width="200">
-                  </div>                                                                              
-                </div>
-              </div>
-              <hr>              
-                         
-              <div class="row mt-2">
-                <div class="col-xl-6">
-                  <label for="disponibles">Complementos disponibles</label>
-                  <select multiple class="form-select" id="disponibles" [(ngModel)]="selectedDisponibleId" name="disponibles">
-                    <option *ngFor="let item of disponibles" [ngValue]="item.id">{{ item.descripcio }}</option>                                                            
-                  </select>
-                </div>
-          
-                <div class="col-xl-1 d-flex flex-column justify-content-center align-items-center">
-                  <button type="button" class="btn btn-primary mb-2" (click)="moverADerecha()"><i class="bi bi-arrow-right-circle"></i></button>
-                  <button type="button" class="btn btn-secondary" (click)="moverAIzquierda()"><i class="bi bi-arrow-left-circle"></i></button>
-                </div>
-          
-                <div class="col-xl-5">
-                  <label for="seleccionadas">Complementos selecionados</label>
-                  <select multiple class="form-select" id="seleccionados" [(ngModel)]="selectedSeleccionadoId" name="seleccionados">
-                    <option *ngFor="let item of seleccionados" [ngValue]="item.id">{{ item.descripcio }}</option>
-                  </select>
-                </div>          
-              </div>
-            </div>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
 
+      <form (ngSubmit)="saveComplement()" #form="ngForm">
 
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-success" [disabled]="!form.valid">Grabar</button>
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Cancelar</button>
-            </div>
-          </form>
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ salaSeleccionado.id === '0' ? 'Crear sala' : 'Modificar sala' }}
+          </h5>
+          <button type="button" class="btn-close" (click)="tancarModal()"></button>
         </div>
-      </div>
-    </div>
 
+        <div class="modal-body">
+
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="salaSeleccionado.descripcio"
+              name="descripcio"
+              required
+              minlength="3"
+              maxlength="50"
+              #descripcioField="ngModel"
+              [class.is-invalid]="descripcioField.invalid && descripcioField.touched">
+
+            <div class="invalid-feedback">
+              El nombre es obligatorio (3–50 caracteres).
+            </div>
+          </div>
+
+          <!-- Edificio -->
+          <div class="mb-3">
+            <label class="form-label">Edificio</label>
+            <select
+              class="form-select"
+              [(ngModel)]="salaSeleccionado.id_edifici"
+              name="id_edifici"
+              required
+              #edificiField="ngModel"
+              [class.is-invalid]="edificiField.invalid && edificiField.touched">
+              <option value="">Seleccione un edificio</option>
+              @for (edi of edificis; track edi.id) {
+                <option [value]="edi.id">{{ edi.nom }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">
+              Debe seleccionar un edificio.
+            </div>
+          </div>
+
+          <!-- Mensaje -->
+          <div class="mb-3">
+            <label class="form-label">Mensaje</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="salaSeleccionado.missatge"
+              name="missatge">
+          </div>
+
+          <!-- Configuración -->
+          <div class="row g-3 mb-3">
+            <div class="col-6 col-md-2">
+              <label class="form-label">Color</label>
+              <input
+                type="color"
+                class="form-control form-control-color"
+                [(ngModel)]="salaSeleccionado.color"
+                name="color">
+            </div>
+
+            <div class="col-6 col-md-2">
+              <label class="form-label">Capacidad</label>
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="salaSeleccionado.max_ocupacio"
+                name="max_ocupacio"
+                required
+                min="1">
+            </div>
+
+            <div class="col-6 col-md-2">
+              <label class="form-label">Estado</label>
+              <select class="form-select" [(ngModel)]="salaSeleccionado.actiu" name="actiu">
+                <option value="SI">Activa</option>
+                <option value="NO">Inactiva</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+              <label class="form-label">Horario</label>
+              <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari">
+                <option value="1">1 hora</option>
+                <option value="2">½ hora</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-2">
+              <label class="form-label">
+                {{ salaSeleccionado.horari === '2' ? 'Precio ½ hora' : 'Precio hora' }}
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                class="form-control"
+                [(ngModel)]="salaSeleccionado.preu"
+                name="preu">
+            </div>
+          </div>
+
+          <!-- Imagen -->
+          <div class="mb-4">
+            <label class="form-label">Fotografía</label>
+            <input type="file" class="form-control" (change)="onFileSeleccionada($event)">
+            <img *ngIf="previewUrl" [src]="previewUrl" class="img-thumbnail mt-2" width="200">
+          </div>
+
+          <!-- Complementos -->
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Disponibles</label>
+              <select multiple class="form-select" [(ngModel)]="selectedDisponibleId" name="disponibles">
+                <option *ngFor="let item of disponibles" [ngValue]="item.id">
+                  {{ item.descripcio }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-2">
+              <button type="button" class="btn btn-outline-primary" (click)="moverADerecha()">
+                <i class="bi bi-arrow-right"></i>
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="moverAIzquierda()">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label">Seleccionados</label>
+              <select multiple class="form-select" [(ngModel)]="selectedSeleccionadoId" name="seleccionados">
+                <option *ngFor="let item of seleccionados" [ngValue]="item.id">
+                  {{ item.descripcio }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            Guardar
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="tancarModal()">
+            Cancelar
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="modalVisible"></div>

@@ -1,54 +1,78 @@
-<div class="bg-image">
-  <app-login class="position-absolute top-0 end-0 m-3"></app-login>
-
-  <div class="d-flex justify-content-center align-items-center vh-100">
-
-
-    <div class="d-flex flex-column flex-lg-row gap-4 bg-white p-4 rounded shadow mt-5">
-      <!-- Formulario -->
-      <div class="text-center flex-fill">
-        <input [(ngModel)]="poblacion" class="form-control mb-3" placeholder="Introduce la población">
-        <button class="btn btn-primary w-100" (click)="buscar()">Buscar edificios</button>
+<div class="bg-image position-relative min-vh-100"> 
+  <div class="overlay position-absolute top-0 start-0 w-100 h-100"></div>
+  <div class="position-relative z-1">
+    <app-login class="position-absolute top-0 end-0 m-3"></app-login>  
+    <section class="d-flex align-items-center text-center py-5">
+      <div class="container">
+        <h1 class="display-5 fw-bold text-white mt-2">Reserva salas profesionales por horas</h1>
+        <p class="lead mt-3 text-white">Encuentra edificios equipados, selecciona tu sala y alquila solo el tiempo que necesitas</p>
+        <div class="row justify-content-center mt-4">
+          <div class="col-md-6">
+            <div class="input-group input-group-lg shadow-sm">
+              <input [(ngModel)]="poblacion" class="form-control" placeholder="Introduce la población"/>
+              <button class="btn btn-primary" (click)="buscar()">Buscar edificios</button>
+            </div>
+          </div>
+        </div>
       </div>
-    
-      <!-- Mapa -->
-      <div class="text-center flex-fill">
-        <button class="btn btn-primary mb-2 w-100" (click)="getLocalizacion()">Mostrar Mi geolocalización</button>
-        <div id="map" class="map-container rounded border"></div>
+    </section>  
+    <section class="bg-white py-5">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col-md-4">
+            <h5 class="fw-bold">1. Elige la ciudad</h5>
+            <p class="text-muted">Busca por población o geolocalización</p>
+          </div>
+          <div class="col-md-4">
+            <h5 class="fw-bold">2. Selecciona edificio y sala</h5>
+            <p class="text-muted">Filtra por capacidad y equipamiento</p>
+          </div>
+          <div class="col-md-4">
+            <h5 class="fw-bold">3. Reserva por horas</h5>
+            <p class="text-muted">Escoge tramos horarios y confirma</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="bg-light d-flex align-items-center">
+      <div class="container">  
+        <h2 class="text-center mb-4">Explora edificios en el mapa</h2>      
+        <div class="row justify-content-center">
+          <div class="col-lg-8 d-flex flex-column align-items-center">          
+            <button class="btn btn-outline-primary mb-3 w-100" (click)="getLocalizacion()">Mostrar mi geolocalización</button>          
+            <div id="map" class="map-container rounded border shadow-sm w-100"></div>          
+          </div>
+        </div>      
+      </div>
+    </section>  
+  </div>
+</div>
+
+<!-- Modal Bootstrap -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Espacios en {{ poblacion }}</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            @if(edificios.length > 0) {              
+              <div class="col-6 col-md-3 mb-3" *ngFor="let edificio of edificios">
+                <button class="btn btn-outline-primary w-100 p-0" (click)="irAlCalendario(edificio.id)">
+                  <img [src]="edificio.imatge" [alt]="edificio.nom" class="img-fluid rounded" />
+                </button>
+                <p class="text-center mt-2">{{ edificio.nom }}</p>
+              </div>
+            }
+          </div>
+        </div>        
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
       </div>
     </div>
   </div>
 </div>
-
-  <!-- Modal Bootstrap -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Espacios en {{ poblacion }}</h5>
-          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
-        </div>
-        <div class="modal-body">
-
-          <div class="container">
-            <div class="row">
-              @if(edificios.length > 0) {              
-                <div class="col-6 col-md-3 mb-3" *ngFor="let edificio of edificios">
-                  <button class="btn btn-outline-primary w-100 p-0" (click)="irAlCalendario(edificio.id)">
-                    <img [src]="edificio.imatge" [alt]="edificio.nom" class="img-fluid rounded" />
-                  </button>
-                  <p class="text-center mt-2">{{ edificio.nom }}</p>
-                </div>
-              }
-            </div>
-          </div>
-          
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-

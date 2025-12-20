@@ -1,0 +1,27 @@
+h1 {
+  color: #212529;
+}
+
+.table td,
+.table th {
+  font-size: 0.9rem;
+}
+
+.btn {
+  min-height: 44px;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.6em;
+}
+
+@media (max-width: 768px) {
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+}

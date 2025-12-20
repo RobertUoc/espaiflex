@@ -1,66 +1,72 @@
-<h1>Comentarios</h1>
-<div class="container mt-4">
-        <div class="row">
-            <div class="col-12 col-md-3 mb-3">
-              <label>Filtrar por Sala</label>
-              <select class="form-select" [(ngModel)]="filtroSala" 
-                      name="nom_sala" id="nom_sala">                                            
-                      <option [value]='0'>Todas</option>
-                      @for(edi of sales; track edi.id ) {
-                        <option [value]="edi.descripcio">{{ edi.descripcio }}</option>
-                      }
-              </select>
-            </div>
-            <div class="col-12 col-md-3 mb-3">
-
-                <label>Filtrar por usuario</label>
-                <input type="input" class="form-control" [(ngModel)]="filtroUsuario"                                           
-                      >
-            </div>          
-      </div>
-
-      <div class="table-responsive mt-2">    
-          <table class="table table-striped table-bordered mt-2">
-            <thead class="table-dark">      
-              <tr>
-                <th>Usuario</th>
-                <th>Sala</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-                <th>Hora inicio</th>
-                <th>Hora fin</th>
-                <th>Comentario</th>
-                <th>Puntuación</th>
-                <th>Creado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let c of getComentariosFiltrados()">
-                <td>{{ c.nom }}</td>
-                <td>{{ c.descripcio }}</td>
-                <td>{{ c.dia_inici }}</td>
-                <td>{{ c.dia_fi }}</td>
-                <td>{{ c.hora_inici }}</td>
-                <td>{{ c.hora_fi }}</td>
-                <td>{{ c.comentari }}</td>
-                <td>{{ c.puntuacio }}</td>
-                <td>{{ c.creat | date:'short' }}</td>
-              </tr>
-            </tbody>
-          </table>    
-          <pagination-controls 
-          (pageChange)="paginaActual = $event"
-          previousLabel="Anterior"
-          nextLabel="Seguiente"
-          screenReaderPageLabel="Página"
-          screenReaderCurrentLabel="Página Actual"
-        ></pagination-controls>
-    </div>
-
-    <div class="row mt-2">
-        <div class="col-12 text-center">
-            <canvas id="general" style="max-width: 100%; height: auto;"></canvas>
+<div class="container py-4">
+  <div class="mb-4">
+    <h1 class="fs-4 fw-semibold m-0">Comentarios</h1>
+  </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Filtrar por sala</label>          
+          <select class="form-select" [(ngModel)]="filtroSala" (ngModelChange)="applyFilters()">
+              <option value="0">Todas</option>
+              <option *ngFor="let edi of sales" [value]="edi.descripcio">{{ edi.descripcio }}</option>
+          </select>                    
         </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Filtrar por usuario</label>                    
+          <input type="text" class="form-control" [(ngModel)]="filtroUsuario" (ngModelChange)="applyFilters()">
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Usuario</th>
+          <th>Sala</th>
+          <th class="d-none d-lg-table-cell">Inicio</th>
+          <th class="d-none d-lg-table-cell">Fin</th>
+          <th class="d-none d-md-table-cell">Horario</th>
+          <th>Comentario</th>
+          <th class="text-center">Puntuación</th>
+          <th class="d-none d-md-table-cell">Creado</th>
+        </tr>
+      </thead>
+      <tbody>        
+          <tr *ngFor="let c of comentariosFiltrados">
+            <td class="fw-medium">{{ c.nom }}</td>
+            <td>{{ c.descripcio }}</td>
+            <td class="d-none d-lg-table-cell">{{ c.dia_inici }}</td>
+            <td class="d-none d-lg-table-cell">{{ c.dia_fi }}</td>
+            <td class="d-none d-md-table-cell">{{ c.hora_inici }} – {{ c.hora_fi }}</td>
+            <td class="text-muted small">{{ c.comentari }}</td>
+            <td class="text-center">
+              <span class="badge bg-primary-subtle text-primary">
+                {{ c.puntuacio }}
+              </span>
+            </td>
+            <td class="d-none d-md-table-cell">
+              {{ c.creat | date:'short' }}
+            </td>
+          </tr>       
+      </tbody>
+    </table>
+  </div>
+  <!-- Paginación -->
+  <div class="d-flex justify-content-left mt-3">
+    <pagination-controls
+      (pageChange)="paginaActual = $event"
+      previousLabel="Anterior"
+      nextLabel="Siguiente">
+    </pagination-controls>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <h2 class="fs-6 fw-semibold mb-3">Puntuación media por sala</h2>
+      <canvas id="comentariosChart"></canvas>
+    </div>
+  </div>
 </div>
-  

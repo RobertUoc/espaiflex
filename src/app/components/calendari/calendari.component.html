@@ -6,19 +6,19 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Menú colapsable -->
-    <div class="collapse navbar-collapse" id="menuOpciones">
+    <div class="collapse navbar-collapse" id="menuOpciones">      
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
         <li class="nav-item">
-            <button type="button" class="btn btn-link nav-link menu-btn"  (click)="neteja(1)" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
+            <button type="button" class="btn btn-link nav-link menu-btn"  (click)="mostrarRegister = true" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
         </li>
         <li class="nav-item">
-            <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(3)" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
+            <button type="button" class="btn btn-link nav-link menu-btn" (click)="abrirActualizar()" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
         </li>
         <li class="nav-item" *ngIf="id_usuari === 0">
-            <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(2)">Identificarse</button>
+            <button type="button" class="btn btn-link nav-link menu-btn" (click)="mostrarLogin = true">Identificarse</button>
         </li>
         <li class="nav-item" *ngIf="id_usuari != 0">
-          <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja(4)">Logout</button>
+          <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja()">Logout</button>
         </li>       
       </ul>      
       <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
@@ -31,10 +31,9 @@
       {{ usuari }}
   </div>
   <div>
-    <button type="button" class="ms-2 btn btn-success" (click)="reserva()" [ngClass]="{ 'd-none': id_usuari === 0 }" (click)="reserva()">Nueva Reserva</button>
+    <button type="button" class="ms-2 btn btn-success" (click)="reserva(true)" [ngClass]="{ 'd-none': id_usuari === 0 }">Nueva Reserva</button>
   </div>
 </div>
-
 
 <hr> 
 
@@ -56,534 +55,68 @@
     </full-calendar>
   </div>
 
-
   <!-- Modal Login -->
-
-  <div class="modal fade" id="loginModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[2] }">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content bg-dark text-white">
-  
-        <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm">
-          <div class="modal-header">
-            <h5 class="modal-title">Iniciar Sesión</h5>
-            <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-12 col-md-12">
-                <label class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" [(ngModel)]="loginData.email" name="loginData.email">
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col-12 col-md-12">
-                <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" [(ngModel)]="loginData.password" name="loginData.password">
-              </div>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary">Entrar</button>
-              <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>
-            </div>
-          </div>
-        </form>
-  
-      </div>
-    </div>
-  </div>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <app-login-modal
+    *ngIf="mostrarLogin"
+    (logged)="onLogin($event)"
+    (close)="mostrarLogin = false">
+  </app-login-modal>   
 
   
-  <!-- Modal Registro Insert o Update -->
-  <div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[1] || modalVisible[3] }">
-    <div class="modal-dialog">
-      <div class="modal-content bg-dark text-white">
-        <div class="modal-header">
-          <h5 class="modal-title" id="registerModalLabel">{{ finestra == 1 ? 'Registrarse' : 'Actualizarse' }}</h5>
-          <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
-        </div>
-        <div class="modal-body">
-          <form (ngSubmit)="onRegisterSubmit()"  #Registreform="ngForm">
-            <div class="row">
-              <div class="col-md-12">
-                <label class="form-label">Nombre</label>
-                <input type="email" class="form-control" [(ngModel)]="registerData.nom"                
-                       required minlength="3" maxlength="50" 
-                       #nomField="ngModel"
-                       name="nom" id="nom">
-                       @if(nomField.invalid && nomField.touched) {      
-                         @if(nomField.errors?.['required']) {
-                           <div class="invalido">Rellene el nombre.</div>
-                         }
-                         @if(nomField.errors?.['minlength']) {
-                           <div class="invalido">Mínimo obligado. {{ nomField.errors?.['minlength'].requiredLength }}</div>
-                         }
-                         @if(nomField.errors?.['maxlength']) {
-                           <div class="invalido">Màximo obligado. {{ nomField.errors?.['maxlength'].requiredLength }}</div>
-                         }    
-                       }            
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">                        
-                <label class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" [(ngModel)]="registerData.email"
-                       required minlength="3" maxlength="50" 
-                       #emailField="ngModel"
-                       name="email" id="email">
-                       @if(emailField.invalid && emailField.touched) {      
-                          @if(emailField.errors?.['required']) {
-                            <div class="invalido">Rellene el correou electrónico.</div>
-                          }
-                          @if(emailField.errors?.['minlength']) {
-                            <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
-                          }
-                          @if(emailField.errors?.['maxlength']) {
-                            <div class="invalido">Màximo obligado. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
-                          }    
-                       }            
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">                                                
-                <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" [(ngModel)]="registerData.password"
-                       required minlength="3" maxlength="8" 
-                       #passwordField="ngModel"
-                       name="password" id="password">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Confirmar contraseña</label>
-                <input type="password" class="form-control" [(ngModel)]="registerData.confirm"
-                      #confirmField="ngModel"
-                      name="confirm" id="confirm">              
-              </div>     
-              
-              @if(passwordField.invalid && passwordField.touched) {      
-                @if(passwordField.errors?.['required']) {
-                  <div class="invalido">Rellene la contraseña.</div>
-                }
-                @if(passwordField.errors?.['minlength']) {
-                  <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
-                }
-                @if(passwordField.errors?.['maxlength']) {
-                  <div class="invalido">Màximo obligado. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
-                }    
-              }            
+  <!-- Registar Insert / Update -->
+  <app-register-modal 
+    *ngIf="mostrarRegister"
+    [user]="registerData"
+    (saved)="onUserUpdated($event)"
+    (close)="mostrarRegister = false">
+  </app-register-modal>
 
-              <div *ngIf="confirmField.touched && !passwordsMatch()" class="text-danger mt-1">
-                   <div class="invalido">Las contraseñas no coinciden.</div>
-              </div>
-            </div>
-            <hr> 
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success mr-2" [disabled]="!Registreform.valid || !passwordsMatch()">{{ finestra == 1 ? 'Registrarse' : 'Actualizarse' }}</button>
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  
+  <!-- Mostrar dia -->
+  <app-mostrar-dia-modal
+    *ngIf="mostrarDia"
+    [dia]="dia"
+    [miraDia]="mira_dia"
+    (close)="mostrarDia = false">
+  </app-mostrar-dia-modal>
 
   <!-- Modal Sala -->
-  <div class="modal fade" id="salaModal" tabindex="-1" [ngClass]="{ 'show d-block': modalVisible[99] }">
-    <div class="modal-dialog">
-      <div class="modal-content bg-warning">
-        <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Sala</h5>
-          <button type="button" class="btn-close btn-close-white" (click)="tancarModal()"></button>
-        </div>
-        <div class="modal-body">                   
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Nombre</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.descripcio" disabled name="descripcio" id="descripcio">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Edificio</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.nom_edifici" disabled name="nom_edifici" id="nom_edifici">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <label>Capacidad</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.max_ocupacio" disabled name="max" id="max">
-                </div>       
-                <div class="col-md-4">
-                  <label>Horario</label>
-                  <select class="form-select" [(ngModel)]="salaSeleccionado.horari" name="horari" id="horari" disabled>
-                        <option value="1">1 hora</option>
-                        <option value="2">½ hora</option>
-                  </select>
-                </div>         
-                <div class="col-md-4">
-                  <label>{{ salaSeleccionado.horari == '2' ? 'Precio ½ hora' : 'Precio hora' }}</label>
-                  <input type="text" class="form-control" [(ngModel)]="salaSeleccionado.preu" disabled name="preu" id="preu">
-                </div>                                                
-              </div>
-              <div class="row p-2">
-                <img src="{{ salaSeleccionado.imatge }}" class="card-img-top" alt="Foto del edificio">           
-              </div>
-              @if(salaSeleccionado.missatge) {
-                <div class="row border rounded mt-4 bg-danger p-2">
-                  <div class="col-md-12">                    
-                    <h5>{{ salaSeleccionado.missatge }}</h5>
-                  </div>
-                </div>
-              }  
-            </div>
-            <hr>
-            <div class="col-md-12">                                              
-                  <table class="table table-striped table-bordered">
-                      <thead class="table-dark">
-                        <tr>        
-                          <th>Complementos</th>
-                          <th>Precio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                          @for(comple of complements;  track comple.id; let id_comple = $index) {
-                            <tr>        
-                                <td class="w-40">{{ comple.descripcio }}</td>      
-                                <td class="w-10 text-end">{{ comple.preu | PipePreu }} €</td>
-                            </tr>
-                          }
-                      </tbody>
-                  </table>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between">               
-                <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
-            </div>         
-        </div>
-      </div>
-    </div>
-  </div>
-
-
+  <app-sala-modal
+  *ngIf="mostrarSala"
+    [sala]="salaSeleccionado"
+    [complements]="complements"
+    (close)="mostrarSala = false">
+  </app-sala-modal>
+  
 <!-- Reserva modal -->
-<div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block':  modalVisible[90] }">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Reserva Sala</h5>
-        <button type="button" class="btn-close" (click)="tancarModal()"></button>
-      </div>
+<app-reserva-modal         
+  *ngIf="mostrarReserva"
+  [form]="reservaForm"
+  [sales]="sales"
+  [complements]="complements"
+  [miraDia]="mira_dia"
+  [mostrarHourGrid]="mostrarHourGrid"
+  [mostrarPeu]="mostrarPeu"
+  [preuTotal]="preu_sala_total"
+  [errorEntrada]="errorEntrada"
+  [missatge]="missatge"
+  [altaReserva]="alta_reserva"
+  [selectedComplements]="selectedComplements"
+  [isNew]="alta_reserva === '0'"
+  [totalPrecio]="preu_sala_total"
+  [canDelete]="canDeleteReserva()"
+  [hasError]="errorEntrada !== ''"
+  [showReviews]="verResenas"
+  [erroresConsulta]="datosConsulta"
+  (close)="tancarSala()"
+  (save)="desarSala()"
+  (saveOpinion)="guardarOpinion()"
+  (frecuenciaChange)="reserva(false)"
+  (salaChange)="actualizarMaximo()"
+  (changeSala)="actualizarMaximo()"
+  (toggleHora)="triaHora($event)"
+  (toggleComplement)="onToggleComplement($event)"
+  (borrar)="treureSala()"
+  (opinion)="ponOpinion()">  
+</app-reserva-modal>
 
-      <form  [formGroup]="reservaForm" (ngSubmit)="saveReserva()">
-        <div class="modal-body container-fluid"> 
-          <div class="row d-none">
-            <div class="col-md-3 mr-2">               
-                <label>id_usuari:</label>                    
-                <input type="text" class="form-control" id="id_user" formControlName="id_user">            
-            </div>                         
-          </div>
-          <div class="row">
-            <div class="col-md-3 mr-2">               
-                <label>Fecha Incial:</label>                    
-                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial">            
-            </div>
-            <div class="col-md-3 mr-2">               
-                <label>Fecha Final:</label>                    
-                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal">              
-            </div>                        
-          </div>
-          <div class="row">
-            <div class="col-md-3 mr-2">              
-                <label>Frecuencia:</label>
-                <select class="form-control" id="frecuencia" formControlName="frecuencia" (change)="saveReserva()">
-                  <option value="diaria">Diaria</option>
-                  <option value="semanal">Semanal</option>
-                  <option value="mensual">Mensual</option>
-                </select>              
-            </div>      
-            <!-- Semanal -->
-            <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'semanal'">              
-                <label>Dias de la semana: </label>
-                <div formGroupName="diasSemana" class="d-flex flex-wrap gap-3">                  
-                  <label><input type="checkbox" formControlName="lunes" (change)="saveReserva()"> Lunes </label>
-                  <label><input type="checkbox" formControlName="martes" (change)="saveReserva()"> Martes</label>
-                  <label><input type="checkbox" formControlName="miercoles" (change)="saveReserva()"> Miercoles</label>
-                  <label><input type="checkbox" formControlName="jueves" (change)="saveReserva()"> Jueves</label>
-                  <label><input type="checkbox" formControlName="viernes" (change)="saveReserva()"> Viernes</label>
-                  <label><input type="checkbox" formControlName="sabado" (change)="saveReserva()"> Sabado</label>
-                  <label><input type="checkbox" formControlName="domingo" (change)="saveReserva()"> Domingo</label>
-                </div>              
-            </div>                   
-            <!-- Mensual -->
-            <div class="col-md-8 mr-2 border mt-2" *ngIf="reservaForm.get('frecuencia')?.value === 'mensual'">              
-                <label for="fecha">Opciones Mensuales:</label>
-                <div class="row" formGroupName="mensualidad">
-                  <!-- Radio -->
-                  <div class="col-md-4 mr-2">
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" id="tipo1" name="tipo" value="1" formControlName="tipo">
-                      <label class="form-check-label" for="byDay">Cada Día </label>
-                    </div>
-                    <div class="form-check mt-2">
-                      <input class="form-check-input" type="radio" id="tipo2" name="tipo" value="2" formControlName="tipo">
-                      <label class="form-check-label" for="byPeriodicity">El </label>
-                    </div>                
-                  </div>
-                  <!-- Valores -->
-                  <div class="col-md-8 mr-2">
-                    <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 1">                   
-                      <div class="row">
-                      <div class="col-md-4 mr-2">
-                        <input type="number" id="numeroDia" class="form-control" formControlName="numeroDia" min="1" max="31" (change)="saveReserva()">
-                      </div>
-                      <div class="col-md-4">
-                        <label> de cada mes</label>
-                      </div>
-                      </div>
-                    </div>      
-                    <div *ngIf="reservaForm.get('mensualidad.tipo')?.value == 2" class="mt-2">
-                      <div class="row">
-                        <div class="col-md-4 mr-2">                    
-                            <select id="periodo" class="col-md-2 mr-2 form-control" formControlName="periodo">                    
-                              <option value="primer">Primer</option>
-                              <option value="segundo">Segundo</option>
-                              <option value="tercer">Tercer</option>
-                              <option value="cuarto">Cuarto</option>
-                              <option value="ultimo">Último</option>
-                            </select>                       
-                        </div>
-                        <div class="col-md-4 mr-2">                    
-                            <select id="diaSemana" class="form-control" formControlName="diaSemana">                    
-                              <option value="lunes">Lunes</option>
-                              <option value="martes">Martes</option>
-                              <option value="miercoles">Miercoles</option>
-                              <option value="jueves">Jueves</option>
-                              <option value="viernes">Viernes</option>
-                              <option value="sabado">Sabado</option>
-                              <option value="domingo">Domingo</option>
-                            </select>                                        
-                        </div>    
-                        <div class="col-md-4 mr-2">                    
-                          <label> de cada mes</label>
-                        </div>                    
-                      </div>
-                    </div>                                                          
-                  </div>
-                </div>
-            </div>                      
-          <hr class="mt-2">
-          <div class="row">  
-            <div class="col-md-4 mr-2">               
-                 <label for="sala">Sala:</label>
-                 <select class="form-control" id="sala_reserva" formControlName="sala_reserva" (change)="actualizarMaximo()">
-                    @for (sala of sales; track sala.id; let id_sala = $index) {
-                      <option value="{{ sala.id}}"> {{ sala.descripcio }}</option>'
-                    }
-                 </select>               
-            </div>   
-          </div>  
-          <div class="row">
-            <div class="col-md-2 mr-2"> 
-                <label for="fecha">Capacidad:</label>                    
-                <input type="input" class="form-control" id="max_sala" formControlName="max_sala" >
-            </div>
-            <div class="col-md-2 mr-2"> 
-                <label for="fecha">Horario:</label>        
-                <select class="form-select" id="horari_sala" formControlName="horari_sala" >
-                      <option value="1">1 hora</option>
-                      <option value="2">½ hora</option>
-                </select>                                                    
-            </div>       
-            <div class="col-md-2 ms-auto" *ngIf="alta_reserva == '0'"> 
-              <button type="button" class="btn btn-secondary" (click)="tancarModal()">Salir</button>                                             
-            </div>
-          </div>   
-          <div *ngIf="mostrarHourGrid">
-            @for(mira of mira_dia;track mira.id) {                         
-              <div class="row text-center mt-2">
-                  @for(col of mira.items;track $index) {
-                    <button class="col-md-2 d-flex p-2 rounded text-white m-1"
-                        #horesSelected
-                        name="horesSelected"
-                        [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"                        
-                        [disabled]="alta_reserva !== '0'" 
-                        (click)="triaHora($event)">                                
-                    {{col.hora_inici}}
-                    </button>                    
-                  }                        
-              </div>
-              <hr>
-              <div class="row mb-2" *ngIf="(mostrarPeu)">
-                   @for(comple of complements;  track comple.id; let id_comple = $index) {
-                       <label>
-                         <input type="checkbox" (click)="sumaComplement('bg-warning')" 
-                                                 name = "chk_{{comple.id}}"
-                                                 #checkComplemento                                                         
-                                                 [checked]="selectedComplements.includes(+comple.id)"     
-                                                 [disabled]="(alta_reserva!= '0')"
-                                                 />                                                                                        
-                         {{ comple.descripcio }} - €{{ comple.preu }}
-                       </label>                            
-                   }                    
-              </div>              
-            }                   
-
-            <div class="container mt-3" *ngIf="mostrarPeu">
-              <div *ngIf="mostrarPeu">    
-                <h1 class="text-end">Precio {{ preu_sala_total | PipePreu }}</h1>   
-                <hr>                  
-                <div class="d-flex">                  
-                  <div>                    
-                    <button *ngIf="alta_reserva == '0'" type="button" class="btn btn-primary me-2" 
-                            [disabled]="errorEntrada != ''" (click)="desarSala()">
-                      Guardar</button>                              
-                    <button *ngIf="alta_reserva != '0'" type="button" class="btn btn-primary me-2"                                                         
-                            (click)="ponOpinion()">
-                      Reseñas</button>
-                    <button *ngIf="alta_reserva != '0' && id_usuari == reservaForm.get('id_user')?.value" 
-                            type="button" class="btn btn-danger me-2" 
-                            (click)="treureSala()">
-                      Borrar</button>
-                  </div>                            
-                  <div class="ms-auto">
-                    <button type="button" class="btn btn-secondary" 
-                            (click)="tancarModal()">
-                      {{ alta_reserva == '0' ? 'Salir' : 'Cancelar' }}</button>
-                  </div>
-                </div>      
-              </div>
-            </div>
-            @if(verResenas) {
-              <div class="container mt-2">                
-                  <h5 class="text-title">Tu opinión sobre la reserva</h5>
-                  <div class="mb-3">
-                    <label for="reseña" class="form-label">Opinión</label>
-                    <textarea id="opinion" class="form-control" rows="4" name="opinion" formControlName="opinion"></textarea>
-                  </div>                  
-                  <!-- Puntuación -->
-                  <div class="col-md-3 mb-3">
-                    <label for="puntuacion" class="form-label">Puntuación</label>
-                    <select id="puntuacion" class="form-select" name="puntuacion" formControlName="puntuacion">
-                      <option value="1">⭐</option>
-                      <option value="2">⭐⭐</option>
-                      <option value="3">⭐⭐⭐</option>
-                      <option value="4">⭐⭐⭐⭐</option>
-                      <option value="5">⭐⭐⭐⭐⭐</option>
-                    </select>
-                  </div>                                            
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" (click)="tancarOpinion()">Cancelar</button>
-                      <button type="button" class="btn btn-primary" (click)="guardarOpinion()">Enviar</button>
-                  </div>                  
-              </div>
-            }                        
-         </div>                            
-        </div>
-        @if(errorEntrada && alta_reserva == '0') {
-          <div class="row border rounded mt-4 bg-danger p-2 mb-2">
-            <div class="col-md-12">                    
-              <h5>{{ errorEntrada }}</h5>
-            </div>
-            
-            <div id="tabla-consulta" *ngIf="datosConsulta.length>0">
-              <table class="table table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th>Día Inicio</th>
-                    <th>Día Fin</th>                    
-                    <th>Hora Inicio</th>
-                    <th>Hora Fin</th>
-                  </tr>
-                </thead>
-                <tbody>          
-                  @for(datos of datosConsulta;track datos.dia_inici) {        
-                  <tr>
-                    <td>{{ datos.dia_inici }}</td>
-                    <td>{{ datos.dia_fi }}</td>                    
-                    <td>{{ datos.hora_inici }}</td>
-                    <td>{{ datos.hora_fi }}</td>
-                  </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-          </div>          
-        }
-        @if(missatge) {
-          <div class="row border rounded mt-4 bg-warning p-2">
-            <div class="col-md-12">                    
-              <h5>{{ missatge }}</h5>
-            </div>
-          </div>
-        }                        
-        </div>
-      </form>
-         
-    </div>  
-  </div>
-</div>    
-
-<!-- Mostrar dia -->
-<div class="modal fade" tabindex="-1" [ngClass]="{ 'show d-block':  modalVisible[80] }">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Dia {{ dia | PipeFecha }}</h5>
-        <button type="button" class="btn-close" (click)="tancarModal()"></button>
-      </div>
-      <div class="modal-body container-fluid text-center">     
-        <div class="row">
-          @for(mira of mira_dia;track mira.id) {
-            <div class="col-md-6">
-               <strong>{{mira.id}}</strong>
-                <div class="row">
-                 @for(col of mira.items;track $index) {
-                      <div class="col-md-3 d-flex p-2 rounded text-white m-1"
-                         [ngClass]="col.estado === 'No informado' ? 'bg-success' : 'bg-danger'"
-                      >
-                        {{col.hora_inici}}
-                      </div>
-                  }
-                </div>
-           </div>                      
-          }
-        </div>   
-        <hr>
-        <div class="d-flex justify-content-between">               
-             <button type="button" class="btn btn-danger" (click)="tancarModal()">Salir</button>            
-        </div>
-      </div>    
-    </div>
-</div>

@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule, NgClass, NgIf } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ComentariService } from '../../service/comentaris.service';
 import { Comentaris } from '../../models/comentaris.model';
 import { FormsModule } from '@angular/forms';
@@ -10,24 +10,28 @@ import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'app-comentaris',
+  standalone: true,
   templateUrl: './comentaris.component.html',
-  imports: [CommonModule, FormsModule, NgxPaginationModule],
   styleUrls: ['./comentaris.component.css'],
+  imports: [CommonModule, FormsModule, NgxPaginationModule],
 })
-export class ComentarisComponent {
+export class ComentarisComponent implements OnInit {
   comentarios: Comentaris[] = [];
+  comentariosFiltrados: Comentaris[] = [];
   filtroSala: string = '0';
   filtroUsuario: string = '';
-  public paginaActual: number = 1;
-  public sales = [new Sales()];
-  public grafico: any;
+  paginaActual = 1;
+  sales: Sales[] = [];
+  grafico!: Chart;
 
-  constructor(
-    private comentariService: ComentariService,
-    private salesService: SalesService
-  ) {}
+  constructor(private comentariService: ComentariService, private salesService: SalesService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadComentarios();
+    this.loadSales();
+  }
+
+  private loadComentarios(): void {
     this.comentariService.getComentarios().subscribe((data) => {
       this.comentarios = data.sort((a, b) => {
         if (a.nom === b.nom) {
@@ -35,68 +39,79 @@ export class ComentarisComponent {
         }
         return a.nom.localeCompare(b.nom);
       });
+      this.applyFilters();
+      this.createOrUpdateChart();
     });
-    this.getSales();
-    this.creaGrafico();
   }
 
-  getSales() {
-    // Complements
+  private loadSales(): void {
     this.salesService.getSales().subscribe({
-      next: (data) => {
-        this.sales = data;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-      complete: () => {
-        console.log('Ok');        
-      },
+      next: (data) => (this.sales = data),
+      error: (err) => console.error(err),
     });
-  }
-  getComentariosFiltrados() {
-    let filtrados = this.comentarios.filter((c) => {
-      let coincideSala =
-        this.filtroSala === '0' || c.descripcio.includes(this.filtroSala);
-      let coincideUsuario =
-        this.filtroUsuario === '' || c.nom.includes(this.filtroUsuario);
-      return coincideSala && coincideUsuario;
-    });
-    this.actualizarGrafico(filtrados);
-    return filtrados;
   }
 
-  creaGrafico() {
-    this.grafico = new Chart('general', {
+  applyFilters(): void {
+    this.comentariosFiltrados = this.comentarios.filter((c) => {
+      const salaOk = this.filtroSala === '0' || c.descripcio.includes(this.filtroSala);
+      const usuarioOk =  !this.filtroUsuario || c.nom.toLowerCase().includes(this.filtroUsuario.toLowerCase());
+      return salaOk && usuarioOk;
+    });
+    this.updateChartData();
+  }
+
+  private createOrUpdateChart(): void {
+    const ctx = document.getElementById('comentariosChart') as HTMLCanvasElement;
+    this.grafico = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [
-          'Sin Puntuar',
-          'Un Punto',
-          'Dos Puntos',
-          'Tres Puntos',
-          'Cuatro Puntos',
-          'Cinco Puntos',
+          'Sin puntuar',
+          '1 punto',
+          '2 puntos',
+          '3 puntos',
+          '4 puntos',
+          '5 puntos',
         ],
         datasets: [
           {
             label: 'Puntuaciones',
             data: [0, 0, 0, 0, 0, 0],
-            backgroundColor: ['green', 'red', 'blue', 'yellow', 'pink', 'orange'],
+            backgroundColor: [
+              '#6c757d',
+              '#dc3545',
+              '#fd7e14',
+              '#ffc107',
+              '#198754',
+              '#0d6efd',
+            ],
           },
         ],
       },
-    });    
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 },
+          },
+        },
+      },
+    });
+    this.updateChartData();
   }
 
-  actualizarGrafico(filtrats: Comentaris[]) {
-    const cero = filtrats.filter((c) => c.puntuacio == 0).length;
-    const uno = filtrats.filter((c) => c.puntuacio == 1).length;
-    const dos = filtrats.filter((c) => c.puntuacio == 2).length;
-    const tres = filtrats.filter((c) => c.puntuacio == 3).length;
-    const cuatro = filtrats.filter((c) => c.puntuacio == 4).length;
-    const cinco = filtrats.filter((c) => c.puntuacio == 5).length;
-    this.grafico.data.datasets[0].data = [cero, uno, dos, tres, cuatro, cinco];           
-    this.grafico.update();    
+  private updateChartData(): void {
+    if (!this.grafico) return;
+    const counts = [0, 0, 0, 0, 0, 0];
+    this.comentariosFiltrados.forEach((c) => {
+      const p = Number(c.puntuacio);
+      if (p >= 0 && p <= 5) { counts[p]++; }
+    });
+    this.grafico.data.datasets[0].data = counts;
+    this.grafico.update();
   }
 }

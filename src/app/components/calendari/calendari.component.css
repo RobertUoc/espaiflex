@@ -11,9 +11,15 @@
     border-color: #ffc107;    
   }
   
-
-
-
+  .bg-image {
+    background: url('/assets/portada.jpg') center / cover no-repeat;
+  }
+  
+  .overlay {
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 0;
+  }
+  
 
 
 

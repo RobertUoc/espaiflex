@@ -71,7 +71,7 @@ class SalesAPI {
             $id = $this->limpiarInt($_GET['id']);
             if (!$id) return $this->json(["error" => "ID inválido"]);
             $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, sal.id_edifici, sal.preu, sal.actiu, sal.color, sal.missatge, sal.max_ocupacio, sal.horari, sal.imatge,
-                                          edi.nom as nom_edifici
+                                          edi.nom as nom_edifici,0 as reservas_mes
                                      FROM _t_sales sal
                                      LEFT JOIN _t_edificis edi ON (sal.id_edifici = edi.id)
                                      WHERE sal.id = ?");
@@ -83,10 +83,12 @@ class SalesAPI {
             $tots = 1;
             $id = $this->limpiarInt($_GET['edifici']);            
             $stmt = $this->db->prepare("SELECT sal.id, sal.descripcio, sal.id_edifici, sal.preu, sal.actiu, sal.color, sal.missatge, sal.max_ocupacio, sal.horari, sal.imatge,
-                                          edi.nom as nom_edifici
+                                          edi.nom as nom_edifici,COUNT(res.id) AS reservas_mes
                                      FROM _t_sales sal
                                      LEFT JOIN _t_edificis edi ON (sal.id_edifici = edi.id)
-                                     WHERE sal.id_edifici = ?");
+                                     LEFT JOIN _t_reserves res  ON res.sala = sal.id AND res.data_delete IS NULL AND res.dia_inici <= LAST_DAY(CURDATE()) AND res.dia_fi >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+                                     WHERE sal.id_edifici = ?
+                                     GROUP BY sal.id");
             $stmt->execute([$id]);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $this->json($data);

@@ -13,6 +13,7 @@ export class LoginModalComponent {
 
   @Output() logged = new EventEmitter<Users>();
   @Output() close = new EventEmitter<void>();
+  @Output() registrarse = new EventEmitter<void>();
 
   loginData = {
     email: '',

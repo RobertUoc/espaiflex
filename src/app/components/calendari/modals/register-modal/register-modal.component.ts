@@ -18,14 +18,22 @@ export class RegisterModalComponent {
   registerData = new Users();
   finestra = 1; // 1 = insert, 3 = update
 
-  constructor(private userService: UsersService) {}
+  constructor(private userService: UsersService) { }
+
+  ngOnInit(): void {
+    if (this.registerData.id == '0') {
+      this.registerData.nom = '';
+      this.registerData.email = '';
+      this.registerData.password = '';    
+      this.registerData.confirm = '';
+    }
+  }
 
   ngOnChanges() {
     if (this.user) {      
       this.registerData = { ...this.user };
     }
   }
-
 
   onRegisterSubmit() {
     const action$ = this.isUpdate()

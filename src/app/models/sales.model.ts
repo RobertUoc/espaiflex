@@ -10,6 +10,7 @@ export class Sales {
     public missatge: string = '',
     public max_ocupacio: string = '1',
     public horari: string = '1',
-    public imatge:string = "",      
+    public imatge:string = "",    
+    public reservas_mes: number = 0  
   ) {}  
 }

@@ -1,67 +1,193 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light">
-  <div class="container-fluid">
-    <!-- Botón hamburguesa -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuOpciones"
-      aria-controls="menuOpciones" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <!-- Menú colapsable -->
-    <div class="collapse navbar-collapse" id="menuOpciones">      
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item">
-            <button type="button" class="btn btn-link nav-link menu-btn"  (click)="mostrarRegister = true" [ngClass]="{ 'd-none': id_usuari != 0 }">Registrarse</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" class="btn btn-link nav-link menu-btn" (click)="abrirActualizar()" [ngClass]="{ 'd-none': id_usuari === 0 }">Actualizarse</button>
-        </li>
-        <li class="nav-item" *ngIf="id_usuari === 0">
-            <button type="button" class="btn btn-link nav-link menu-btn" (click)="mostrarLogin = true">Identificarse</button>
-        </li>
-        <li class="nav-item" *ngIf="id_usuari != 0">
-          <button type="button" class="btn btn-link nav-link menu-btn" (click)="neteja()">Logout</button>
-        </li>       
-      </ul>      
-      <button type="button" class="btn btn-outline-danger" (click)="tornar()">Salir</button>
+<div class="container-fluid mt-2">
+  <div class="d-flex align-items-center">   
+    <div class="btn-group" role="group" aria-label="Admin menu">
+      <div [ngClass]="id_usuari === 0? 'ms-2 p-2 text-danger bg-dark rounded d-inline-block': 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">{{ usuari }}</div>
     </div>
-  </div>
-</nav>
-
-<div class="btn-group" role="group" aria-label="Admin menu">
-  <div [ngClass]="id_usuari === 0 ? 'ms-2 p-2 text-danger bg-dark rounded d-inline-block' : 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">
-      {{ usuari }}
-  </div>
-  <div>
-    <button type="button" class="ms-2 btn btn-success" (click)="reserva(true)" [ngClass]="{ 'd-none': id_usuari === 0 }">Nueva Reserva</button>
+    <button type="button" class="ms-auto btn btn-outline-danger" (click)="tornar()">Salir</button>
   </div>
 </div>
-
-<hr> 
-
-<div class="d-flex justify-content-center">
-    @for (sala of sales; track sala.id; let id_sala = $index) {
-      <button class="col-md-1 border border-secondary rounded ms-2 p-2 text-center" [ngStyle]="{ 'background-color': sala.color }" (click)="getSala( sala.id )">{{sala.descripcio}}</button>
-    }
-</div>
-
 
 <hr>
 
-  <div class='container-fluid mt-4'>
-    <full-calendar [options]='calendarOptions()' #calendar>
-      <ng-template #eventContent let-arg>
-        <b>{{ arg.timeText }}</b>
-        <i>{{ arg.event.title }}</i>
-      </ng-template>
-    </full-calendar>
+<!-- Calendario -->
+<div class='container-fluid mt-4'>
+  <full-calendar [options]='calendarOptions()' #calendar>
+    <ng-template #eventContent let-arg>
+      <b>{{ arg.timeText }}</b>
+      <i>{{ arg.event.title }}</i>
+    </ng-template>
+  </full-calendar>
+</div>
+
+<hr>
+
+
+
+<footer class="bg-light border-top py-3">
+
+  <div class="container-fluid">
+
+    <!-- TÍTULO -->
+    <h2 class="mb-3">Salas disponibles </h2>
+
+    <!-- CONTENIDO FOOTER -->
+    <div class="row align-items-start">
+
+      <!-- IZQUIERDA: SALAS -->
+      <div class="col">
+
+        <!-- CONTENEDOR SCROLLABLE -->
+        <div class="d-flex gap-3 overflow-auto pb-2">
+
+          @for (sala of sales; track sala.id) {
+            <div style="min-width: 220px; max-width: 220px;">
+
+              <div class="card h-100 border-secondary shadow-sm">
+
+                <!-- HEADER -->
+                <div
+                  class="card-header text-white px-3 py-2"
+                  [ngStyle]="{ 'background-color': sala.color }">
+
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-door-open-fill text-black"></i>
+                    <span class="fw-semibold small text-black">
+                      {{ sala.descripcio }}
+                    </span>
+                  </div>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-2">
+
+                  <p class="mb-1 small">
+                    <strong>Horario:</strong>
+                    {{ sala.horari=='1'?'1 hora':'½ hora' }}
+                    <strong>Capacidad:</strong>
+                    {{ sala.max_ocupacio }}
+                  </p>
+
+                  <p class="mb-2 text-muted small">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    {{ sala.reservas_mes }} reservas
+                  </p>
+
+                  <div class="d-grid">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                      (click)="getSala(sala.id)">
+                      Ver sala
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- DERECHA: ACCIÓN PRINCIPAL -->
+      <div class="col-auto d-flex align-items-start">
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="reserva(true)"
+          *ngIf="id_usuari !== 0">
+          <i class="bi bi-plus-lg me-1"></i>
+          Nueva Reserva
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="mostrarLogin = true"
+          *ngIf="id_usuari === 0">
+          <i class="bi bi-plus-lg me-1"></i>
+          Nueva Reserva
+        </button>
+
+      </div>
+
+    </div>
   </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Modal Login -->
   <app-login-modal
     *ngIf="mostrarLogin"
     (logged)="onLogin($event)"
+    (registrarse)="mostrarRegister = true"
     (close)="mostrarLogin = false">
   </app-login-modal>   
-
   
   <!-- Registar Insert / Update -->
   <app-register-modal 
@@ -71,7 +197,6 @@
     (close)="mostrarRegister = false">
   </app-register-modal>
 
-  
   <!-- Mostrar dia -->
   <app-mostrar-dia-modal
     *ngIf="mostrarDia"
@@ -82,41 +207,40 @@
 
   <!-- Modal Sala -->
   <app-sala-modal
-  *ngIf="mostrarSala"
+    *ngIf="mostrarSala"
     [sala]="salaSeleccionado"
     [complements]="complements"
     (close)="mostrarSala = false">
   </app-sala-modal>
   
-<!-- Reserva modal -->
-<app-reserva-modal         
-  *ngIf="mostrarReserva"
-  [form]="reservaForm"
-  [sales]="sales"
-  [complements]="complements"
-  [miraDia]="mira_dia"
-  [mostrarHourGrid]="mostrarHourGrid"
-  [mostrarPeu]="mostrarPeu"
-  [preuTotal]="preu_sala_total"
-  [errorEntrada]="errorEntrada"
-  [missatge]="missatge"
-  [altaReserva]="alta_reserva"
-  [selectedComplements]="selectedComplements"
-  [isNew]="alta_reserva === '0'"
-  [totalPrecio]="preu_sala_total"
-  [canDelete]="canDeleteReserva()"
-  [hasError]="errorEntrada !== ''"
-  [showReviews]="verResenas"
-  [erroresConsulta]="datosConsulta"
-  (close)="tancarSala()"
-  (save)="desarSala()"
-  (saveOpinion)="guardarOpinion()"
-  (frecuenciaChange)="reserva(false)"
-  (salaChange)="actualizarMaximo()"
-  (changeSala)="actualizarMaximo()"
-  (toggleHora)="triaHora($event)"
-  (toggleComplement)="onToggleComplement($event)"
-  (borrar)="treureSala()"
-  (opinion)="ponOpinion()">  
-</app-reserva-modal>
-
+  <!-- Reserva modal -->
+  <app-reserva-modal         
+    *ngIf="mostrarReserva"
+    [form]="reservaForm"
+    [sales]="sales"
+    [complements]="complements"
+    [miraDia]="mira_dia"
+    [mostrarHourGrid]="mostrarHourGrid"
+    [mostrarPeu]="mostrarPeu"
+    [preuTotal]="preu_sala_total"
+    [errorEntrada]="errorEntrada"
+    [missatge]="missatge"
+    [altaReserva]="alta_reserva"
+    [selectedComplements]="selectedComplements"
+    [isNew]="alta_reserva === '0'"
+    [totalPrecio]="preu_sala_total"
+    [canDelete]="canDeleteReserva()"
+    [hasError]="errorEntrada !== ''"
+    [showReviews]="verResenas"
+    [erroresConsulta]="datosConsulta"
+    (close)="tancarSala()"
+    (save)="desarSala()"
+    (saveOpinion)="guardarOpinion()"
+    (frecuenciaChange)="reserva(false)"
+    (salaChange)="actualizarMaximo()"
+    (changeSala)="actualizarMaximo()"
+    (toggleHora)="triaHora($event)"
+    (toggleComplement)="onToggleComplement($event)"
+    (borrar)="treureSala()"
+    (opinion)="ponOpinion()">  
+  </app-reserva-modal>

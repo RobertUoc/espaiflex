@@ -14,9 +14,7 @@
                <strong>{{mira.id}}</strong>
                 <div class="row">
                  @for(col of mira.items;track $index) {
-                      <div class="col-md-3 d-flex p-2 rounded text-white m-1"
-                         [ngClass]="getHoraClass(col.estado)"
-                      >
+                      <div class="col-md-3 d-flex p-2 rounded text-white m-1" [ngClass]="getHoraClass(col.estado)">
                         {{col.hora_inici}}
                       </div>
                   }

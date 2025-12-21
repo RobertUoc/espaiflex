@@ -76,7 +76,7 @@ export class CalendariComponent implements OnInit {
     email: '',
     password: '',
   };
-  private TODAY_STR = new Date().toISOString().replace(/T.*$/, ''); // Avui
+  public TODAY_STR = new Date().toISOString().replace(/T.*$/, ''); // Avui
   public modalVisible = [false];
   public registerData = new Users();
   public eventGuid: number = 0;
@@ -148,7 +148,7 @@ export class CalendariComponent implements OnInit {
       },
       initialView: 'dayGridMonth',
       contentHeight: 'auto',
-      aspectRatio: isMobile ? 0.7 : 1.5,
+      aspectRatio: isMobile ? 0.7 : 1.4,
       events: this.eventos(),
       locale: 'es',
       locales: [esLocale],
@@ -256,6 +256,7 @@ export class CalendariComponent implements OnInit {
         console.log(error);
       },
       complete: () => {
+        console.log(this.sales);
         console.log('Ok');
       },
     });
@@ -275,7 +276,8 @@ export class CalendariComponent implements OnInit {
           data.missatge,
           data.max_ocupacio,
           data.horari,
-          data.imatge
+          data.imatge,
+          data.reservas_mes
         );
       },
       error: (error) => {
@@ -422,17 +424,8 @@ export class CalendariComponent implements OnInit {
   private calcularHoraFinal(horari: string, hora_inici: string): string {
     const [hora, minuto] = hora_inici.split(':');
     const horaNum = +hora;
-    let horaFinal = `${hora.padStart(2, '0')} a ${(horaNum + 1)
-      .toString()
-      .padStart(2, '0')}`;
-    if (horari == '2') {
-      horaFinal =
-        minuto === '00'
-          ? `${hora}:00 a ${hora}:30`
-          : `${hora}:${minuto} a ${(horaNum + 1)
-              .toString()
-              .padStart(2, '0')}:00`;
-    }
+    let horaFinal = `${hora.padStart(2, '0')} a ${(horaNum + 1).toString().padStart(2, '0')}`;
+    if (horari == '2') { horaFinal = minuto === '00'  ? `${hora}:00 a ${hora}:30` : `${hora}:${minuto} a ${(horaNum + 1).toString().padStart(2, '0')}:00`; }
     return horaFinal;
   }
 
@@ -441,23 +434,16 @@ export class CalendariComponent implements OnInit {
     //
     let inici = '0';
     horaFinal = this.calcularHoraFinal(this.horari, item.hora_inici);
-    if (!this.horas.includes(horaFinal)) {
-      this.horas.push(horaFinal);
-    }
+    if (!this.horas.includes(horaFinal)) { this.horas.push(horaFinal); }
     inici = horaFinal.substring(0, 2);
-    if (item.estado != 'No informado') {
-      compara = item.estado.substring(0, 2);
-    }
-    if (inici < compara) {
-      item.estado = compara;
-    }
+    if (item.estado != 'No informado') { compara = item.estado.substring(0, 2); }
+    if (inici < compara) { item.estado = compara; }
     this.agrupado[item.descripcio].push({
       hora_inici: horaFinal,
       estado: item.estado, 
       cssClass: item.estado === 'No informado' ? 'bg-success' : 'bg-danger',
       seleccionada: false
     });
-
     return compara;
   }
 
@@ -473,6 +459,8 @@ export class CalendariComponent implements OnInit {
             compara = '0';
           }
           // Crear Capcelera
+          console.log(item);
+          this.horari = item.tipus;
           compara = this.CrearBotons(item, compara);
         });
         this.horas = this.horas.sort();
@@ -485,7 +473,7 @@ export class CalendariComponent implements OnInit {
         console.log(error);
       },
       complete: () => {
-        console.log('Ok');
+        console.log('Dia Ok');
       },
     });
     const calendarApi = selectInfo.view.calendar;
@@ -516,16 +504,13 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {
         let dia_reserva = this.reservas[0];
-
         this.reservaForm.get('diasSemana')?.disable();
         this.reservaForm.get('sala_reserva')?.disable();
         this.reservaForm.get('mensualidad')?.disable();
-
         this.preu_sala_total = dia_reserva.import_sala;
         this.max_sala = dia_reserva.max_ocupacio;
         this.horari = dia_reserva.horari;
         this.missatge = dia_reserva.missatge;
-
         this.reservaForm.patchValue({
           id_user: dia_reserva.id_user,
           id: dia_reserva.id,
@@ -556,32 +541,20 @@ export class CalendariComponent implements OnInit {
       },
     });
     this.calendariService
-      .getMiraReserva(
-        this.data_reserva_ini,
-        this.sala_reserva,
-        clickInfo.event.id
-      )
+      .getMiraReserva(this.data_reserva_ini, this.sala_reserva, clickInfo.event.id)
       .subscribe({
-        next: (data) => {
-          this.creaHorari(data);
-        },
-        error: (error) => {
-          console.log(error);
-        },
+        next: (data) => { this.creaHorari(data); },
+        error: (error) => { console.log(error); },
         complete: () => {
           // Busco els complements de la sala
-          this.preu_sala =
-            this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+          this.preu_sala = this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
           this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
           this.mostrarHourGrid = true;
-
-          console.log('final');
-          
+          console.log('final');          
           this.recalcularPrecio();
           console.log(this.reservas);
           this.preu_sala_total = parseFloat(this.reservas[0].preu_sala);
-
           this.mostrarPeu = true;
           console.log('Lectura Ok');
         },
@@ -709,14 +682,12 @@ export class CalendariComponent implements OnInit {
     let El2 = this.reservaForm.get('mensualidad.diaSemana')?.value;
     this.data_reserva_ini = new Date(feInicial).toISOString().substring(0, 10);
     this.data_reserva_fin = new Date(feFinal).toISOString().substring(0, 10);
-    let color =
-      this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
-    let nom =
-      this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
-    const complements = this.checkboxes
-      .filter((cb) => cb.nativeElement.checked)
-      .map((cb) => cb.nativeElement.name.trim().split('_')[1])
-      .join('#');
+    let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
+    let nom   = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
+
+    // Carrego complements
+    const complements = this.selectedComplements.map(id => this.complements.find(c => +c.id === id)?.id).filter(Boolean).join('#');    
+
     // Agrupacio d'hores
     let ranges = [];
     let start = null;
@@ -742,7 +713,6 @@ export class CalendariComponent implements OnInit {
       const [h2, m2] = hora2.split(':').map(Number);
       return h2 * 60 + m2 - (h1 * 60 + m1);
     };    
-
     
     for (let i = 0; i < selectedHours.length; i++) {
       const inicio = selectedHours[i];
@@ -764,9 +734,6 @@ export class CalendariComponent implements OnInit {
     if (start !== null) {
       ranges.push({ inicio: start, final: end });
     }   
-
-
-    console.log(ranges);     
 
     let horaslibres = 0;    
     const observables = [];
@@ -806,7 +773,6 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {        
         console.log('Todas las peticiones se han completado.');
-
         if (horaslibres == 0) {
           this.errorEntrada = '';
           // Grabo Factura.
@@ -1212,6 +1178,7 @@ export class CalendariComponent implements OnInit {
     this.registerData = user;
     this.usuari = user.nom;
     this.id_usuari = Number(user.id);
+    this.reserva(true);
   }
 
   canDeleteReserva(): boolean {
@@ -1248,9 +1215,7 @@ export class CalendariComponent implements OnInit {
     let totalComplementos = 0;  
     for (const id of this.selectedComplements) {
       const comp = this.complements.find(c => +c.id === id);
-      if (comp) {
-        totalComplementos += comp.preu;
-      }
+      if (comp) { totalComplementos += comp.preu; }
     }  
     this.preu_sala_total += totalComplementos;  
     this.mostrarPeu = horasSeleccionadas.length > 0;
@@ -1260,11 +1225,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarPeu = false;
     this.errorEntrada = '';
     hora.seleccionada = !hora.seleccionada;
-    if (hora.seleccionada) {
-      hora.cssClass = 'bg-warning';
-    } else {
-      hora.cssClass = 'bg-success';
-    }
+    if (hora.seleccionada) { hora.cssClass = 'bg-warning'; } else { hora.cssClass = 'bg-success'; }
     this.recalcularPrecio();
   }
   
@@ -1273,9 +1234,7 @@ export class CalendariComponent implements OnInit {
       this.selectedComplements =
         this.selectedComplements.filter(id => id !== compleId);
     }     
-    else {
-      this.selectedComplements = [...this.selectedComplements, compleId];
-    }
+    else { this.selectedComplements = [...this.selectedComplements, compleId]; }
     this.recalcularPrecio();
   }
   

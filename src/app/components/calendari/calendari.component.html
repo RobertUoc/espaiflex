@@ -24,162 +24,51 @@
 
 
 <footer class="bg-light border-top py-3">
-
-  <div class="container-fluid">
-
-    <!-- TÍTULO -->
+  <div class="container-fluid">    
     <h2 class="mb-3">Salas disponibles </h2>
-
-    <!-- CONTENIDO FOOTER -->
     <div class="row align-items-start">
-
-      <!-- IZQUIERDA: SALAS -->
       <div class="col">
-
-        <!-- CONTENEDOR SCROLLABLE -->
         <div class="d-flex gap-3 overflow-auto pb-2">
-
           @for (sala of sales; track sala.id) {
             <div style="min-width: 220px; max-width: 220px;">
-
               <div class="card h-100 border-secondary shadow-sm">
-
                 <!-- HEADER -->
-                <div
-                  class="card-header text-white px-3 py-2"
-                  [ngStyle]="{ 'background-color': sala.color }">
-
+                <div class="card-header text-white px-3 py-2"  [ngStyle]="{ 'background-color': sala.color }">
                   <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-door-open-fill text-black"></i>
                     <span class="fw-semibold small text-black">
                       {{ sala.descripcio }}
                     </span>
                   </div>
-
                 </div>
-
                 <!-- BODY -->
                 <div class="card-body p-2">
-
                   <p class="mb-1 small">
                     <strong>Horario:</strong>
                     {{ sala.horari=='1'?'1 hora':'½ hora' }}
                     <strong>Capacidad:</strong>
                     {{ sala.max_ocupacio }}
                   </p>
-
                   <p class="mb-2 text-muted small">
                     <i class="bi bi-calendar-event me-1"></i>
                     {{ sala.reservas_mes }} reservas
                   </p>
-
                   <div class="d-grid">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-primary"
-                      (click)="getSala(sala.id)">
-                      Ver sala
-                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="getSala(sala.id)">Ver sala</button>
                   </div>
-
                 </div>
-
               </div>
             </div>
           }
-
         </div>
       </div>
-
-      <!-- DERECHA: ACCIÓN PRINCIPAL -->
       <div class="col-auto d-flex align-items-start">
-
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="reserva(true)"
-          *ngIf="id_usuari !== 0">
-          <i class="bi bi-plus-lg me-1"></i>
-          Nueva Reserva
-        </button>
-
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="mostrarLogin = true"
-          *ngIf="id_usuari === 0">
-          <i class="bi bi-plus-lg me-1"></i>
-          Nueva Reserva
-        </button>
-
+        <button type="button" class="btn btn-primary" (click)="reserva(true)" *ngIf="id_usuari !== 0"> <i class="bi bi-plus-lg me-1"></i>Nueva Reserva</button>
+        <button type="button" class="btn btn-primary" (click)="mostrarLogin = true" *ngIf="id_usuari === 0"><i class="bi bi-plus-lg me-1"></i>Nueva Reserva</button>
       </div>
-
     </div>
   </div>
 </footer>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   <!-- Modal Login -->
   <app-login-modal

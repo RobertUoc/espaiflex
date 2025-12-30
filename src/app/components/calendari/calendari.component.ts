@@ -50,8 +50,6 @@ import { MostrarDiaModalComponent } from './modals/mostrar-dia-modal/mostrar-dia
 import { SalaModalComponent } from './modals/sala-modal/sala-modal.component';
 import { ReservaModalComponent } from './modals/reserva-modal/reserva-modal.component';
 
-declare var bootstrap: any;
-
 @Component({
   selector: 'app-calendari',
   imports: [
@@ -255,8 +253,7 @@ export class CalendariComponent implements OnInit {
       error: (error) => {
         console.log(error);
       },
-      complete: () => {
-        console.log(this.sales);
+      complete: () => {        
         console.log('Ok');
       },
     });
@@ -304,23 +301,6 @@ export class CalendariComponent implements OnInit {
 
   tornar() {
     this.router.navigate(['/']);
-  }
-
-  neteja() {
-    this.registerData = new Users();
-    this.id_usuari = 0;
-    this.usuari = 'Visitante';   
-    this.closeMenu();
-  }
-
-  closeMenu() {
-    const menu = document.getElementById('menuOpciones');
-    if (menu) {
-      const bsCollapse = bootstrap.Collapse.getInstance(menu);
-      if (bsCollapse) {
-        bsCollapse.hide();
-      }
-    }
   }
 
   reserva(todo:boolean) {    
@@ -412,8 +392,7 @@ export class CalendariComponent implements OnInit {
       },
       complete: () => {
         // Busco els complements de la sala
-        this.preu_sala =
-          this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
+        this.preu_sala = this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
         this.getcomplement(this.sala_reserva);
         this.checkboxes.forEach((checkbox, i) => {});
         this.mostrarHourGrid = true;
@@ -534,7 +513,9 @@ export class CalendariComponent implements OnInit {
             diaSemana: dia_reserva.el_dia,
           },
         });
+        this.mostrarPeu = true;
         this.actualizarMaximo();             
+        this.mostrarPeu = true;
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
         this.preu_sala_total = parseFloat(dia_reserva.preu_sala);
@@ -694,7 +675,6 @@ export class CalendariComponent implements OnInit {
     let end = '';  
 
       let selectedHours: string[] = [];      
-
       this.mira_dia.forEach((bloque) => {
         bloque.items.forEach((hora: HoraItem) => {
           if (hora.seleccionada) {

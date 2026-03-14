@@ -1,0 +1,50 @@
+
+<div class="modal fade" [class.show]="visible" [style.display]="visible ? 'block' : 'none'" tabindex="-1" role="dialog" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h5 class="modal-title">FACTURA Nº {{ factura?.id }}</h5>
+          <button type="button" class="btn-close" (click)="tancarModal()"></button>
+        </div>
+       
+        <div class="modal-body" *ngIf="factura">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="fw-semibold">Cliente</h6>
+              <p class="mb-1">{{ factura.nom_user }}</p>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="fw-semibold">Sala</h6>
+              <p class="mb-1">{{ factura.nom_sala }}</p>
+            </div>
+          </div>
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <td>Base</td>
+                <td class="text-end">{{ factura.base | PipePreu }} €</td>
+              </tr>
+              <tr>
+                <td>IVA ({{ factura.iva }}%)</td>
+                <td class="text-end">{{ factura.iva_import | PipePreu }} €</td>
+              </tr>
+              <tr class="fw-bold">
+                <td>TOTAL</td>
+                <td class="text-end">{{ factura.total_factura | PipePreu }} €</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">          
+          <button type="button" class="btn btn-outline-secondary" (click)="tancarModal()">Cerrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Backdrop manual -->
+<div class="modal-backdrop fade show" *ngIf="visible"></div>
+

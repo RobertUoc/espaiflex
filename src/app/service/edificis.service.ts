@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { config } from '../models/config';
 import { Observable } from 'rxjs';
 import { Edificis } from '../models/edificis.model';
@@ -8,51 +8,46 @@ import { Edificis } from '../models/edificis.model';
   providedIn: 'root'
 })
 export class EdificisService {
-    public apiUrl: string = config.url;
+    public apiUrl: string = config.url + 'edificis';
+    private tokenApi: string = config.token;
 
     constructor( private http:HttpClient) { }
 
     // GET Leeer
     // POST guardar
-    // PUT actulatzar
-    // DELETE borrar
+    // PUT actulatzar    
 
-    getEdificis(): Observable<Edificis[]>  {
-      return this.http.get<Edificis[]>( this.apiUrl + 'edificis.php');      
+    getEdificis(): Observable<Edificis[]> {
+      return this.http.get<Edificis[]>(`${this.apiUrl}`);
     }
 
-    getEdifici(id:string): Observable<Edificis> {
-      console.log(this.apiUrl + 'edificis.php?id=' + id);
-      return this.http.get<Edificis>( this.apiUrl + 'edificis.php?id=' + id);      
-    }
-
-    getProvincies(id:string): Observable<[]> {      
-      return this.http.get<[]>( this.apiUrl + 'edificis.php?provincia=' + id);            
-    }
-
-    putEdifici(_id:string,_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string,_latitud:string,_longitud:string) {      
-      return this.http.put(this.apiUrl + 'edificis.php', {
-        id: _id,
-        nom: _nom,
-        idprovincia: _id_provincia,        
-        imatge: _imatge,
-        descripcio: _descripcio,
-        actiu: _actiu,        
-        latitud: _latitud,
-        longitud: _longitud
+    // GET: Un edificio por ID
+    getEdifici(id: string): Observable<Edificis> {
+      // Laravel prefiere /edificis/1, pero si quieres usar query params (?id=1) 
+      // se hace así para que coincida con tu controlador actual:
+      const params = new HttpParams().set('id', id);
+      return this.http.get<Edificis>(`${this.apiUrl}`, {         
+        params: params 
       });
     }
-    
-    insertEdifici(_nom:string,_id_provincia:string,_imatge:string,_descripcio:string,_actiu:string,_latitud:string,_longitud:string) {
-      return this.http.post(this.apiUrl + 'edificis.php', {
-        nom: _nom,
-        idprovincia: _id_provincia,
-        imatge: _imatge,
-        descripcio: _descripcio,
-        actiu: _actiu,
-        latitud: _latitud,
-        longitud: _longitud        
-      });     
+
+    // GET: Filtrar por provincia
+    getProvincies(nombreProvincia: string): Observable<Edificis[]> {
+      const params = new HttpParams().set('provincia', nombreProvincia);
+      return this.http.get<Edificis[]>(`${this.apiUrl}`, {         
+        params: params 
+      });
+    }
+
+    // POST: Insertar (Laravel usa la ruta base con método POST)
+    insertEdifici(edifici: any): Observable<any> {     
+      console.log(edifici); 
+      return this.http.post(`${this.apiUrl}`, edifici);
+    }
+
+    // PUT: Actualizar (Laravel usa /edificis/{id} con método PUT)
+    putEdifici(id: string, edifici: any): Observable<any> {
+      return this.http.put(`${this.apiUrl}/${id}`, edifici);
     }
     
 }

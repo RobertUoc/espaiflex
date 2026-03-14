@@ -1,7 +1,7 @@
 export class Calendario { 
 
     constructor(
-        public id: string = '0',
+        public id: number = 0,
         public dia_inici: Date = new Date(),
         public dia_fi: Date = new Date(),
         public hora_inici: string = '',

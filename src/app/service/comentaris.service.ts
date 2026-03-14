@@ -8,7 +8,7 @@ import { Comentaris } from '../models/comentaris.model';
   providedIn: 'root',
 })
 export class ComentariService {
-  public apiUrl: string = config.url;
+  public apiUrl: string = config.url+'comentaris';
 
   constructor(private http: HttpClient) {}
 
@@ -18,20 +18,22 @@ export class ComentariService {
   // DELETE borrar
 
   getComentarios(): Observable<Comentaris[]> {
-    return this.http.get<Comentaris[]>(this.apiUrl + 'comentaris.php');
+    return this.http.get<Comentaris[]>(this.apiUrl);
   }
+  
 
   insertComentari(
-    _id_reserves: string,
-    _id_user: number,
-    _comentari: string,
-    _puntuacio: string
-  ) {
-    return this.http.post(this.apiUrl + 'comentaris.php', {
-      id_reserves: _id_reserves,
-      id_user: _id_user,
-      comentari: _comentari,
-      puntacio: _puntuacio,
-    });
+      id_reserves: string,
+      id_user: number,
+      comentari: string,
+      puntuacio: number
+    ) {
+      return this.http.post(this.apiUrl, {
+        id_reserves,
+        id_user,
+        comentari,
+        puntuacio, 
+      });
   }
+
 }

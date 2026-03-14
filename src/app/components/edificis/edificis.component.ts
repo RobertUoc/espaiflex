@@ -6,6 +6,7 @@ import { ProvinciesService } from '../../service/provincies..service';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import e from 'cors';
 
 @Component({
   selector: 'app-edificis',
@@ -15,11 +16,11 @@ import { HttpClient } from '@angular/common/http';
 })
 export class EdificisComponent implements OnInit {
   // Arreglar
-  public edificis = [new Edificis()];
+  public edificis = [new Edificis('','',0,'','','',0,0,'')];
   public provincies = [new Provincia(0, '')];
   public id_edifici: string = '';
   public modalVisible = false;
-  public edificioSeleccionado = new Edificis();  
+  public edificioSeleccionado = new Edificis('','',0,'','','',0,0,'');  
   public selectedFile: File | null = null;
   public uploadedImageUrl: string | null = null;
   public base64: string = '';
@@ -66,15 +67,14 @@ export class EdificisComponent implements OnInit {
   obrirModal( id_edifici: string) {    
     this.modalVisible = true;    
     if (id_edifici == '0') {      
-      this.edificioSeleccionado = new Edificis();
+      this.edificioSeleccionado = new Edificis('','',null,'','SI','',0,0,'');
     }
     else {
       this.EdificisServeis.getEdifici(id_edifici).subscribe({
         next: data => {                 
-            this.edificioSeleccionado = new Edificis(data.id,data.nom,data.id_provincia,data.imatge,data.descripcio,data.actiu,data.latitud,data.longitud);    
+            this.edificioSeleccionado = new Edificis(data.id,data.nom,data.id_provincia,data.descripcio,data.actiu,'',data.latitud,data.longitud,data.imatge);    
             this.previewUrl = data.imatge;
-            this.imagenBase64 = 'data:image/jpeg;base64,' + data.imatge;
-            console.log(this.edificioSeleccionado);
+            this.imagenBase64 = 'data:image/jpeg;base64,' + data.imatge;            
         },
         error: error => {
           console.log(error);
@@ -88,61 +88,51 @@ export class EdificisComponent implements OnInit {
 
   tancarModal() {
     this.modalVisible = false;
+    // 🔥 reset imagen
+    this.selectedFile = null;
+    this.base64 = '';
+    this.previewUrl = '';
+    this.imagenBase64 = '';
+    // opcional: reset sala
+    this.edificioSeleccionado = new Edificis('','',0,'','','',0,0,'');    
   }
 
-  saveEdifici() {    
-    if (this.edificioSeleccionado.id == '0') {
-      // Insert
-      if (!this.selectedFile) {
-        this.base64 = this.previewUrl;
-        console.log('insert selected');
-      }
-      console.log('ALTA');            
-      this.EdificisServeis.insertEdifici(this.edificioSeleccionado.nom,
-        this.edificioSeleccionado.id_provincia,
-        this.base64,
-        this.edificioSeleccionado.descripcio,
-        this.edificioSeleccionado.actiu,
-        this.edificioSeleccionado.latitud,
-        this.edificioSeleccionado.longitud
-      ).subscribe(response => {        
+  saveEdifici() {
+    const isNew = !this.edificioSeleccionado.id || this.edificioSeleccionado.id == '0';
+    if (this.selectedFile) {
+      this.edificioSeleccionado.imatge = this.base64;
+    }
+    if (isNew) {
+      this.EdificisServeis.insertEdifici(this.edificioSeleccionado)
+        .subscribe(() => {
+          this.tancarModal();
+          this.getEdificis();
+        });
+    } else {
+      this.EdificisServeis.putEdifici(
+        this.edificioSeleccionado.id,
+        this.edificioSeleccionado
+      ).subscribe(() => {
         this.tancarModal();
         this.getEdificis();
       });
     }
-    else {
-      // Update
-      if (!this.selectedFile) {      
-        this.base64 = this.previewUrl;
-        console.log('update selected')
-      }      
-
-      this.EdificisServeis.putEdifici(this.edificioSeleccionado.id,
-        this.edificioSeleccionado.nom,
-        this.edificioSeleccionado.id_provincia,
-        this.base64,
-        this.edificioSeleccionado.descripcio,
-        this.edificioSeleccionado.actiu,        
-        this.edificioSeleccionado.latitud,
-        this.edificioSeleccionado.longitud
-      ).subscribe(response => {        
-        this.tancarModal();
-        this.getEdificis();
-      });
-    }    
   }
 
   onFileSeleccionada(event: any): void {
-    this.selectedFile = event.target.files[0];  
-    let nom_file = this.selectedFile?.name;
-    if (this.selectedFile) {            
-      const reader = new FileReader();      
-      reader.onload = (e: any) => {
-        this.previewUrl = e.target.result;        
-        this.base64 = reader.result as string;
-      };
-      reader.readAsDataURL(this.selectedFile);      
-    }
+    const file = event.target.files?.[0];
+    if (!file) return;
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.base64 = reader.result as string;
+      this.previewUrl = this.base64;
+      console.log('BASE64 generado:', this.base64);
+    };
+    reader.onerror = (error) => {
+      console.error('Error leyendo archivo:', error);
+    };
+    reader.readAsDataURL(file);
   }
 
 }

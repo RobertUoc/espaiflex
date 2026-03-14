@@ -38,7 +38,6 @@ import { CalendariService } from '../../service/calendari.service';
 import Swal from 'sweetalert2';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { of } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import esLocale from '@fullcalendar/core/locales/es';
@@ -94,7 +93,7 @@ export class CalendariComponent implements OnInit {
   public data_reserva_ini: string = '';
   public data_reserva_fin: string = '';
   public frecuencia: string = 'diaria';
-  public sala_reserva: string = '';
+  public sala_reserva: number = 0;
   public missatge: string = '';
   public errorEntrada: string = '';
   public max_sala: string = '1';
@@ -104,7 +103,7 @@ export class CalendariComponent implements OnInit {
     {};
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
-  public horari: string = '1';
+  public horari: number = 1;
   public selectedComplements: number[] = [];
   public verResenas: boolean = false;
   public totalPrecio: number = 0;
@@ -124,7 +123,7 @@ export class CalendariComponent implements OnInit {
   public alta_reserva: string = '0';
   getInSiteForm: any;
 
-  id_edifici: string = '';
+  id_edifici: number = 0;
   public mostrarRegister = false;
   public mostrarLogin = false;
   public mostrarDia = false;
@@ -182,7 +181,7 @@ export class CalendariComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.id_edifici = this.route.snapshot.paramMap.get('id') || '';
+    this.id_edifici = Number(this.route.snapshot.paramMap.get('id')) || 0;
     this.getSales(this.id_edifici);
     this.carregaDies();
     this.createForm();
@@ -236,7 +235,7 @@ export class CalendariComponent implements OnInit {
     let salaId = this.reservaForm.get('sala_reserva')?.value;
     let DadesSala = this.sales.find((reg) => reg.id == salaId);
     this.max_sala = DadesSala?.max_ocupacio ?? '';
-    this.horari = DadesSala?.horari ?? '';
+    this.horari = DadesSala?.horari ?? 0;
     this.missatge = DadesSala?.missatge ?? '';
     this.reservaForm.get('max_sala')?.setValue(DadesSala?.max_ocupacio ?? '');
     this.reservaForm.get('horari_sala')?.setValue(DadesSala?.horari ?? '');
@@ -245,8 +244,8 @@ export class CalendariComponent implements OnInit {
     }
   }
 
-  getSales(id_edifici: string) {
-    this.salesService.getEdifici(id_edifici).subscribe({
+  getSales(id_edifici: number) {
+    this.salesService.getByEdifici(id_edifici).subscribe({
       next: (data) => {
         this.sales = data;
       },
@@ -259,7 +258,7 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  getSala(id_sala: string) {
+  getSala(id_sala: number) {    
     this.salesService.getSala(id_sala).subscribe({
       next: (data) => {
         this.salaSeleccionado = new Sales(
@@ -288,7 +287,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarSala = true;
   }
 
-  getcomplement(id_sala: string) {
+  getcomplement(id_sala: number) {
     this.salesService.getSeleccionats(id_sala).subscribe({
       next: (data) => {
         this.complements = data;
@@ -347,13 +346,17 @@ export class CalendariComponent implements OnInit {
     // horari
     this.agrupado = {};
     let compara = '0';
+
+    if(!data || !Array.isArray(data)){
+      return;
+    }    
     data.forEach((item) => {
       if (!this.agrupado[item.descripcio]) {
         this.agrupado[item.descripcio] = [];
         compara = '0';
       }
       // Crear Capcelera
-      this.horari = item.tipus;
+      this.horari = Number(item.tipus);
       compara = this.CrearBotons(item, compara);
     });
     this.horas = this.horas.
@@ -367,7 +370,7 @@ export class CalendariComponent implements OnInit {
   generate() {
     this.resetGenerate();
     this.sala_reserva = this.reservaForm.get('sala_reserva')?.value;
-    if (this.sala_reserva == '0') {
+    if (this.sala_reserva == 0) {
       this.mostrarAlertes(
         'Atención!!!',
         'No se ha seleccionado ningua sala.',
@@ -400,11 +403,11 @@ export class CalendariComponent implements OnInit {
     });
   }
 
-  private calcularHoraFinal(horari: string, hora_inici: string): string {
+  private calcularHoraFinal(horari: number, hora_inici: string): string {
     const [hora, minuto] = hora_inici.split(':');
     const horaNum = +hora;
     let horaFinal = `${hora.padStart(2, '0')} a ${(horaNum + 1).toString().padStart(2, '0')}`;
-    if (horari == '2') { horaFinal = minuto === '00'  ? `${hora}:00 a ${hora}:30` : `${hora}:${minuto} a ${(horaNum + 1).toString().padStart(2, '0')}:00`; }
+    if (horari == 2) { horaFinal = minuto === '00'  ? `${hora}:00 a ${hora}:30` : `${hora}:${minuto} a ${(horaNum + 1).toString().padStart(2, '0')}:00`; }
     return horaFinal;
   }
 
@@ -426,7 +429,7 @@ export class CalendariComponent implements OnInit {
     return compara;
   }
 
-  handleDateSelect(selectInfo: DateSelectArg) {
+  handleDateSelect(selectInfo: DateSelectArg) {    
     this.dia = selectInfo.startStr;
     this.calendariService.getMira(this.dia, this.id_edifici).subscribe({
       next: (data) => {
@@ -437,9 +440,8 @@ export class CalendariComponent implements OnInit {
             this.agrupado[item.descripcio] = [];
             compara = '0';
           }
-          // Crear Capcelera
-          console.log(item);
-          this.horari = item.tipus;
+          // Crear Capcelera          
+          this.horari = Number(item.tipus);
           compara = this.CrearBotons(item, compara);
         });
         this.horas = this.horas.sort();
@@ -460,14 +462,14 @@ export class CalendariComponent implements OnInit {
     this.mostrarDia = true;
   }
 
-  handleEventClick(clickInfo: EventClickArg) {
+  handleEventClick(clickInfo: EventClickArg) {    
     this.mostrarReserva = true;
     this.mostrarHourGrid = false;
     this.agrupado = {};    
     this.data_reserva_ini = clickInfo.event.startStr.substring(0, 10);
     this.resetGenerate();
     this.mostrarPeu = true;
-    this.sala_reserva = clickInfo.event.groupId;
+    this.sala_reserva = Number(clickInfo.event.groupId);
     this.alta_reserva = clickInfo.event.id;
     if (this.alta_reserva != '0') {
       this.reservaForm.get('fechaInicial')?.disable();
@@ -488,7 +490,7 @@ export class CalendariComponent implements OnInit {
         this.reservaForm.get('mensualidad')?.disable();
         this.preu_sala_total = dia_reserva.import_sala;
         this.max_sala = dia_reserva.max_ocupacio;
-        this.horari = dia_reserva.horari;
+        this.horari = Number(dia_reserva.horari);
         this.missatge = dia_reserva.missatge;
         this.reservaForm.patchValue({
           id_user: dia_reserva.id_user,
@@ -519,10 +521,11 @@ export class CalendariComponent implements OnInit {
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
         this.preu_sala_total = parseFloat(dia_reserva.preu_sala);
-      },
-    });
+
+
+
     this.calendariService
-      .getMiraReserva(this.data_reserva_ini, this.sala_reserva, clickInfo.event.id)
+      .getMiraReserva(this.data_reserva_ini, this.sala_reserva, Number(clickInfo.event.id))
       .subscribe({
         next: (data) => { this.creaHorari(data); },
         error: (error) => { console.log(error); },
@@ -540,6 +543,9 @@ export class CalendariComponent implements OnInit {
           console.log('Lectura Ok');
         },
       });
+
+      },
+    });
   }
 
   handleEvents(events: EventApi[]) {
@@ -548,13 +554,13 @@ export class CalendariComponent implements OnInit {
   }
 
   carregaDies() {
-    let any = '2025';
+    let any = new Date().getFullYear().toString();        
     this.calendariService.getCarga(any, this.id_edifici).subscribe({
       next: (data) => {
         const nuevos = [...this.eventos()];
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {                
           nuevos.push({
-            id: data[i].id,
+            id: String(data[i].id),
             title: data[i].descripcio,
             groupId: data[i].sala,
             start: `${data[i].dia_inici}T${data[i].hora_inici}`,
@@ -664,7 +670,7 @@ export class CalendariComponent implements OnInit {
     this.data_reserva_ini = new Date(feInicial).toISOString().substring(0, 10);
     this.data_reserva_fin = new Date(feFinal).toISOString().substring(0, 10);
     let color = this.sales.find((reg) => reg.id == this.sala_reserva)?.color ?? '';
-    let nom   = this.sales.find((reg) => reg.id == this.sala_reserva)?.descripcio ?? '';
+    let nom   = this.sales.find((reg) =>reg.id == this.sala_reserva)?.descripcio ?? '';
 
     // Carrego complements
     const complements = this.selectedComplements.map(id => this.complements.find(c => +c.id === id)?.id).filter(Boolean).join('#');    
@@ -756,7 +762,7 @@ export class CalendariComponent implements OnInit {
         if (horaslibres == 0) {
           this.errorEntrada = '';
           // Grabo Factura.
-          this.grabaFactura(this.id_usuari, this.preu_sala_total);
+          this.grabaFactura(Number(this.alta_reserva), this.preu_sala_total);
           for (let i = 0; i < ranges.length; i++) {
             let horaInici = ranges[i].inicio + ':00';
             let horaFi = ranges[i].final + ':00';
@@ -964,13 +970,6 @@ export class CalendariComponent implements OnInit {
             this.tancarSala();         
           }      
         }    
-
-
-
-
-
-
-
       }
     });
 
@@ -978,7 +977,7 @@ export class CalendariComponent implements OnInit {
 
   insertaDia(
     tit: string,
-    sal_reserva: string,
+    sal_reserva: number,
     fIninic: string,
     fFi: string,
     color: string,
@@ -1008,7 +1007,7 @@ export class CalendariComponent implements OnInit {
     console.log('ALTA');
     this.calendariService
       .insertEvent(
-        sal_reserva,
+        String(sal_reserva),
         fIninic,
         fFi,
         hInici,
@@ -1037,7 +1036,7 @@ export class CalendariComponent implements OnInit {
           nuevos.push({
             id: ids,
             title: tit,
-            groupId: sal_reserva,
+            groupId: String(sal_reserva),
             start: `${event_ini}`,
             end: `${event_fi}`,
             backgroundColor: color,
@@ -1054,14 +1053,14 @@ export class CalendariComponent implements OnInit {
       });
   }
 
-  grabaFactura(i_usuari: number, pts: number) {
+  grabaFactura(i_reserva: number,pts: number) {
     console.log('ALTA FACTURA');
     let iva = 21;
     let iva_importe = pts * 0.21;
     let total = pts + iva_importe;
-    let fecha = new Date().toISOString().substring(0, 10);
+    let fecha = new Date().toISOString().substring(0, 10);    
     this.calendariService
-      .grabaFactura(i_usuari, fecha, pts, iva, iva_importe, total)
+      .grabaFactura(i_reserva, fecha, pts, iva, iva_importe, total)
       .subscribe({
         next: () => {
           console.log('Factura Grabada');
@@ -1085,7 +1084,8 @@ export class CalendariComponent implements OnInit {
       if (result.isConfirmed) {
         console.log('Confirmado');
         // Generar Abono
-        this.grabaFactura(this.id_usuari, this.preu_sala_total * -1);
+
+        this.grabaFactura(Number(this.alta_reserva), this.preu_sala_total * -1);
         // Anular Event
         this.calendariService.deleteEvent(this.alta_reserva).subscribe({
           next: () => {
@@ -1144,20 +1144,19 @@ export class CalendariComponent implements OnInit {
 
   abrirActualizar() {
     if (this.id_usuari === 0) return;
-  
     this.mostrarRegister = true;
   }  
 
   onUserUpdated(user: Users) {
     this.registerData = user;
-    this.usuari = user.nom;
+    this.usuari = user.name;
     this.id_usuari = Number(user.id);
   }  
 
-  onLogin(user: Users) {
+  onLogin(user: Users) {    
     this.registerData = user;
-    this.usuari = user.nom;
-    this.id_usuari = Number(user.id);
+    this.usuari = user.name;
+    this.id_usuari = user.id;    
     this.reserva(true);
   }
 
@@ -1218,5 +1217,8 @@ export class CalendariComponent implements OnInit {
     this.recalcularPrecio();
   }
   
+  editarPerfil() {
+    console.log(this.registerData)
+  }
 
 }

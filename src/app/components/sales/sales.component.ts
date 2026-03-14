@@ -20,20 +20,23 @@ export class SalesComponent implements OnInit {
   public modalVisible = false;
   public salaSeleccionado = new Sales();  
   public paginaActual: number = 1;
-  public edificis = [new Edificis()];
+  public edificis:Edificis[] = [];
+  
   public complements = [new Complements()];
   public selectedFile: File | null = null;
   public uploadedImageUrl: string | null = null;
   public base64: string = '';
   public imagenBase64: string = '';
   public previewUrl: string = '';    
+  public mensajeMovimiento: string = '';
+  private mensajeTimeout: any;
 
   
 disponibles = [new Complements()];
 seleccionados = [new Complements()];
 
-selectedDisponibleId: string | null = null;
-selectedSeleccionadoId: string | null = null;
+selectedDisponibleId: number | null = null;
+selectedSeleccionadoId: number | null = null;
 
   relaciones: {
     id: number;
@@ -84,9 +87,9 @@ selectedSeleccionadoId: string | null = null;
     });
   }
 
-  obrirModal(id_sala: string) {  
+  obrirModal(id_sala: number) {  
     this.modalVisible = true;
-    if (id_sala == '0') {            
+    if (id_sala == 0) {            
       this.salesService.getDisponibles(id_sala).subscribe({
           next: data => {                 
             this.disponibles = data;              
@@ -137,47 +140,60 @@ selectedSeleccionadoId: string | null = null;
 
   tancarModal() {
     this.modalVisible = false;    
+    // 🔥 reset imagen
+    this.selectedFile = null;
+    this.base64 = '';
+    this.previewUrl = '';
+    this.imagenBase64 = '';
+    // opcional: reset sala
+    this.salaSeleccionado = new Sales();    
   }  
 
-  saveComplement() {    
-    let complement = this.seleccionados.map(item => item.id).join('#');
-    if (this.salaSeleccionado.id == '0') {
-      // Insert
-      if (!this.selectedFile) {
-        this.base64 = this.previewUrl;
-        console.log('insert selected');
-      }      
-      console.log('ALTA');                  
-      this.salesService.insertSala(this.salaSeleccionado.descripcio, this.salaSeleccionado.id_edifici,
-        this.salaSeleccionado.preu,                  
-        this.salaSeleccionado.color,
-        this.salaSeleccionado.missatge,
-        this.salaSeleccionado.actiu,        
-        this.salaSeleccionado.max_ocupacio,
-        this.salaSeleccionado.horari,
-        this.base64,
-        complement
-      ).subscribe(response => {        
-        this.tancarModal();
-        this.getSales();
-      });            
+  saveComplement() {
+    const complementsIds = this.seleccionados.map(item => item.id);
+    const isNew = !this.salaSeleccionado.id || this.salaSeleccionado.id == 0;
+    // Si hay imagen nueva
+    if (this.selectedFile) {
+      this.salaSeleccionado.imatge = this.base64;
     }
-    else {
-      // Update
-      console.log('UPDATE');            
-      this.salesService.putSala(this.salaSeleccionado.id,
-        this.salaSeleccionado.descripcio,  this.salaSeleccionado.id_edifici ,this.salaSeleccionado.preu,
-        this.salaSeleccionado.color, this.salaSeleccionado.missatge, this.salaSeleccionado.actiu,
-        this.salaSeleccionado.max_ocupacio, this.salaSeleccionado.horari, this.base64,
-        complement
-      ).subscribe(response => {        
-        this.tancarModal();
-        this.getSales();
-      });
-    }    
-  }  
 
-  moverADerecha() {
+    if (isNew) {      
+      this.salesService
+        .insertSala(this.salaSeleccionado, complementsIds)
+        .subscribe(() => {
+          this.tancarModal();
+          this.getSales();
+        });
+
+    } else {
+      console.log(this.salaSeleccionado.id);
+      console.log(this.salaSeleccionado);
+      console.log(complementsIds);
+      this.salesService
+        .updateSala(this.salaSeleccionado.id, this.salaSeleccionado, complementsIds)
+        .subscribe(() => {
+          this.tancarModal();
+          this.getSales();
+        });
+
+    }
+  }
+
+  private mostrarMensaje(texto: string): void {
+    this.mensajeMovimiento = texto;   
+    if (this.mensajeTimeout) {
+      clearTimeout(this.mensajeTimeout);
+    }
+    this.mensajeTimeout = setTimeout(() => {
+      this.mensajeMovimiento = '';
+    }, 3000); 
+  }
+
+  moverADerecha() {    
+    if (this.selectedDisponibleId == null) {
+        this.mostrarMensaje('Debe seleccionar un complemento disponible.');
+        return;
+    }    
     if (this.selectedDisponibleId !== null) {            
       const item = this.disponibles.find(i => i.id == this.selectedDisponibleId);    
       if (item) {
@@ -189,6 +205,10 @@ selectedSeleccionadoId: string | null = null;
   }
 
   moverAIzquierda() {
+    if (this.selectedSeleccionadoId === null) {
+        this.mostrarMensaje('Debe seleccionar un complemento seleccionado.');
+        return;
+    }    
     if (this.selectedSeleccionadoId !== null) {
       const item = this.seleccionados.find(i => i.id == this.selectedSeleccionadoId);      
       if (item) {
@@ -200,15 +220,19 @@ selectedSeleccionadoId: string | null = null;
   }
   
   onFileSeleccionada(event: any): void {
-    this.selectedFile = event.target.files[0];  
-    let nom_file = this.selectedFile?.name;
-    if (this.selectedFile) {            
-      const reader = new FileReader();      
-      reader.onload = (e: any) => {
-        this.previewUrl = e.target.result;        
-        this.base64 = reader.result as string;
-      };
-      reader.readAsDataURL(this.selectedFile);      
-    }
-  }  
+    const file = event.target.files?.[0];
+    if (!file) return;
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.base64 = reader.result as string;
+      this.previewUrl = this.base64;
+      console.log('BASE64 generado:', this.base64);
+    };
+    reader.onerror = (error) => {
+      console.error('Error leyendo archivo:', error);
+    };
+    reader.readAsDataURL(file);
+  }
+
 }

@@ -1,43 +1,58 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Users } from '../../../../models/users.model';
 import { UsersService } from '../../../../service/users.service';
+import { AuthService } from '../../../../service/auth.service';
 
 @Component({
   selector: 'app-login-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login-modal.component.html'
 })
+
 export class LoginModalComponent {
 
   @Output() logged = new EventEmitter<Users>();
   @Output() close = new EventEmitter<void>();
   @Output() registrarse = new EventEmitter<void>();
+  
+  public loginError:string = '';
 
   loginData = {
     email: '',
     password: ''
   };
 
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService, private authService: AuthService) {}
 
-  onLoginSubmit() {
-    this.usersService
-      .getUser(this.loginData.email, this.loginData.password, 'usuari')
-      .subscribe(user => {
-        if (user?.id) {
-          this.logged.emit(
-            new Users(
-              user.id,
-              user.nom,
-              user.email,
-              user.password,
-              user.password
-            )
-          );
-          this.close.emit();
+    onLoginSubmit() {
+    this.loginError = '';
+    this.authService.loginUser(
+      this.loginData.email,
+      this.loginData.password
+    ).subscribe({
+      next: (response) => {        
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('role', response.user.role);
+        localStorage.setItem('userId', response.user.id.toString());
+        const userModel = new Users(
+          response.user.id,
+          response.user.name,
+          response.user.email,
+          '', 
+          'user' 
+        );
+        this.logged.emit(userModel);
+        this.close.emit();
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.loginError = 'Correo o contraseña incorrectos';
         }
-      });
-  }
+      }
+    });
+  }  
+
 }

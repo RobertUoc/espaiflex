@@ -7,7 +7,7 @@ export class Comentaris {
     public hora_inici: string = '',
     public hora_fi: string = '',
     public comentari: string = '',
-    public puntuacio: number = 0,
-    public creat: string = ''
+    public puntuacio: number = 0,    
+    public created_at: string  = ''
   ) {}
 }

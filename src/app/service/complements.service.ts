@@ -8,38 +8,37 @@ import { Complements } from '../models/complements.model';
   providedIn: 'root'
 })
 export class ComplementsService {
-    public apiUrl: string = config.url;
 
-    constructor( private http:HttpClient) { }
+  private apiUrl = config.url + 'complements';
 
-    // GET Leeer
-    // POST guardar
-    // PUT actulatzar
-    // DELETE borrar
+  constructor(private http: HttpClient) {}
 
-    getComplements(): Observable<Complements[]>  {
-      return this.http.get<Complements[]>( this.apiUrl + 'complements.php');      
-    }
-    
-    getComplement(id:string): Observable<Complements> {
-      return this.http.get<Complements>( this.apiUrl + 'complements.php?id=' + id);      
-    }
+  // GET todos
+  getComplements(): Observable<Complements[]> {
+    return this.http.get<Complements[]>(this.apiUrl);
+  }
 
-    putComplement(_id:string,_descripcio:string,_preu:number,_actiu:string) {      
-      return this.http.put(this.apiUrl + 'complements.php', {
-        id: _id,        
-        descripcio: _descripcio,
-        preu: _preu,
-        actiu: _actiu,        
-      });
-    }
-    
-    insertComplement(_descripcio:string,_preu:number,_actiu:string) {
-      return this.http.post(this.apiUrl + 'complements.php', {                  
-        descripcio: _descripcio,
-        preu: _preu,
-        actiu: _actiu
-      });     
-    }
-    
+  // GET uno por id
+  getComplement(id: number): Observable<Complements> {
+    return this.http.get<Complements>(`${this.apiUrl}?id=${id}`);
+  }
+
+  // POST crear
+  insertComplement(data: {
+    descripcio: string;
+    preu: number;
+    actiu: string;
+  }): Observable<any> {
+    return this.http.post(this.apiUrl, data);
+  }
+
+  // PUT actualizar
+  updateComplement(id: string, data: {
+    descripcio: string;
+    preu: number;
+    actiu: string;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
+  }
+
 }

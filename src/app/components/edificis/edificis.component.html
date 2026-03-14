@@ -45,11 +45,15 @@
           </div>          
           <div class="mb-3">
             <label class="form-label">Provincia</label>
-            <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia">
+            <select class="form-select" [(ngModel)]="edificioSeleccionado.id_provincia" name="id_provincia" required  #provinciaField="ngModel" [class.is-invalid]="provinciaField.invalid && provinciaField.touched">
+              <option [ngValue]="null">Elige una provincia</option>
               @for (pro of provincies; track pro.id) {
                 <option [value]="pro.id">{{ pro.nom }}</option>
               }
             </select>
+              <div class="invalid-feedback" *ngIf="provinciaField.invalid && provinciaField.touched">
+                  La provincia es obligatoria.
+              </div>                      
           </div>          
           <div class="mb-3">
             <label class="form-label">Fotografía</label>
@@ -70,11 +74,18 @@
             </div>
             <div class="col-6 col-md-3">
               <label class="form-label">Latitud</label>
-              <input type="number" step="any" class="form-control" [(ngModel)]="edificioSeleccionado.latitud" name="latitud">
+              <input type="number" step="any" class="form-control"  [(ngModel)]="edificioSeleccionado.latitud" name="latitud" required #latField="ngModel" [class.is-invalid]="latField.invalid && latField.touched">
+              <div class="invalid-feedback">
+                  La latitud es obligatoria.
+              </div>                      
             </div>
             <div class="col-6 col-md-3">
               <label class="form-label">Longitud</label>
-              <input type="number" step="any" class="form-control" [(ngModel)]="edificioSeleccionado.longitud" name="longitud">
+              <input type="number" step="any" class="form-control" [(ngModel)]="edificioSeleccionado.longitud" name="longitud" required #lonField="ngModel" [class.is-invalid]="lonField.invalid && lonField.touched">
+                <div class="invalid-feedback">
+                  La longitud es obligatoria.
+                </div>              
+        
             </div>
           </div>
         </div>

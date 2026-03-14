@@ -1,12 +1,24 @@
 <div class="container-fluid mt-2">
   <div class="d-flex align-items-center">   
     <div class="btn-group" role="group" aria-label="Admin menu">
-      <div [ngClass]="id_usuari === 0? 'ms-2 p-2 text-danger bg-dark rounded d-inline-block': 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">{{ usuari }}</div>
+      <div
+        [ngClass]="id_usuari === 0
+          ? 'ms-2 p-2 text-danger bg-dark rounded d-inline-block'
+          : 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">
+        <span>{{ usuari }}</span>      
+        <i *ngIf="id_usuari !== 0" class="bi bi-person-circle ms-2 cursor-pointer" style="cursor:pointer" (click)="mostrarRegister = true"></i>
+      </div>
     </div>
-    <button type="button" class="ms-auto btn btn-outline-danger" (click)="tornar()">Salir</button>
+
+    <button
+      type="button"
+      class="ms-auto btn btn-outline-danger"
+      (click)="tornar()">
+      Salir
+    </button>
+
   </div>
 </div>
-
 <hr>
 
 <!-- Calendario -->
@@ -20,8 +32,6 @@
 </div>
 
 <hr>
-
-
 
 <footer class="bg-light border-top py-3">
   <div class="container-fluid">    
@@ -45,7 +55,7 @@
                 <div class="card-body p-2">
                   <p class="mb-1 small">
                     <strong>Horario:</strong>
-                    {{ sala.horari=='1'?'1 hora':'½ hora' }}
+                    {{ sala.horari==1?'1 hora':'½ hora' }}
                     <strong>Capacidad:</strong>
                     {{ sala.max_ocupacio }}
                   </p>

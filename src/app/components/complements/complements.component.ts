@@ -16,7 +16,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./complements.component.css']
 })
 export class ComplementsComponent implements OnInit {
-  public complements = [new Complements()];
+  public complements = [new Complements(0,'',0,'')];
   public modalVisible = false;
   public paginaActual: number = 1;
   public complement!: FormGroup;
@@ -37,6 +37,7 @@ export class ComplementsComponent implements OnInit {
       actiu: ['SI']
     });    
   }
+  
   getComplements() {
     // Complements
     this.complementsService.getComplements().subscribe({
@@ -52,7 +53,7 @@ export class ComplementsComponent implements OnInit {
     });
   }
 
-  obrirModal(id_complement: string) {  
+  obrirModal(id_complement: number) {  
     this.modalVisible = true;       
     this.complement.patchValue({
       id:'0',
@@ -60,7 +61,7 @@ export class ComplementsComponent implements OnInit {
       preu:'0',
       actiu:'SI'
     })    
-    if (id_complement != '0') {      
+    if (id_complement != 0) {      
       this.complementsService.getComplement(id_complement).subscribe({
         next: data => {                             
             this.complement.patchValue({
@@ -84,24 +85,30 @@ export class ComplementsComponent implements OnInit {
     this.modalVisible = false;
   }  
 
-  saveComplement() {    
-    if (this.complement.value.id == '0') {
-      // Insert                
-      this.complementsService.insertComplement(this.complement.value.descripcio, this.complement.value.preu, this.complement.value.actiu
-      ).subscribe(response => {        
-        this.tancarModal();
-        this.getComplements();
-      });
+
+  saveComplement() {
+
+    const data = {
+      descripcio: this.complement.value.descripcio,
+      preu: this.complement.value.preu,
+      actiu: this.complement.value.actiu
+    };
+
+    if (this.complement.value.id === '0') {
+      this.complementsService.insertComplement(data)
+        .subscribe(() => {
+          this.tancarModal();
+          this.getComplements();
+        });
+
+    } else {
+      this.complementsService.updateComplement(this.complement.value.id, data)
+        .subscribe(() => {
+          this.tancarModal();
+          this.getComplements();
+        });
     }
-    else {
-      // Update      
-      this.complementsService.putComplement(this.complement.value.id, this.complement.value.descripcio, this.complement.value.preu, this.complement.value.actiu
-      ).subscribe(response => {        
-        this.tancarModal();
-        this.getComplements();
-      });
-    }    
-  }  
+  }
 
   generarFechas(
     startDate: Date,

@@ -11,8 +11,8 @@ import { Router } from '@angular/router';
 })
 
 export class LoginComponent implements OnInit {
-  user : string = 'ceinvde@infonegocio.com';
-  password : string = '1234';
+  user : string = 'admin@admin.com';
+  password : string = '123456';
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
       if (isAuthenticated) {
         this.router.navigate(['/admin']);
       } else {        
-        console.log('Error en credenciales');
+        console.log('Error en credenciales');        
       }
     });    
   }

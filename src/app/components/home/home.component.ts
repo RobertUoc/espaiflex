@@ -14,6 +14,13 @@ interface Edifici {
   imatge: string;
 }
 
+const customIcon = L.icon({
+  iconUrl: 'assets/marker.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  shadowUrl: 'assets/marker-shadow.png'
+});  
+
 @Component({
   selector: 'app-home',
   imports: [ LoginComponent, FormsModule, NgIf, NgFor ],
@@ -23,8 +30,8 @@ interface Edifici {
 
 export class HomeComponent implements OnInit { 
   poblacion: string = '';
-  edificios: Edifici[] = [];     
-  public edificis = [new Edificis()];
+  edificios: Edificis[] = [];     
+  public edificis = [new Edificis('','',0,'','','',0,0,'')];
   dades: string[] = [];
   mostrarModal: boolean = false;
   private map:any;
@@ -48,7 +55,7 @@ export class HomeComponent implements OnInit {
 
   buscar() {
     if (this.poblacion.trim()) {
-      // this.router.navigate(['/resultados'], { queryParams: { poblacion: this.poblacion } });      
+      // this.router.navigate(['/resultados'], { queryParams: { poblacion: this.poblacion } });        
       this.obtenerEdificios(this.poblacion);      
     }
   }
@@ -57,6 +64,7 @@ export class HomeComponent implements OnInit {
     // Edificis
     this.EdificisServeis.getEdificis().subscribe({
       next: data => {
+          console.log(data);
           this.edificis = data;
       },
       error: error => {
@@ -64,8 +72,8 @@ export class HomeComponent implements OnInit {
       },
       complete: () => {            
         this.initMap();                        
-        this.edificis.forEach(sala => {
-          let marcador = L.marker([parseFloat(sala.latitud), parseFloat(sala.longitud)]).addTo(this.map);
+        this.edificis.forEach(sala => {          
+          let marcador = L.marker([sala.latitud, sala.longitud],{ icon: customIcon }).addTo(this.map);
           marcador.on('click', () => { this.router.navigate(['/calendari/' + sala.id]); });
         });
         console.log('Carga Ok');
@@ -83,7 +91,7 @@ export class HomeComponent implements OnInit {
         navigator.geolocation.getCurrentPosition((position) => {
           const coords:[number,number] = [position.coords.latitude, position.coords.longitude];
           if (this.userMarker) { 
-            this.userMarker = L.marker(coords ); } else { this.userMarker = L.marker(coords, { icon: myIcon, draggable:true })
+            this.userMarker = L.marker(coords); } else { this.userMarker = L.marker(coords, { icon: myIcon, draggable:true })
             .addTo(this.map)
             .bindPopup('Estas Aqui')
             .openPopup();
@@ -105,8 +113,8 @@ export class HomeComponent implements OnInit {
 
   obtenerEdificios(poblacion: string) {        
     this.EdificisServeis.getProvincies(poblacion).subscribe({
-      next: data => {
-          this.edificios = data;          
+      next: data => {        
+        this.edificios = data;    
       },
       error: error => {
         console.log(error);

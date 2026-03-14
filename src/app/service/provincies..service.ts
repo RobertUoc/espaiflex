@@ -8,21 +8,19 @@ import { Provincia } from '../models/provincia.model';
   providedIn: 'root'
 })
 export class ProvinciesService {
-    public apiUrl: string = config.url;
 
-    constructor( private http:HttpClient) { }
+  private apiUrl = config.url + 'provincies';
 
-    // GET Leeer
-    // POST guardar
-    // PUT actulatzar
-    // DELETE borrar
+  constructor(private http: HttpClient) {}
 
-    getProvincies(): Observable<Provincia[]>  {
-      return this.http.get<Provincia[]>( this.apiUrl + 'provincies.php');      
-    }
+  // GET todas
+  getProvincies(): Observable<Provincia[]> {
+    return this.http.get<Provincia[]>(this.apiUrl);
+  }
 
-    getProvincia(id:string): Observable<Provincia> {
-      return this.http.get<Provincia>( this.apiUrl + 'proivincia.php?id=' + id);      
-    }
+  // GET una por id
+  getProvincia(id: number): Observable<Provincia> {
+    return this.http.get<Provincia>(`${this.apiUrl}/${id}`);
+  }
 
 }

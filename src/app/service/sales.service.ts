@@ -9,75 +9,52 @@ import { Complements } from '../models/complements.model';
   providedIn: 'root',
 })
 export class SalesService {
-  public apiUrl: string = config.url;
+
+  private apiUrl = config.url + 'sales';
+  private get_apiUrl = config.url + 'getsales';
 
   constructor(private http: HttpClient) {}
 
-  // GET Leeer
-  // POST guardar
-  // PUT actulatzar
-  // DELETE borrar
-
-  getSales(): Observable<Sales[]> {
-    return this.http.get<Sales[]>(this.apiUrl + 'sales.php');
+  getSales(): Observable<Sales[]> {    
+    return this.http.get<Sales[]>(this.apiUrl);
   }
 
-  getSala(id: string): Observable<Sales> {
-    return this.http.get<Sales>(this.apiUrl + 'sales.php?id=' + id);
+  getSala(id: number): Observable<Sales> {
+    return this.http.get<Sales>(`${this.get_apiUrl}/versala/${id}`);
   }
 
-  getEdifici(id_edifici: string): Observable<Sales[]> {
-    return this.http.get<Sales[]>(
-      this.apiUrl + 'sales.php?edifici=' + id_edifici
-    );
+  getSeleccionats(id_sala: number): Observable<Complements[]> {
+    return this.http.get<Complements[]>(`${this.get_apiUrl}/vercomplements/${id_sala}`);
   }
 
-  getDisponibles(id_sala: string): Observable<Complements[]> {
+
+  getByEdifici(id_edifici: number): Observable<Sales[]> {    
+    return this.http.get<Sales[]>(`${this.get_apiUrl}/edifici/${id_edifici}`);
+  }
+
+  getDisponibles(id_sala: number): Observable<Complements[]> {
     return this.http.get<Complements[]>(
-      this.apiUrl + 'sales.php?disponibles=' + id_sala
+      `${this.apiUrl}?disponibles=${id_sala}`
     );
   }
 
-  getSeleccionats(id_sala: string): Observable<Complements[]> {
-    return this.http.get<Complements[]>(
-      this.apiUrl + 'sales.php?seleccionats=' + id_sala
-    );
-  }
 
-  putSala(
-    _id: string, _descripcio: string, _idedifici: string, _preu: number, _color: string, _missatge: string, _actiu: string, _max_ocupacio: string, _horari: string,    
-    _imatge:string, _complement: string   
-  ) {    
-    return this.http.put(this.apiUrl + 'sales.php', {      
-      descripcio: _descripcio,
-      idedifici: _idedifici,
-      preu: _preu,
-      color: _color,
-      missatge: _missatge,      
-      max_ocupacio: _max_ocupacio,
-      actiu: _actiu,
-      horari: _horari,      
-      imatge: _imatge,
-      complement: _complement,  
-      id: _id,    
+  insertSala(sala: Sales, complements: number[]) {
+
+    return this.http.post(this.apiUrl, {
+      ...sala,
+      id_edifici: Number(sala.id_edifici),
+      complements: complements
     });
   }
 
-  insertSala(
-    _descripcio: string,  _idedifici: string, _preu: number, _color: string, _missatge: string, _actiu: string, _max_ocupacio: string,
-    _horari: string, _imatge:string, _complement: string )
-   {
-    return this.http.post(this.apiUrl + 'sales.php', {
-      descripcio: _descripcio,
-      idedifici: _idedifici,
-      preu: _preu,
-      color: _color,
-      missatge: _missatge,
-      actiu: _actiu,
-      max_ocupacio: _max_ocupacio,
-      horari : _horari,
-      imatge : _imatge,
-      complement: _complement,            
+  updateSala(id: number, sala: Sales, complements: number[]) {
+
+    return this.http.put(`${this.apiUrl}/${id}`, {
+      ...sala,
+      id_edifici: Number(sala.id_edifici),
+      complements: complements
     });
   }
+
 }

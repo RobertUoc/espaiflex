@@ -13,7 +13,10 @@ import { UsersService } from '../../../../service/users.service';
 export class RegisterModalComponent {
   @Input() user: Users | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<Users>();
+  @Output() saved = new EventEmitter<Users>();  
+  public confirm: string = '';
+  public validationErrors: { [key: string]: string[] } = {};
+  public backendMessage: string = '';
 
   registerData = new Users();
   finestra = 1; // 1 = insert, 3 = update
@@ -21,12 +24,19 @@ export class RegisterModalComponent {
   constructor(private userService: UsersService) { }
 
   ngOnInit(): void {
-    if (this.registerData.id == '0') {
-      this.registerData.nom = '';
-      this.registerData.email = '';
-      this.registerData.password = '';    
-      this.registerData.confirm = '';
+    if (this.registerData.id == 0) {
+      this.registerData = new Users();
+      this.confirm = '';
     }
+  }
+
+  onInputChange() {
+    this.validationErrors = {};
+    this.backendMessage = '';
+  }
+
+  getError(field: string): string | null {
+    return this.validationErrors[field]?.[0] || null;
   }
 
   ngOnChanges() {
@@ -37,47 +47,34 @@ export class RegisterModalComponent {
 
   onRegisterSubmit() {
     const action$ = this.isUpdate()
-      ? this.userService.putUser(
-          this.registerData.id,
-          this.registerData.nom,
-          this.registerData.email,
-          this.registerData.password
+      ? this.userService.putUser(          
+          this.registerData
         )
       : this.userService.insertUser(
-          this.registerData.nom,
-          this.registerData.email,
-          this.registerData.password
+          this.registerData
         );
-  
-    action$.subscribe(() => {
-      this.saved.emit(this.registerData); 
-      this.close.emit();
-    });
+      action$.subscribe({
+        next: () => {
+          this.validationErrors = {};
+          this.backendMessage = '';
+          this.saved.emit(this.registerData);
+          this.close.emit();
+        },
+        error: (err) => {
+          if (err.status === 422) {
+             this.backendMessage = err.error.message;
+             this.validationErrors = err.error.errors || {};
+          }
+        }
+      });    
   }
   
-
-  onRegisterSubmit2() {
-    if (this.registerData.id === '0') {
-      this.userService.insertUser(
-        this.registerData.nom,
-        this.registerData.email,
-        this.registerData.password
-      ).subscribe(() => this.close.emit());
-    } else {
-      this.userService.putUser(
-        this.registerData.id,
-        this.registerData.nom,
-        this.registerData.email,
-        this.registerData.password
-      ).subscribe(() => this.close.emit());
-    }
-  }
-
   passwordsMatch(): boolean {
-    return this.registerData.password === this.registerData.confirm;
+    return this.registerData.password === this.confirm;
   }
 
   isUpdate(): boolean {
-    return !!this.registerData?.id && this.registerData.id !== '0';
+    return !!this.registerData?.id && this.registerData.id !== 0;
   }  
+
 }

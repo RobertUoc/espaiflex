@@ -8,7 +8,7 @@ import { Users } from '../models/users.model';
   providedIn: 'root'
 })
 export class UsersService {
-    public apiUrl: string = config.url;
+    public apiUrl: string = config.url + 'users';
 
     constructor( private http:HttpClient) { }
 
@@ -16,29 +16,22 @@ export class UsersService {
     // POST guardar
     // PUT actulatzar
     // DELETE borrar
-
-    getUsers(): Observable<Users[]>  {
-      return this.http.get<Users[]>( this.apiUrl + 'users.php');      
-    }
-
-    getUser(email:string,password:string,tipus:string): Observable<Users> {
-      return this.http.get<Users>( this.apiUrl + 'users.php?email=' + email + '&password=' + password + '&usuari=' + tipus);      
-    }
-
-    putUser(_id:string,_nom:string,_email:string,_password:string) {      
-      return this.http.put(this.apiUrl + 'users.php', {
-        id: _id,        
-        nom: _nom,
-        email: _email,
-        password: _password
-      });
+    
+    putUser(user: Users): Observable<any> {
+       return this.http.put(this.apiUrl + '/' + user.id, {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          role: 'user'
+        });
     }
     
-    insertUser(_nom:string,_email:string,_password:string) {      
-      return this.http.post(this.apiUrl + 'users.php', {                  
-        nom: _nom,
-        email: _email,
-        password: _password
+    insertUser(user: Users): Observable<any> {
+      return this.http.post(this.apiUrl, {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          role: 'user'
       });     
     }
     

@@ -7,7 +7,7 @@
     <button
       type="button"
       class="btn btn-primary"
-      (click)="obrirModal('0')">
+      (click)="obrirModal(0)">
       <i class="bi bi-plus-lg me-1"></i>
       Nueva sala
     </button>
@@ -52,7 +52,7 @@
             </td>
 
             <td class="d-none d-lg-table-cell">
-              {{ sala.horari === '1' ? '1 hora' : '½ hora' }}
+              {{ sala.horari === 1 ? '1 hora' : '½ hora' }}
             </td>
 
             <td class="d-none d-md-table-cell text-end">
@@ -109,7 +109,7 @@
 
         <div class="modal-header">
           <h5 class="modal-title">
-            {{ salaSeleccionado.id === '0' ? 'Crear sala' : 'Modificar sala' }}
+            {{ salaSeleccionado.id === 0 ? 'Crear sala' : 'Modificar sala' }}
           </h5>
           <button type="button" class="btn-close" (click)="tancarModal()"></button>
         </div>
@@ -205,7 +205,7 @@
 
             <div class="col-12 col-md-2">
               <label class="form-label">
-                {{ salaSeleccionado.horari === '2' ? 'Precio ½ hora' : 'Precio hora' }}
+                {{ salaSeleccionado.horari === 2 ? 'Precio ½ hora' : 'Precio hora' }}
               </label>
               <input
                 type="number"
@@ -250,8 +250,13 @@
                   {{ item.descripcio }}
                 </option>
               </select>
-            </div>
+            </div>            
           </div>
+
+          <div *ngIf="mensajeMovimiento" class="alert alert-warning py-2 mt-2">
+                {{ mensajeMovimiento }}
+          </div>            
+
 
         </div>
 

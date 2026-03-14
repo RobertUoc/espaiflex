@@ -8,14 +8,18 @@
         <button type="button" class="btn-close btn-close-white" (click)="close.emit()"></button>
       </div>
       <div class="modal-body">
+        <div *ngIf="backendMessage" class="alert alert-danger mb-2">
+            {{ backendMessage }}
+        </div>
         <form (ngSubmit)="onRegisterSubmit()"  #Registreform="ngForm">
           <div class="row">
             <div class="col-md-12">
               <label class="form-label">Nombre</label>
-              <input type="email" class="form-control" [(ngModel)]="registerData.nom"                
+              <input type="text" class="form-control" [(ngModel)]="registerData.name"                
                      required minlength="3" maxlength="50" 
                      #nomField="ngModel"
-                     name="nom" id="nom">
+                     (input)="onInputChange()"
+                     name="name" id="name">
                      @if(nomField.invalid && nomField.touched) {      
                        @if(nomField.errors?.['required']) {
                          <div class="invalido">Rellene el nombre.</div>
@@ -35,6 +39,7 @@
               <input type="email" class="form-control" [(ngModel)]="registerData.email"
                      required minlength="3" maxlength="50" 
                      #emailField="ngModel"
+                     (input)="onInputChange()"
                      name="email" id="email">
                      @if(emailField.invalid && emailField.touched) {      
                         @if(emailField.errors?.['required']) {
@@ -55,12 +60,14 @@
               <input type="password" class="form-control" [(ngModel)]="registerData.password"
                      required minlength="3" maxlength="8" 
                      #passwordField="ngModel"
+                     (input)="onInputChange()"
                      name="password" id="password">
             </div>
             <div class="col-md-6">
               <label class="form-label">Confirmar contraseña</label>
-              <input type="password" class="form-control" [(ngModel)]="registerData.confirm"
+              <input type="password" class="form-control" [(ngModel)]="confirm"
                     #confirmField="ngModel"
+                    (input)="onInputChange()"
                     name="confirm" id="confirm">              
             </div>     
             
@@ -69,10 +76,10 @@
                 <div class="invalido">Rellene la contraseña.</div>
               }
               @if(passwordField.errors?.['minlength']) {
-                <div class="invalido">Mínimo obligado. {{ emailField.errors?.['minlength'].requiredLength }}</div>
+                <div class="invalido">Mínimo obligado. {{ passwordField.errors?.['minlength'].requiredLength }}</div>
               }
               @if(passwordField.errors?.['maxlength']) {
-                <div class="invalido">Màximo obligado. {{ emailField.errors?.['maxlength'].requiredLength }}</div>
+                <div class="invalido">Màximo obligado. {{ passwordField.errors?.['maxlength'].requiredLength }}</div>
               }    
             }            
 
@@ -81,9 +88,12 @@
             </div>
           </div>
           <hr> 
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between mb-2">
               <button type="submit" class="btn btn-outline-primary" [disabled]="!Registreform.valid || !passwordsMatch()">{{ !isUpdate() ? 'Registrarse' : 'Actualizarse' }}</button>
               <button type="button" class="btn btn-outline-secondary" (click)="close.emit()">Salir</button>                                                           
+          </div>
+          <div *ngIf="getError('email')" class="text-danger mt-1">
+            {{ getError('email') }}
           </div>
         </form>
       </div>

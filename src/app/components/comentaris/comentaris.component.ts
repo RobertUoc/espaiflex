@@ -35,7 +35,7 @@ export class ComentarisComponent implements OnInit {
     this.comentariService.getComentarios().subscribe((data) => {
       this.comentarios = data.sort((a, b) => {
         if (a.nom === b.nom) {
-          return new Date(a.creat).getTime() - new Date(b.creat).getTime();
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         }
         return a.nom.localeCompare(b.nom);
       });

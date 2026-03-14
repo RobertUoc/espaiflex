@@ -1,0 +1,132 @@
+<div class="container py-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+    <h1 class="fs-4 fw-semibold m-0">Factures</h1>    
+  </div>
+  <div class="table-responsive">
+
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            (click)="exportarCSV()">
+            <i class="bi bi-download me-1"></i>
+            Exportar CSV
+          </button>
+
+          <table class="table table-hover align-middle mt-2">
+          <thead class="table-light">
+            <tr>
+              <th>Reserva</th>
+              <th>Número Factura</th>
+              <th>Usuario</th>
+              <th>Fecha Factura</th>
+              <th class="d-none d-md-table-cell text-end">Base</th>
+              <th class="d-none d-md-table-cell text-center">Iva</th>
+              <th class="d-none d-md-table-cell text-end">Importe Iva</th>
+              <th class="d-none d-md-table-cell text-end">TOTAL</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>        
+            @for (factura of factures | paginate: { itemsPerPage: 5, currentPage: paginaActual };track factura.id) {
+                <tr>
+                <td class="fw-medium">
+                  {{ factura.nom_sala }}
+                </td>
+                <td class="fw-medium">
+                  {{ factura.id }}
+                </td>
+                <td class="fw-medium">
+                  {{ factura.nom_user }}
+                </td>
+                <td class="fw-medium">
+                  {{ factura.data_factura }}
+                </td>
+                <td class="d-none d-md-table-cell text-end">
+                  {{ factura.base | PipePreu }} €
+                </td>
+                <td class="d-none d-md-table-cell text-end">
+                  {{ factura.iva | PipePreu }} €
+                </td>
+                <td class="d-none d-md-table-cell text-end">
+                  {{ factura.iva_import | PipePreu }} €
+                </td>        
+                <td class="d-none d-md-table-cell text-end">
+                  {{ factura.total_factura | PipePreu }} €
+                </td>
+
+                <td class="text-center">
+                <div class="d-flex justify-content-center gap-2">
+                    <!-- Ver factura -->
+                    <button
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="verFactura(factura.id)"
+                    aria-label="Ver factura">
+                    <i class="bi bi-eye"></i>
+                    </button>
+                    <!-- Enviar email -->
+                    <button
+                    class="btn btn-outline-success btn-sm"
+                    (click)="enviarFacturaEmail(factura.id)"
+                    aria-label="Enviar factura por email">
+                    <i class="bi bi-envelope"></i>
+                    </button>
+                </div>                        
+              </tr>
+            }
+          </tbody>
+        </table>
+  </div>
+  <!-- Paginación -->
+  <div class="d-flex justify-content-left mt-3">
+    <pagination-controls
+      (pageChange)="paginaActual = $event"
+      previousLabel="Anterior"
+      nextLabel="Siguiente">
+    </pagination-controls>
+  </div>
+
+  <div class="row g-3 mb-4">
+
+  <!-- Año -->
+  <div class="col-md-3">
+    <label class="form-label">Año</label>
+    <select class="form-select"
+            [(ngModel)]="anioSeleccionado"
+            (change)="onFiltroChange()">
+      <option value="0">Seleccione año</option>
+      <option *ngFor="let a of anios" [value]="a">
+        {{ a }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Mes -->
+  <div class="col-md-3">
+    <label class="form-label">Mes</label>
+    <select class="form-select"
+            [(ngModel)]="mesSeleccionado"
+            (change)="onFiltroChange()">
+      <option value="0">Todos los meses</option>
+      <option *ngFor="let m of meses" [value]="m.value">
+        {{ m.label }}
+      </option>
+    </select>
+  </div>
+
+</div>
+
+<!-- Gráfica -->
+<div class="card shadow-sm p-3">
+  <canvas id="facturasChart"></canvas>
+</div>
+
+
+</div>
+
+<!-- MODAL -->
+
+<app-factura-modal
+  [visible]="modalVisible"
+  [factura]="facturaDetalle"
+  (close)="modalVisible = false">
+</app-factura-modal>
+

@@ -1,9 +1,9 @@
 export class Users { 
     constructor(
-       public id:string = '0',
-       public nom:string = '',
+       public id:number = 0,
+       public name:string = '',
        public email:string = '',
-       public password:string = '',
-       public confirm:string = ''
+       public password:string = '',       
+       public role: string = 'user',       
     ) { }    
 }

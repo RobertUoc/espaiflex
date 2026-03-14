@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class CalendariService {
-  public apiUrl: string = config.url;
+  public apiUrl: string = config.url + 'reserves/';
 
   constructor(private http: HttpClient) {}
 
@@ -21,48 +21,42 @@ export class CalendariService {
   // PUT actulatzar
   // DELETE borrar
 
-  getMira(dia: string, edifici: string): Observable<Horas[]> {
-    return this.http.get<Horas[]>(
-      this.apiUrl + 'calendari.php?dia=' + dia + '&edifici=' + edifici
+  getCarga(any: string, edificio: number): Observable<Calendario[]> {
+    return this.http.get<Calendario[]>(
+      this.apiUrl + 'any/' + any + '/edifici/' + edificio
     );
   }
 
-  getMiraDia(dia: string, sala: string): Observable<Horas[]> {
+  getMira(dia: string, edifici: number): Observable<Horas[]> {
     return this.http.get<Horas[]>(
-      this.apiUrl + 'calendari.php?dia=' + dia + '&sala=' + sala
+      this.apiUrl + 'dia/' + dia + '/edifici/' + edifici
+    );
+  }
+  
+  getMiraDia(dia: string, sala: number): Observable<Horas[]> {
+    return this.http.get<Horas[]>(
+      this.apiUrl + 'dia/' + dia + '/sala/' + sala
+    );
+  }
+  
+  getDadesReserva(id: string): Observable<Reserva[]> {
+    return this.http.get<Reserva[]>(
+      this.apiUrl + 'reserva/' + id
     );
   }
 
   getMiraReserva(
     dia: string,
-    sala: string,
-    reserva: string
+    sala: number,
+    reserva: number
   ): Observable<Horas[]> {
     return this.http.get<Horas[]>(
-      this.apiUrl +
-        'calendari.php?dia=' +
-        dia +
-        '&sala=' +
-        sala +
-        '&reserva=' +
-        reserva
-    );
-  }
-
-  getCarga(any: string, edificio: string): Observable<Calendario[]> {
-    return this.http.get<Calendario[]>(
-      this.apiUrl + 'calendari.php?any=' + any + '&edifici=' + edificio
+      this.apiUrl + 'dia/' + dia + '/sala/' + sala + '/reserva/' +  reserva
     );
   }
 
   getDia(id: string): Observable<Calendario> {
-    return this.http.get<Calendario>(this.apiUrl + 'calendari.php?id=' + id);
-  }
-
-  getDadesReserva(id: string): Observable<Reserva[]> {
-    return this.http.get<Reserva[]>(
-      this.apiUrl + 'calendari.php?reserva=' + id
-    );
+    return this.http.get<Calendario>(this.apiUrl + 'reserva/' + id);
   }
 
   insertEvent(
@@ -112,7 +106,7 @@ export class CalendariService {
   }
 
   buscarInsertDia(
-    _sala: string,
+    _sala: number,
     _dia_inici: string,
     _dia_fi: string,
     _frecuencia: string,
@@ -135,26 +129,26 @@ export class CalendariService {
   }
 
   grabaFactura(
-    _usuari: number,
+    _reserva: number,    
     _fecha: string,
     _base: number,
     _iva: number,
     _iva_importe: number,
     _total: number
   ) {
-    return this.http.put(this.apiUrl + 'calendari.php', {
-      usuario: _usuari,
-      fecha: _fecha,
+    return this.http.put(this.apiUrl + 'factura', {
+      id_reserva: _reserva,      
+      data_factura: _fecha,
       base: _base,
       iva: _iva,
-      iva_importe: _iva_importe,
-      total: _total,
+      iva_import: _iva_importe,
+      total_factura: _total,
     });
   }
 
   deleteEvent(id_event: string) {
     return this.http.get(
-      this.apiUrl + 'calendari.php?delete_event=' + id_event
+      this.apiUrl + 'delete_event/' + id_event
     );
   }
 }

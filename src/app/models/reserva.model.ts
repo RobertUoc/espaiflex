@@ -1,6 +1,6 @@
 export class Reserva {
   constructor(
-    public id: string = '0',
+    public id: number = 0,
     public dia: Date = new Date(),
     public hora_inici: string = '',
     public hora_fi: string = '',

@@ -81,7 +81,7 @@ export class CalendariService {
     _el_dia: string,
     _complements: string
   ): Observable<InsertEvent> {
-    return this.http.post<InsertEvent>(this.apiUrl + 'calendari.php', {
+    return this.http.post<InsertEvent>(this.apiUrl , {
       sala: _sala,
       dia_inici: _dia_inici,
       dia_fi: _dia_fi,
@@ -114,17 +114,7 @@ export class CalendariService {
     _hora_fi: string
   ): Observable<ErrorEvent[]> {
     return this.http.get<ErrorEvent[]>(
-      this.apiUrl +
-        'calendari.php?buscarSala=' +
-        _sala +
-        '&diaInici=' +
-        _dia_inici +
-        '&diaFi=' +
-        _dia_fi +
-        '&horaInici=' +
-        _hora_inici +
-        '&horaFi=' +
-        _hora_fi
+      this.apiUrl + 'buscarSala/sala/' + _sala + '/diainici/' + _dia_inici + '/diafi/' + _dia_fi + '/horainici/' + _hora_inici + '/horafi/' + _hora_fi
     );
   }
 

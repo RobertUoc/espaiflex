@@ -488,7 +488,7 @@ export class CalendariComponent implements OnInit {
         this.reservaForm.get('diasSemana')?.disable();
         this.reservaForm.get('sala_reserva')?.disable();
         this.reservaForm.get('mensualidad')?.disable();
-        this.preu_sala_total = dia_reserva.import_sala;
+        this.preu_sala_total = +dia_reserva.import_sala;
         this.max_sala = dia_reserva.max_ocupacio;
         this.horari = Number(dia_reserva.horari);
         this.missatge = dia_reserva.missatge;
@@ -763,6 +763,7 @@ export class CalendariComponent implements OnInit {
           this.errorEntrada = '';
           // Grabo Factura.
           this.grabaFactura(Number(this.alta_reserva), this.preu_sala_total);
+          //
           for (let i = 0; i < ranges.length; i++) {
             let horaInici = ranges[i].inicio + ':00';
             let horaFi = ranges[i].final + ':00';
@@ -1048,6 +1049,7 @@ export class CalendariComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error', err);
+          console.log(err.error);
         },
         complete: () => {},
       });
@@ -1175,7 +1177,7 @@ export class CalendariComponent implements OnInit {
     ).length;
     if (hihabtn > 0) {
       this.mostrarPeu = true;
-      this.preu_sala_total = this.preu_sala * hihabtn;
+      this.preu_sala_total = +this.preu_sala * hihabtn;
       this.checkboxes.forEach((checkbox, i) => {
         if (checkbox.nativeElement.checked) {
           total += this.complements[i].preu;
@@ -1186,16 +1188,19 @@ export class CalendariComponent implements OnInit {
     this.saveReserva();
   }
 
-  recalcularPrecio() {    
+  recalcularPrecio() {        
     const horasSeleccionadas = this.mira_dia
       .flatMap(d => d.items)
       .filter((h: HoraItem) => h.seleccionada);    
     this.preu_sala_total = horasSeleccionadas.length * this.preu_sala;   
-    let totalComplementos = 0;  
+    let totalComplementos:number = 0;  
     for (const id of this.selectedComplements) {
       const comp = this.complements.find(c => +c.id === id);
-      if (comp) { totalComplementos += comp.preu; }
+      if (comp) { 
+        totalComplementos += +comp.preu; 
+      }
     }  
+    console.log(totalComplementos);
     this.preu_sala_total += totalComplementos;  
     this.mostrarPeu = horasSeleccionadas.length > 0;
   }

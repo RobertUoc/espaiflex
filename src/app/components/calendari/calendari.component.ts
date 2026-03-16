@@ -476,6 +476,7 @@ export class CalendariComponent implements OnInit {
       this.reservaForm.get('fechaFinal')?.disable();
       this.reservaForm.get('frecuencia')?.disable();
     }
+
     this.calendariService.getDadesReserva(clickInfo.event.id).subscribe({
       next: (data) => {
         this.reservas = data;
@@ -563,8 +564,8 @@ export class CalendariComponent implements OnInit {
             id: String(data[i].id),
             title: data[i].descripcio,
             groupId: data[i].sala,
-            start: `${data[i].dia_inici}T${data[i].hora_inici}`,
-            end: `${data[i].dia_fi}T${data[i].hora_fi}`,
+            start: data[i].start,
+            end: data[i].end,
             backgroundColor: data[i].color,
             borderColor: '#dc3545',
             textColor: '#000000',
@@ -1084,11 +1085,8 @@ export class CalendariComponent implements OnInit {
       cancelButtonText: 'No',
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log('Confirmado');
-        // Generar Abono
-
-        this.grabaFactura(Number(this.alta_reserva), this.preu_sala_total * -1);
-        // Anular Event
+        console.log('Confirmado ' + this.alta_reserva);
+        // Anular Event i generar factura abono
         this.calendariService.deleteEvent(this.alta_reserva).subscribe({
           next: () => {
             // Treure Event

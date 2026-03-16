@@ -8,7 +8,9 @@ export class Calendario {
         public hora_fi: string = '',
         public color: string = '',
         public descripcio: string = '',
-        public sala: string = ''
+        public sala: string = '',
+        public start: string = '',
+        public end: string = ''
     ) { }
     
 }

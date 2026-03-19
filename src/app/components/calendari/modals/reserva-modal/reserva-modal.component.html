@@ -29,9 +29,19 @@
             <div class="col-md-3 mr-2">              
                 <label>Frecuencia:</label>
                 <select class="form-control" id="frecuencia" formControlName="frecuencia" (change)="frecuenciaChange.emit()">
-                  <option value="diaria">Diaria</option>
-                  <option value="semanal">Semanal</option>
-                  <option value="mensual">Mensual</option>
+
+ <!-- SOLO cuando es mismo día -->
+  <option *ngIf="esMismaFecha" value="diahoy">
+    Solo hoy
+  </option>
+
+  <!-- SOLO cuando son fechas distintas -->
+  <ng-container *ngIf="!esMismaFecha">
+    <option value="diaria">Cada día</option>
+    <option value="semanal">Una vez a la semana</option>
+    <option value="mensual">Una vez al mes</option>
+  </ng-container>
+
                 </select>              
             </div>      
             <!-- Semanal -->
@@ -54,11 +64,11 @@
                   <!-- Radio -->
                   <div class="col-md-4 mr-2">
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" id="tipo1" name="tipo" value="1" formControlName="tipo">
+                      <input class="form-check-input" type="radio" value="1" formControlName="tipo">
                       <label class="form-check-label" for="byDay">Cada Día </label>
                     </div>
                     <div class="form-check mt-2">
-                      <input class="form-check-input" type="radio" id="tipo2" name="tipo" value="2" formControlName="tipo">
+                      <input class="form-check-input" type="radio" value="2" formControlName="tipo">
                       <label class="form-check-label" for="byPeriodicity">El </label>
                     </div>                
                   </div>
@@ -78,9 +88,9 @@
                       <div class="row">
                         <div class="col-md-4 mr-2">                    
                             <select id="periodo" class="col-md-2 mr-2 form-control" formControlName="periodo">                    
-                              <option value="primer">Primer</option>
+                              <option value="primero">Primer</option>
                               <option value="segundo">Segundo</option>
-                              <option value="tercer">Tercer</option>
+                              <option value="tercero">Tercer</option>
                               <option value="cuarto">Cuarto</option>
                               <option value="ultimo">Último</option>
                             </select>                       

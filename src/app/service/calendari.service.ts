@@ -4,7 +4,6 @@ import { config } from '../models/config';
 import { Horas } from '../models/horas.model';
 import { Calendario } from '../models/calendario.model.';
 import { Reserva } from '../models/reserva.model';
-import { InsertEvent } from '../models/insertEvent.model';
 import { ErrorEvent } from '../models/errorEvent.model';
 import { Observable } from 'rxjs';
 
@@ -63,44 +62,30 @@ export class CalendariService {
     _sala: string,
     _dia_inici: string,
     _dia_fi: string,
-    _hora_inici: string,
-    _hora_fi: string,
+    _frecuencia: string,
+    _diesSeleccionats: string,
+    _seleccio_mensual: string,
+    _dia_seleccionado: number,
+    _El1: string,
+    _El2: string,
     _import: number,
     _id_user: number,
-    _frecuencia: string,
-    _dom: number,
-    _lun: number,
-    _mar: number,
-    _mie: number,
-    _jue: number,
-    _vie: number,
-    _sab: number,
-    _tipo: number,
-    _dia_mes: number,
-    _el_semana: string,
-    _el_dia: string,
+    _horasAgrupadas: string,
     _complements: string
-  ): Observable<InsertEvent> {
-    return this.http.post<InsertEvent>(this.apiUrl , {
+  ): Observable<Calendario[]> {
+    return this.http.post<Calendario[]>(this.apiUrl , {
       sala: _sala,
       dia_inici: _dia_inici,
       dia_fi: _dia_fi,
-      hora_inici: _hora_inici,
-      hora_fi: _hora_fi,
+      frecuencia: _frecuencia,
+      diesSeleccionats: _diesSeleccionats,
+      seleccio_mensual: _seleccio_mensual,
+      dia_seleccionado: _dia_seleccionado,
+      el_semana: _El1,
+      el_dia: _El2,
       import: _import,
       id_user: _id_user,
-      frecuencia: _frecuencia,
-      dom: _dom,
-      lun: _lun,
-      mar: _mar,
-      mie: _mie,
-      jue: _jue,
-      vie: _vie,
-      sab: _sab,
-      tipo: _tipo,
-      dia_mes: _dia_mes,
-      el_semana: _el_semana,
-      el_dia: _el_dia,
+      horasAgrupadas: _horasAgrupadas,
       complements: _complements,
     });
   }
@@ -116,24 +101,6 @@ export class CalendariService {
     return this.http.get<ErrorEvent[]>(
       this.apiUrl + 'buscarSala/sala/' + _sala + '/diainici/' + _dia_inici + '/diafi/' + _dia_fi + '/horainici/' + _hora_inici + '/horafi/' + _hora_fi
     );
-  }
-
-  grabaFactura(
-    _reserva: number,    
-    _fecha: string,
-    _base: number,
-    _iva: number,
-    _iva_importe: number,
-    _total: number
-  ) {
-    return this.http.put(this.apiUrl + 'factura', {
-      id_reserva: _reserva,      
-      data_factura: _fecha,
-      base: _base,
-      iva: _iva,
-      iva_import: _iva_importe,
-      total_factura: _total,
-    });
   }
 
   deleteEvent(id_event: string) {

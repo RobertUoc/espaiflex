@@ -115,7 +115,8 @@
   <!-- Reserva modal -->
   <app-reserva-modal         
     *ngIf="mostrarReserva"
-    [form]="reservaForm"
+    [form]="reservaForm"    
+    [esMismaFecha]="esMismaFecha"
     [sales]="sales"
     [complements]="complements"
     [miraDia]="mira_dia"

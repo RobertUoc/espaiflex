@@ -16,8 +16,10 @@ import { HoraItem } from '../../../../models/horaItem.model';
 })
 
 export class ReservaModalComponent {
+
   // Entradas
   @Input() form!: FormGroup;
+  @Input() esMismaFecha!: boolean;
   @Input() sales: Sales[] = [];
   @Input() complements: Complements[] = [];
   @Input() miraDia: any[] = [];
@@ -45,8 +47,8 @@ export class ReservaModalComponent {
   @Output() borrar = new EventEmitter<void>();
   @Output() opinion = new EventEmitter<void>();
   @Output() frecuenciaChange = new EventEmitter<void>();
-  @Output() salaChange = new EventEmitter<void>();      
-
+  @Output() salaChange = new EventEmitter<void>();   
+  
 }
 
 

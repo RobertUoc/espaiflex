@@ -18,11 +18,11 @@
           <div class="row">
             <div class="col-md-3 mr-2">               
                 <label>Fecha Incial:</label>                    
-                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial">            
+                <input type="date" class="form-control" id="fechaIncial" formControlName="fechaInicial" (change)="frecuenciaChange.emit()">            
             </div>
             <div class="col-md-3 mr-2">               
                 <label>Fecha Final:</label>                    
-                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal">              
+                <input type="date" class="form-control" id="fechaFinal" formControlName="fechaFinal" (change)="frecuenciaChange.emit()">              
             </div>                        
           </div>
           <div class="row">
@@ -30,17 +30,17 @@
                 <label>Frecuencia:</label>
                 <select class="form-control" id="frecuencia" formControlName="frecuencia" (change)="frecuenciaChange.emit()">
 
- <!-- SOLO cuando es mismo día -->
-  <option *ngIf="esMismaFecha" value="diahoy">
-    Solo hoy
-  </option>
+                    <!-- SOLO cuando es mismo día -->
+                      <option *ngIf="esMismaFecha" value="diahoy">
+                        Solo hoy
+                      </option>
 
-  <!-- SOLO cuando son fechas distintas -->
-  <ng-container *ngIf="!esMismaFecha">
-    <option value="diaria">Cada día</option>
-    <option value="semanal">Una vez a la semana</option>
-    <option value="mensual">Una vez al mes</option>
-  </ng-container>
+                      <!-- SOLO cuando son fechas distintas -->
+                      <ng-container *ngIf="!esMismaFecha">
+                        <option value="diaria">Cada día</option>
+                        <option value="semanal">Una vez a la semana</option>
+                        <option value="mensual">Una vez al mes</option>
+                      </ng-container>
 
                 </select>              
             </div>      
@@ -137,7 +137,7 @@
                       <option value="2">½ hora</option>
                 </select>                                                    
             </div>       
-            <div class="col-md-2 ms-auto" *ngIf="isNew"> 
+            <div class="col-md-1 ms-auto" *ngIf="isNew"> 
               <button type="button" class="btn btn-secondary" (click)="close.emit()">Salir</button>                                             
             </div>
           </div>   
@@ -149,7 +149,7 @@
                     <button
                       class="col-md-2 d-flex p-2 text-white rounded m-1"
                       [ngClass]="col.cssClass"  
-                      [disabled]="!isNew"
+                      [disabled]="!isNew || col.cssClass == 'bg-danger'"
                       (click)="toggleHora.emit(col)">
                       {{ col.hora_inici }}
                     </button>
@@ -180,9 +180,11 @@
                   <div>                    
                     <button *ngIf="isNew" type="button" class="btn btn-primary me-2" 
                             [disabled]="hasError" 
-                            (click)="save.emit()">
-                      Guardar</button>                              
-                    <button *ngIf="!isNew" type="button" class="btn btn-primary me-2"                                                         
+                            (click)="onSave()">
+                      {{ isSaving ? 'Guardando...' : 'Guardar' }}                            
+                      </button>                              
+                    <button *ngIf="!isNew" type="button" class="btn btn-primary me-2"   
+                            [disabled]="!isEnable"                                                                                  
                             (click)="opinion.emit()">
                       Reseñas</button>
                     <button *ngIf="canDelete" type="button" class="btn btn-danger me-2"

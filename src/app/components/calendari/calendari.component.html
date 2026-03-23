@@ -7,6 +7,7 @@
           : 'ms-2 p-2 bg-dark text-warning rounded d-inline-block'">
         <span>{{ usuari }}</span>      
         <i *ngIf="id_usuari !== 0" class="bi bi-person-circle ms-2 cursor-pointer" style="cursor:pointer" (click)="mostrarRegister = true"></i>
+        <i *ngIf="id_usuari === 0" class="bi bi-person-circle ms-2 cursor-pointer" style="cursor:pointer" (click)="mostrarLoginCabecera = true"></i>
       </div>
     </div>
 
@@ -80,7 +81,15 @@
   </div>
 </footer>
 
-  <!-- Modal Login -->
+  <!-- Modal Login Cabecera-->
+  <app-login-modal
+    *ngIf="mostrarLoginCabecera"
+    (logged)="onLoginCabecera($event)"
+    (registrarse)="mostrarRegister = true"
+    (close)="mostrarLoginCabecera = false">
+  </app-login-modal>   
+
+  <!-- Modal Login Peu-->
   <app-login-modal
     *ngIf="mostrarLogin"
     (logged)="onLogin($event)"
@@ -128,6 +137,7 @@
     [altaReserva]="alta_reserva"
     [selectedComplements]="selectedComplements"
     [isNew]="alta_reserva === '0'"
+    [isEnable]="verBoton === '1' "
     [totalPrecio]="preu_sala_total"
     [canDelete]="canDeleteReserva()"
     [hasError]="errorEntrada !== ''"

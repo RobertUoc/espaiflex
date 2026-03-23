@@ -10,7 +10,8 @@ export class Calendario {
         public descripcio: string = '',
         public sala: string = '',
         public start: string = '',
-        public end: string = ''
+        public end: string = '',
+        public id_reserva: string = '',
     ) { }
     
 }

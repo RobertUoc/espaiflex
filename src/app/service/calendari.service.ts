@@ -32,9 +32,9 @@ export class CalendariService {
     );
   }
   
-  getMiraDia(dia: string, sala: number): Observable<Horas[]> {
+  getMiraDia(sala: number, reserva: number): Observable<Horas[]> {
     return this.http.get<Horas[]>(
-      this.apiUrl + 'dia/' + dia + '/sala/' + sala
+      this.apiUrl + 'sala/' + sala + '/reserva/' + reserva
     );
   }
   
@@ -56,6 +56,30 @@ export class CalendariService {
 
   getDia(id: string): Observable<Calendario> {
     return this.http.get<Calendario>(this.apiUrl + 'reserva/' + id);
+  }
+
+  getDisponibilidad(
+    _sala: number,
+    _dia_inici: string,
+    _dia_fi: string,
+    _frecuencia: string,
+    _diesSeleccionats: string,
+    _seleccio_mensual: string,
+    _dia_seleccionado: number,
+    _El1: string,
+    _El2: string,
+  ): Observable<Horas[]> {
+    return this.http.post<Horas[]>(this.apiUrl + 'disponibilidad' , {
+      sala: _sala,
+      dia_inici: _dia_inici,
+      dia_fi: _dia_fi,
+      frecuencia: _frecuencia,
+      diesSeleccionats: _diesSeleccionats,
+      seleccio_mensual: _seleccio_mensual,
+      dia_seleccionado: _dia_seleccionado,
+      el_semana: _El1,
+      el_dia: _El2,
+    });
   }
 
   insertEvent(
@@ -88,19 +112,6 @@ export class CalendariService {
       horasAgrupadas: _horasAgrupadas,
       complements: _complements,
     });
-  }
-
-  buscarInsertDia(
-    _sala: number,
-    _dia_inici: string,
-    _dia_fi: string,
-    _frecuencia: string,
-    _hora_inici: string,
-    _hora_fi: string
-  ): Observable<ErrorEvent[]> {
-    return this.http.get<ErrorEvent[]>(
-      this.apiUrl + 'buscarSala/sala/' + _sala + '/diainici/' + _dia_inici + '/diafi/' + _dia_fi + '/horainici/' + _hora_inici + '/horafi/' + _hora_fi
-    );
   }
 
   deleteEvent(id_event: string) {

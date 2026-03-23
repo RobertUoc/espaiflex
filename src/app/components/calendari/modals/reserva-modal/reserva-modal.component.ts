@@ -31,11 +31,13 @@ export class ReservaModalComponent {
   @Input() altaReserva = '0';
   @Input() selectedComplements: number[] = [];  
   @Input() isNew!: boolean;  
+  @Input() isEnable!: boolean;  
   @Input() totalPrecio = 0;
   @Input() canDelete = false;
   @Input() hasError = false;
   @Input() showReviews = false;
   @Input() erroresConsulta: ErrorEvent[] = [];
+  @Input() isSaving = false;
 
   // Salidas
   @Output() close = new EventEmitter<void>();
@@ -49,6 +51,13 @@ export class ReservaModalComponent {
   @Output() frecuenciaChange = new EventEmitter<void>();
   @Output() salaChange = new EventEmitter<void>();   
   
+  onSave() {
+    if (this.isSaving) return;
+
+    this.isSaving = true;
+    this.save.emit();
+  }
+
 }
 
 

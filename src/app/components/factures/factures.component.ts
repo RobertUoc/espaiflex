@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Factures } from '../../models/factura.model';
+import { FacturaDetalle, Factures } from '../../models/factura.model';
 import { Chart } from 'chart.js/auto';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -24,7 +24,7 @@ export class FacturesComponent implements OnInit
     public paginaActual: number = 1
     public grafico!: Chart;    
     public facturaSeleccionada?: Factures;
-    public facturaDetalle?: Factures;
+    public facturaDetalle?: FacturaDetalle;
 
     public anios: number[] = [];
     public meses = [
@@ -69,6 +69,7 @@ export class FacturesComponent implements OnInit
 
     verFactura(id: number) {
       this.facturesService.getFactura(id).subscribe(data => {
+        console.log(data);
         this.facturaDetalle = data;
         this.modalVisible = true;
         console.log('ver');

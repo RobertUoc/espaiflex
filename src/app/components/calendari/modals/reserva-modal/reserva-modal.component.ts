@@ -24,8 +24,7 @@ export class ReservaModalComponent {
   @Input() complements: Complements[] = [];
   @Input() miraDia: any[] = [];
   @Input() mostrarHourGrid = false;
-  @Input() mostrarPeu = false;
-  @Input() preuTotal = 0;
+  @Input() mostrarPeu = false;  
   @Input() errorEntrada = '';
   @Input() missatge = '';
   @Input() altaReserva = '0';
@@ -33,6 +32,9 @@ export class ReservaModalComponent {
   @Input() isNew!: boolean;  
   @Input() isEnable!: boolean;  
   @Input() totalPrecio = 0;
+  @Input() totalParcial = 0;
+  @Input() preuTotal = 0;
+  @Input() totalDias = 0;
   @Input() canDelete = false;
   @Input() hasError = false;
   @Input() showReviews = false;

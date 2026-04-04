@@ -97,9 +97,11 @@ export class CalendariComponent implements OnInit {
     {};
   public preu_sala: number = 0;
   public preu_sala_total: number = 0;
+  public preu_sala_parcial: number = 0;
   public horari: number = 1;
   public selectedComplements: number[] = [];
   public verResenas: boolean = false;
+  public totalParcial: number = 0;
   public totalPrecio: number = 0;
   public isSaving: boolean = true;
   public eventos = signal([
@@ -121,6 +123,7 @@ export class CalendariComponent implements OnInit {
   getInSiteForm: any;
 
   id_edifici: number = 0;
+  public dias_contar = 1;
   public mostrarRegister = false;
   public mostrarLogin = false;
   public mostrarLoginCabecera = false;
@@ -323,6 +326,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarHourGrid = false;
     this.mostrarPeu = false;
     this.agrupado = {};    
+    this.dias_contar = 1;
     // Reset Campos
     this.reservaForm.get('sala_reserva')?.reset();  
     this.isSaving = true;
@@ -347,6 +351,7 @@ export class CalendariComponent implements OnInit {
     this.mostrarPeu = false;
     this.agrupado = {};
     this.preu_sala_total = 0;
+    this.preu_sala_parcial = 0;
   }
 
   creaHorari(data: Horas[]) {
@@ -411,9 +416,7 @@ export class CalendariComponent implements OnInit {
     let seleccio_mensual = this.reservaForm.get('mensualidad.tipo')?.value;
     let dia_seleccionado = this.reservaForm.get('mensualidad.numeroDia')?.value;
     let El1 = this.reservaForm.get('mensualidad.periodo')?.value;
-    let El2 = this.reservaForm.get('mensualidad.diaSemana')?.value;
-    
-    console.log(this.sala_reserva);
+    let El2 = this.reservaForm.get('mensualidad.diaSemana')?.value;    
     
     if (this.alta_reserva == '0') {
       this.calendariService.getDisponibilidad(this.sala_reserva,fechaInicial,fechaFinal,frecuencia,diesSeleccionats,
@@ -421,6 +424,7 @@ export class CalendariComponent implements OnInit {
         next: (data) => {
           console.log(data);
           this.creaHorari(data);
+          this.dias_contar = data[0].contardias;          
         },
         error: (error) => {
           console.log(error);
@@ -542,6 +546,7 @@ export class CalendariComponent implements OnInit {
         this.reservaForm.get('sala_reserva')?.disable();
         this.reservaForm.get('mensualidad')?.disable();
         this.preu_sala_total = +dia_reserva.import_sala;
+        this.preu_sala_parcial = 0;
         this.max_sala = dia_reserva.max_ocupacio;
         this.horari = Number(dia_reserva.horari);
         this.missatge = dia_reserva.missatge;
@@ -573,6 +578,7 @@ export class CalendariComponent implements OnInit {
         this.mostrarPeu = true;
         this.selectedComplements = [];
         this.selectedComplements = this.reservas.map((r) => +r.id_complements);
+        this.preu_sala_parcial = parseFloat(dia_reserva.preu_sala);
         this.preu_sala_total = parseFloat(dia_reserva.preu_sala);
 
     this.calendariService
@@ -585,10 +591,9 @@ export class CalendariComponent implements OnInit {
           this.preu_sala = this.sales.find((item) => item.id == this.sala_reserva)?.preu ?? 0;
           this.getcomplement(this.sala_reserva);
           this.checkboxes.forEach((checkbox, i) => {});
-          this.mostrarHourGrid = true;
-          console.log('final');          
-          this.recalcularPrecio();
-          console.log(this.reservas);
+          this.mostrarHourGrid = true;                  
+          this.recalcularPrecio();          
+          this.preu_sala_parcial = parseFloat(this.reservas[0].preu_sala);
           this.preu_sala_total = parseFloat(this.reservas[0].preu_sala);
           this.mostrarPeu = true;
           console.log('Lectura Ok');
@@ -774,8 +779,7 @@ export class CalendariComponent implements OnInit {
       ranges.push({ inicio: start, final: end });
     }   
     // Horas agrupadas
-    let HorasAgrupadas = JSON.stringify(ranges);
-    console.log(HorasAgrupadas);
+    let HorasAgrupadas = JSON.stringify(ranges);    
 
     if ((frecuencia == 'diahoy')||(frecuencia == 'diaria')||(frecuencia == 'mensual')) {
       let matriuDias: number[] = [0,0,0,0,0,0,0];
@@ -807,6 +811,10 @@ export class CalendariComponent implements OnInit {
     this.verBoton = '2';
     this.isSaving = false;
 
+    console.log(HorasAgrupadas);
+    console.log(this.dias_contar);
+    console.log(this.preu_sala);
+
     this.calendariService
       .insertEvent(
         String(this.sala_reserva),
@@ -821,6 +829,8 @@ export class CalendariComponent implements OnInit {
         this.preu_sala_total,
         this.id_usuari,
         HorasAgrupadas,
+        this.dias_contar,
+        this.preu_sala_parcial,
         complements
       )
       .subscribe({
@@ -959,7 +969,8 @@ export class CalendariComponent implements OnInit {
     ).length;
     if (hihabtn > 0) {
       this.mostrarPeu = true;
-      this.preu_sala_total = +this.preu_sala * hihabtn;
+      this.preu_sala_total = +this.preu_sala * hihabtn * this.dias_contar;
+      this.preu_sala_parcial = +this.preu_sala * hihabtn * this.dias_contar;
       this.checkboxes.forEach((checkbox, i) => {
         if (checkbox.nativeElement.checked) {
           total += this.complements[i].preu;
@@ -974,7 +985,8 @@ export class CalendariComponent implements OnInit {
     const horasSeleccionadas = this.mira_dia
       .flatMap(d => d.items)
       .filter((h: HoraItem) => h.seleccionada);    
-    this.preu_sala_total = horasSeleccionadas.length * this.preu_sala;   
+    this.preu_sala_total = horasSeleccionadas.length * this.preu_sala * this.dias_contar;
+    this.preu_sala_parcial = horasSeleccionadas.length * this.preu_sala * this.dias_contar;
     let totalComplementos:number = 0;  
     for (const id of this.selectedComplements) {
       const comp = this.complements.find(c => +c.id === id);

@@ -54,16 +54,20 @@
                 </div>
                 <!-- BODY -->
                 <div class="card-body p-2">
-                  <p class="mb-1 small">
-                    <strong>Horario:</strong>
-                    {{ sala.horari==1?'1 hora':'½ hora' }}
-                    <strong>Capacidad:</strong>
-                    {{ sala.max_ocupacio }}
-                  </p>
-                  <p class="mb-2 text-muted small">
-                    <i class="bi bi-calendar-event me-1"></i>
-                    {{ sala.reservas_mes }} reservas
-                  </p>
+                  <div>
+                    <p class="mb-2 small">
+                      <strong>Horario:</strong>
+                      {{ sala.horari==1?'1 hora':'½ hora' }}
+                    </p>
+                    <p class="mb-2 small">
+                      <strong>Capacidad:</strong>
+                      {{ sala.max_ocupacio }}
+                    </p>
+                    <p class="mb-3 text-muted small">
+                      <i class="bi bi-calendar-event me-1"></i>
+                      {{ sala.reservas_mes }} reservas
+                    </p>
+                  </div>                  
                   <div class="d-grid">
                     <button type="button" class="btn btn-sm btn-outline-primary" (click)="getSala(sala.id)">Ver sala</button>
                   </div>
@@ -73,10 +77,16 @@
           }
         </div>
       </div>
-      <div class="col-auto d-flex align-items-start">
-        <button type="button" class="btn btn-primary" (click)="reserva(true)" *ngIf="id_usuari !== 0"> <i class="bi bi-plus-lg me-1"></i>Nueva Reserva</button>
-        <button type="button" class="btn btn-primary" (click)="mostrarLogin = true" *ngIf="id_usuari === 0"><i class="bi bi-plus-lg me-1"></i>Nueva Reserva</button>
+      <div  class="w-100 mt-3" style="max-width: 240px;">
+        <div class="card h-100 shadow-sm d-flex align-items-center justify-content-center text-center action-card" (click)="id_usuari !== 0 ? reserva(true) : mostrarLogin = true">
+          <div>
+            <i class="bi bi-plus-lg fs-2 mb-2"></i>
+            <h6 class="fw-bold mb-1">Nueva reserva</h6>
+            <small>Crear nueva reserva</small>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 </footer>
@@ -138,7 +148,9 @@
     [selectedComplements]="selectedComplements"
     [isNew]="alta_reserva === '0'"
     [isEnable]="verBoton === '1' "
+    [totalParcial]="preu_sala_parcial"
     [totalPrecio]="preu_sala_total"
+    [totalDias]="dias_contar"
     [canDelete]="canDeleteReserva()"
     [hasError]="errorEntrada !== ''"
     [showReviews]="verResenas"

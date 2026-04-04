@@ -174,7 +174,8 @@
 
             <div class="container mt-3" *ngIf="mostrarPeu">
               <div *ngIf="mostrarPeu">    
-                <h1 class="text-end">Precio {{ totalPrecio | PipePreu }}</h1>   
+                <h6 *ngIf="isNew" class="text-end">Precio x {{totalDias }} {{ totalDias > 1 ? 'Días' : 'Día' }} {{ totalParcial | PipePreu }}</h6>   
+                <h1 class="text-end">Precio TOTAL {{ totalPrecio | PipePreu }}</h1>   
                 <hr>                  
                 <div class="d-flex">                  
                   <div>                    

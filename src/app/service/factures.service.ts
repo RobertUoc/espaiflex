@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { FacturaMes } from '../models/factura.model';
+import { FacturaDetalle, FacturaMes } from '../models/factura.model';
 import { FacturaDia } from '../models/factura.model';
 import { Factures } from '../models/factura.model';
 import { config } from '../models/config';
@@ -36,12 +36,13 @@ export class FacturesService {
   }  
 
   getFactura(id: number) {
-    return this.http.get<Factures>(`${this.apiUrl}/${id}`);
+    return this.http.get<FacturaDetalle>(`${this.apiUrl}/${id}`);
   }
 
   enviarFacturaEmail(id: number) {
     return this.http.post(`${this.apiUrl}/${id}/email`, {}
   );
+  
 }
 
 }

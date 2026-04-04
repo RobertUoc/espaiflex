@@ -95,8 +95,10 @@ export class CalendariService {
     _import: number,
     _id_user: number,
     _horasAgrupadas: string,
-    _complements: string
-  ): Observable<Calendario[]> {
+    _dias: number,
+    _precio: number,
+    _complements: string,
+  ): Observable<Calendario[]> {    
     return this.http.post<Calendario[]>(this.apiUrl , {
       sala: _sala,
       dia_inici: _dia_inici,
@@ -110,6 +112,8 @@ export class CalendariService {
       import: _import,
       id_user: _id_user,
       horasAgrupadas: _horasAgrupadas,
+      dias: _dias,
+      precio_dia: _precio,
       complements: _complements,
     });
   }
@@ -119,4 +123,5 @@ export class CalendariService {
       this.apiUrl + 'delete_event/' + id_event
     );
   }
+
 }

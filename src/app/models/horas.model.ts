@@ -5,7 +5,8 @@ export class Horas {
         public descripcio: string = '',
         public hora_inici: string = '',
         public estado: string = '',
-        public tipus: string = '1'
+        public tipus: string = '1',
+        public contardias : number = 0
     ) { }
     
 }

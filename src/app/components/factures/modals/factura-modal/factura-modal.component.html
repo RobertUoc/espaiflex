@@ -20,7 +20,52 @@
               <h6 class="fw-semibold">Sala</h6>
               <p class="mb-1">{{ factura.nom_sala }}</p>
             </div>
+            <div class="col-md-6">
+              <h6 class="fw-semibold">Fecha</h6>
+              <p class="mb-1">{{ factura.data_factura | PipeFecha }}</p>
+            </div>
           </div>
+
+
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Dias </th>
+                    <th class="text-end">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ factura.dias }}</td>
+                    <td class="text-end">{{ factura.precio_dia | PipePreu }} €</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        <div class="row mb-4" *ngIf="factura.complements.length > 0">
+          <div class="col-md-12">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Complementos</th>
+                  <th class="text-end">Precio</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of factura.complements">
+                  <td>{{ c?.nombre }}</td>
+                  <td class="text-end">{{ c.precio | PipePreu }} €</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
           <table class="table table-sm">
             <tbody>
               <tr>
@@ -37,6 +82,7 @@
               </tr>
             </tbody>
           </table>
+
         </div>
         <div class="modal-footer">          
           <button type="button" class="btn btn-outline-secondary" (click)="tancarModal()">Cerrar</button>

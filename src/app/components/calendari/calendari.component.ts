@@ -917,11 +917,12 @@ export class CalendariComponent implements OnInit {
   }
 
   guardarOpinion() {
+    console.log(this.usuari);
     this.verResenas = false;
     let puntuacion = this.reservaForm.get('puntuacion')?.value;
     let opinion = this.reservaForm.get('opinion')?.value;
     this.comentariService
-      .insertComentari(this.alta_reserva, this.id_usuari, opinion, puntuacion)
+      .insertComentari(this.alta_reserva, this.id_usuari, opinion, puntuacion, this.usuari)
       .subscribe((response) => {
         console.log(response);
       });

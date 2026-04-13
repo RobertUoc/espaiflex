@@ -28,13 +28,13 @@ export class ComentariService {
       comentari: string,
       puntuacio: number,
       nom:string
-    ) {
+    ) {      
       return this.http.post(this.apiUrl, {
         id_reserves,
         id_user,
+        nom,
         comentari,
         puntuacio, 
-        nom
       });
   }
 

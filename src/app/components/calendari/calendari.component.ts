@@ -916,8 +916,7 @@ export class CalendariComponent implements OnInit {
     this.verResenas = false;
   }
 
-  guardarOpinion() {
-    console.log(this.usuari);
+  guardarOpinion() {    
     this.verResenas = false;
     let puntuacion = this.reservaForm.get('puntuacion')?.value;
     let opinion = this.reservaForm.get('opinion')?.value;

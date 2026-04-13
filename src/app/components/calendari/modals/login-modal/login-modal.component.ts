@@ -27,32 +27,36 @@ export class LoginModalComponent {
 
   constructor(private usersService: UsersService, private authService: AuthService) {}
 
+
     onLoginSubmit() {
-    this.loginError = '';
-    this.authService.loginUser(
-      this.loginData.email,
-      this.loginData.password
-    ).subscribe({
-      next: (response) => {        
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('role', response.user.role);
-        localStorage.setItem('userId', response.user.id.toString());
-        const userModel = new Users(
-          response.user.id,
-          response.user.name,
-          response.user.email,
-          '', 
-          'user' 
-        );
-        this.logged.emit(userModel);
-        this.close.emit();
-      },
-      error: (err) => {
-        if (err.status === 401) {
-          this.loginError = 'Correo o contraseña incorrectos';
+      console.log(localStorage);
+      this.loginError = '';
+      this.authService.loginUser(
+        this.loginData.email,
+        this.loginData.password
+      ).subscribe({
+        next: (response) => {        
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('role', response.user.role);
+          localStorage.setItem('userId', response.user.id.toString());
+          localStorage.setItem('user', 'user');     
+          const userModel = new Users(
+            response.user.id,
+            response.user.name,
+            response.user.email,
+            '', 
+            'user' 
+          );
+          console.log(localStorage);
+          this.logged.emit(userModel);
+          this.close.emit();
+        },
+        error: (err) => {
+          if (err.status === 401) {
+            this.loginError = 'Correo o contraseña incorrectos';
+          }
         }
-      }
-    });
+      });
   }  
 
 }

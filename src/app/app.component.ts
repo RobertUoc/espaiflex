@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { config } from './models/config';
+import { AuthService } from './service/auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -10,4 +12,23 @@ import { config } from './models/config';
 })
 export class AppComponent {
   title = config.title;
+
+constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.loginVisitant();
+  }
+
+  loginVisitant() {
+    this.authService.login('visitant@admin.com', '654321').subscribe({
+      next: (response) => {
+        console.log('ok');
+      },
+      error: (err) => {
+        console.error('Error en login visitante', err);
+      }
+    });
+  }
+
+
 }

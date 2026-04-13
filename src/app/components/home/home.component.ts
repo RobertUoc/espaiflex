@@ -6,6 +6,7 @@ import { NgIf, NgFor } from '@angular/common';
 import { EdificisService } from '../../service/edificis.service';
 import * as L from 'leaflet';
 import { Edificis } from '../../models/edificis.model';
+import { AuthService } from '../../service/auth.service';
 
 interface Edifici {
   provincia: string;
@@ -37,9 +38,10 @@ export class HomeComponent implements OnInit {
   private map:any;
   private userMarker: L.Marker<any> | undefined;
   
-  constructor(private router : Router, private EdificisServeis: EdificisService) {}
+  constructor(private authService: AuthService, private router : Router, private EdificisServeis: EdificisService) {}
   
   ngOnInit() {    
+    this.loginVisitant();
     this.getEdificis(); 
   }
 
@@ -133,5 +135,15 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/calendari/' + id_edifici]);
   }
 
+  loginVisitant() {
+    this.authService.login('visitant@admin.com', '654321').subscribe({
+      next: (response) => {
+        console.log('ok');
+      },
+      error: (err) => {
+        console.error('Error en login visitante', err);
+      }
+    });
+  }
 
 }

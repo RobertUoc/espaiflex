@@ -42,6 +42,7 @@ import { LoginModalComponent } from './modals/login-modal/login-modal.component'
 import { MostrarDiaModalComponent } from './modals/mostrar-dia-modal/mostrar-dia-modal.component';
 import { SalaModalComponent } from './modals/sala-modal/sala-modal.component';
 import { ReservaModalComponent } from './modals/reserva-modal/reserva-modal.component';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-calendari',
@@ -170,6 +171,7 @@ export class CalendariComponent implements OnInit {
   currentEvents = signal<EventApi[]>([]);
 
   constructor(
+    private authService: AuthService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -993,8 +995,7 @@ export class CalendariComponent implements OnInit {
       if (comp) { 
         totalComplementos += +comp.preu; 
       }
-    }  
-    console.log(totalComplementos);
+    }      
     this.preu_sala_total += totalComplementos;  
     this.mostrarPeu = horasSeleccionadas.length > 0;
   }

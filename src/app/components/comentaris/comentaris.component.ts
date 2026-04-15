@@ -33,6 +33,7 @@ export class ComentarisComponent implements OnInit {
 
   private loadComentarios(): void {
     this.comentariService.getComentarios().subscribe((data) => {
+      console.log(data);
       this.comentarios = data.sort((a, b) => {
         if (a.nom === b.nom) {
           return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();

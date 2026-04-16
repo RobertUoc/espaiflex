@@ -850,6 +850,7 @@ export class CalendariComponent implements OnInit {
             textColor: '#000000',
             allDay: data[i].dia_inici == data[i].dia_fi ? true : false,
           });
+          console.log(data[i].id);
         }
         this.eventos.set(nuevosInsert);        
         console.log('ok');
@@ -857,6 +858,18 @@ export class CalendariComponent implements OnInit {
         this.isSaving = true;     
         },
         error: (err) => {
+          Swal.fire({
+            title: 'Atención!!!',
+            text: 'Esta tramo esta ocupado ' + err.error.detalle.hora_inici + ' a ' + err.error.detalle.hora_fi,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ok',
+          }).then((result) => {
+            this.isSaving = true; 
+            // Refrescar
+            this.carregaDies();
+            this.tancarSala();
+          });
           console.error('Error', err);
           console.log(err.error);
         },

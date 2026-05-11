@@ -72,6 +72,30 @@
                 <option value="NO">Inactivo</option>
               </select>
             </div>
+
+            <div class="mb-3">
+
+  <label class="form-label">
+    Buscar dirección
+  </label>
+
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="direccionBusqueda"
+                name="direccionBusqueda"
+                placeholder="Ej: Rambla Sant Jordi 42, Lleida">
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                (click)="buscarDireccion()">
+                <i class="bi bi-search"></i>
+                Buscar
+              </button>
+            </div>
+          </div>
+
             <div class="col-6 col-md-3">
               <label class="form-label">Latitud</label>
               <input type="number" step="any" class="form-control"  [(ngModel)]="edificioSeleccionado.latitud" name="latitud" required #latField="ngModel" [class.is-invalid]="latField.invalid && latField.touched">

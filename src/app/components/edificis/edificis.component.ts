@@ -6,7 +6,7 @@ import { ProvinciesService } from '../../service/provincies..service';
 import { FormsModule } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import e from 'cors';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-edificis',
@@ -26,6 +26,11 @@ export class EdificisComponent implements OnInit {
   public base64: string = '';
   public imagenBase64: string = '';
   public previewUrl: string = '';  
+
+  direccionBusqueda = '';
+
+map: any;
+marker: any;
 
   constructor(private EdificisServeis: EdificisService, private ProvinciesServies: ProvinciesService, private http: HttpClient) { }
 
@@ -135,4 +140,55 @@ export class EdificisComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+ngAfterViewInit(): void {
+
+  this.map = L.map('map').setView([41.6176, 0.6200], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(this.map);
+
+}
+
+buscarDireccion() {
+
+  if (!this.direccionBusqueda) {
+    return;
+  }
+
+  fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.direccionBusqueda)}`
+  )
+  .then(res => res.json())
+  .then(data => {
+
+    if (!data || data.length === 0) {
+      alert('Dirección no encontrada');
+      return;
+    }
+
+    const lugar = data[0];
+
+    const lat = parseFloat(lugar.lat);
+    const lon = parseFloat(lugar.lon);
+
+    // Guardar coordenadas
+    this.edificioSeleccionado.latitud = lat;
+    this.edificioSeleccionado.longitud = lon;
+
+    // Mover mapa
+    this.map.setView([lat, lon], 16);
+
+    // Eliminar marker anterior
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
+
+    // Nuevo marker
+    this.marker = L.marker([lat, lon])
+      .addTo(this.map);
+
+  });
+
+}  
 }

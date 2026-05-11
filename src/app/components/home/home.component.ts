@@ -37,18 +37,28 @@ export class HomeComponent implements OnInit {
   mostrarModal: boolean = false;
   private map:any;
   private userMarker: L.Marker<any> | undefined;
+  geoDisponible: boolean = true;
+  defaultCoords: [number, number] = [41.6176, 0.6200];
   
   constructor(private authService: AuthService, private router : Router, private EdificisServeis: EdificisService) {}
   
   ngOnInit() {    
     this.loginVisitant();
-    this.getEdificis(); 
+    this.getEdificis();    
   }
 
   private initMap() {
-    this.map = L.map('map').setView([41.6176, 0.6200], 13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-  
+   this.map = L.map('map').setView(this.defaultCoords, 13);
+    L.tileLayer(
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution: '&copy; OpenStreetMap'
+      }
+    ).addTo(this.map);    
+    L.marker(this.defaultCoords, { icon: customIcon })
+      .addTo(this.map)
+      .bindPopup('Ubicació predeterminada')
+      .openPopup();
   }
 
   ngAfterViewInit() {
@@ -86,30 +96,43 @@ export class HomeComponent implements OnInit {
 
   getLocalizacion() {
       if (navigator.geolocation) {
-        const myIcon = L.icon({
-          iconUrl:'../../../assets/marker.png', 
-          iconSize: [ 25,41 ]
-        });
-        navigator.geolocation.getCurrentPosition((position) => {
-          const coords:[number,number] = [position.coords.latitude, position.coords.longitude];
-          if (this.userMarker) { 
-            this.userMarker = L.marker(coords); } else { this.userMarker = L.marker(coords, { icon: myIcon, draggable:true })
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords: [number, number] = [
+              position.coords.latitude,
+              position.coords.longitude
+            ];
+            const myIcon = L.icon({
+              iconUrl: 'assets/marker.png',
+              iconSize: [25, 41]
+            });            
+            if (this.userMarker) {
+              this.map.removeLayer(this.userMarker);
+            }
+            this.userMarker = L.marker(coords, {
+              icon: myIcon,
+              draggable: true
+            })
             .addTo(this.map)
-            .bindPopup('Estas Aqui')
+            .bindPopup('Estàs aquí')
             .openPopup();
-
-            this.userMarker.on('dragend', (event) => {
+            this.userMarker.on('dragend', (event: any) => {
               const marker = event.target;
               const position = marker.getLatLng();
               marker.setLatLng(position).openPopup();
-              this.map.setView(position,19);
-              console.log(position);
-            })
+              this.map.setView(position, 16);
+            });
+            this.map.setView(coords, 16);
+            this.geoDisponible = true;
+          },
+          (error) => {
+            console.log('Geolocalització no disponible', error);
+            this.geoDisponible = false;            
+            this.map.setView(this.defaultCoords, 13);
           }
-          this.map.setView(coords, 19);
-      }, () => {
-          console.log('No lo encuentro');
-        });
+        );
+      } else {
+        this.geoDisponible = false;
       }
   }
 

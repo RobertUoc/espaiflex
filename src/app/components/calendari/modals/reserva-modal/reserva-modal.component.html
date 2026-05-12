@@ -179,23 +179,24 @@
                 <hr>                  
                 <div class="d-flex">                  
                   <div>                    
-                    <button *ngIf="isNew" type="button" class="btn btn-primary me-2" 
-                            [disabled]="hasError" 
-                            (click)="onSave()">
-                      {{ isSaving ? 'Guardando...' : 'Guardar' }}                            
-                      </button>                              
+                    <button type="button" class="btn btn-secondary me-2" 
+                            (click)="close.emit()">
+                      {{ isNew ? 'Salir' : 'Cancelar' }}
+                    </button>
                     <button *ngIf="!isNew" type="button" class="btn btn-primary me-2"   
                             [disabled]="!isEnable"                                                                                  
-                            (click)="opinion.emit()">
-                      Reseñas</button>
+                            (click)="opinion.emit()">Reseñas
+                    </button>
                     <button *ngIf="canDelete" type="button" class="btn btn-danger me-2"
-                            (click)="borrar.emit()">
-                      Borrar</button>                    
+                            (click)="borrar.emit()">Borrar
+                    </button>                    
                   </div>                            
                   <div class="ms-auto">
-                    <button type="button" class="btn btn-secondary" 
-                            (click)="close.emit()">
-                      {{ isNew ? 'Salir' : 'Cancelar' }}</button>
+                      <button *ngIf="isNew" type="button" class="btn btn-primary me-2" 
+                            [disabled]="hasError" 
+                            (click)="onSave()">
+                            {{ isSaving ? 'Guardando...' : 'Guardar' }}                            
+                      </button>                              
                   </div>
                 </div>      
               </div>

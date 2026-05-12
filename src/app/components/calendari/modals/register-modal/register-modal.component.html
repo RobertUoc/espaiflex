@@ -89,8 +89,8 @@
           </div>
           <hr> 
           <div class="d-flex justify-content-between mb-2">
-              <button type="submit" class="btn btn-outline-primary" [disabled]="!Registreform.valid || !passwordsMatch()">{{ !isUpdate() ? 'Registrarse' : 'Actualizarse' }}</button>
               <button type="button" class="btn btn-outline-secondary" (click)="close.emit()">Salir</button>                                                           
+              <button type="submit" class="btn btn-outline-primary" [disabled]="!Registreform.valid || !passwordsMatch()">{{ !isUpdate() ? 'Registrarse' : 'Actualizarse' }}</button>
           </div>
           <div *ngIf="getError('email')" class="text-danger mt-1">
             {{ getError('email') }}
